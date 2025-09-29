@@ -9,15 +9,14 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 1. **Prerequisites**
    - Node.js 20+
    - npm 10+
+   - typescript as required in package.json
+   - vscode or other editors that support ts/eslint/prettier
+   - make sure `eslint`, `auto-format` and `commit-lint` all work
 
-2. **Install Dependencies**
+2. **Setup**
    ```bash
    npm install
-   ```
-
-3. **Development Commands**
-   ```bash
-   npm start          # Start documentation site
+   npm start          # Start demo and documentation site
    ```
 
 ### Project Structure
@@ -79,14 +78,23 @@ This project has **two separate parts**:
 - Follow existing naming conventions
 - Write meaningful commit messages
 - Keep functions small and focused
-- Add JSDoc comments for public APIs
+- Add JSDoc for public APIs
+
+### ✨ AI coder/copilot
+
+- It's **recommended** to heavily rely on AI when maintaining **the webpages and tests**.
+- BUT **NOT the core lib!!!** Be very careful if AI touched any code in the core lib.
+- Review anything AI wrote before make a commit. You are the author of anything you commit. NOT AI.
+- Update the AI instructions.
+   - Cursor and Cline: `./.cursor/rules`
+   - Github Copilot: `./.github/copilot-instructions.md`
+   - Claude Code: `./CLAUDE.md`
 
 ### Core Library (`src/`)
 
 - **No React dependencies** - Pure JavaScript/TypeScript only
 - Use event bus for component communication
 - Follow browser-use patterns for DOM operations
-- Maintain compatibility with CDN injection
 
 ### Documentation Site (`pages/`)
 
@@ -97,7 +105,13 @@ This project has **two separate parts**:
 
 ## 🔧 Development Workflows
 
-### Library Development
+### Website Development
+
+```bash
+npm start                # React development server
+```
+
+### Core Lib Development and Testing
 
 - Config your LLM API
 - Start a local script
@@ -109,11 +123,7 @@ This project has **two separate parts**:
    javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5173/dist/lib/page-agent.umd.cjs?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
    ```
 
-### Website Development
 
-```bash
-npm start                # React development server
-```
 
 ### Adding Documentation
 
@@ -143,7 +153,7 @@ We especially welcome contributions in:
 
 By contributing to this project, you agree that your contributions will be licensed under the MIT License.
 
-You may need to sign a github CLA before you create a PR.
+> You may need to sign a github CLA before you create a PR.
 
 ### Browser-Use Attribution
 
