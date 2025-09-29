@@ -10,7 +10,7 @@ const __dirname = dirname(__filename)
 // Library build configuration
 export default defineConfig({
 	plugins: [
-		dts({ tsconfigPath: './tsconfig.lib.json' }),
+		dts({ tsconfigPath: './tsconfig.lib.json', bundleTypes: true }),
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
 	],
 	resolve: {
