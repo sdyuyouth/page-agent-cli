@@ -1,0 +1,21 @@
+.syntax {
+	white-space: pre-wrap;
+	word-break: break-word;
+	overflow-wrap: break-word;
+	font-family: monospace;
+}
+
+.keyword {
+	color: #d73a49;
+	font-weight: 600;
+}
+.string {
+	color: #1d6eca;
+}
+.number {
+	color: #00c583;
+}
+.comment {
+	color: #6a737d;
+	font-style: italic;
+}

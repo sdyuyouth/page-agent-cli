@@ -1,0 +1,67 @@
+---
+alwaysApply: true
+---
+### Project structure and navigation map
+
+- **Library entry (CDN/UMD)**: Public script entry is `src/entry.ts`. It attaches `PageAgent` to `window` and auto-initializes if injected via a `<script>` tag. Library build outputs to `dist/lib/` with file name `page-agent.*`.
+
+- **Main Page entry**: `pages/main.tsx` mounts a `wouter` `Router` with `useHashLocation`. Routes delegate to:
+  - `pages/router.tsx` for docs/marketing pages
+  - `pages/test-pages/router.tsx` for internal test pages under `#/test-pages`
+
+- **Docs layout**: Use `pages/components/DocsLayout.tsx` for all docs pages. When adding a new doc page, add it to:
+  - the navigation in `DocsLayout.tsx`, and
+  - the switch in `pages/router.tsx` with `<Header /> + <DocsLayout>...` wrapper
+
+- **Hash routing**: Always use hash routes (e.g. `#/docs/...`). The `Router` is created as:
+  - `createRoot(...).render(<Router hook={useHashLocation}> ...)`
+  - Base URL in dev is `/`; otherwise computed relative to `index.html`. Do not change `vite.config.ts` base from `./` without updating `pages/main.tsx`.
+
+- **Aliases**: Use `@/` as alias for `src/` and `@pages/` as alias for `pages/` (set in both Vite configs). Prefer absolute alias imports over deep relative chains.
+
+- **Styling**: Tailwind v4 is enabled via `@tailwindcss/vite`. Use semantic utility classes; avoid ad‑hoc inline styles.
+
+- **Do not edit generated files**: Never edit anything under `dist/`. Add sources under `src/` and let builds emit artifacts.
+
+- **Event bus**: Type-safe event system for decoupling components, primarily used for PageAgent-UI communication.
+
+### Conventions
+
+- **Routing (wouter)**:
+  - Prefer `<Route path="/segment" component={Page} />` for simple pages; use children form when wrapping with layout.
+  - Keep 404 as the final catch‑all `Route` in `pages/router.tsx`.
+  - For test pages, mount under `#/test-pages` only.
+
+- **Docs pages**: Place in `pages/docs/**/page.tsx`. Export a default React component. Pages are rendered inside `DocsLayout` and must be linked in the sidebar.
+
+- **Typescript**:
+  - TS strict is enabled; however, ESLint relaxes many unsafe rules for DX. Keep exported/public APIs typed explicitly.
+  - JSX runtime is `react-jsx` (React 19).
+
+- **Global objects**: The library exposes `window.PageAgent` and `window.pageAgent`. Guard re‑injection by disposing `window.pageAgent` before re‑creating, as done in `src/entry.ts`.
+
+### Core modules (src/)
+
+- **PageAgent.ts**: Core agent implementation and public API
+- **entry.ts**: Library entry point for CDN/UMD usage
+- **config/**: Configuration constants and settings management
+- **tools/**: Agent tool implementations for web actions and page manipulation
+- **ui/**: User interface components (Panel, SimulatorMask, etc.) for agent visualization
+- **llms/**: LLM integration and communication layer
+- **dom/**: HTML serialization, page analysis utilities, and DOM manipulation helpers
+- **utils/**: Shared utilities including the type-safe event bus system
+- **patches/**: Framework-specific optimizations and compatibility fixes (React, Antd, etc.)
+- **prompts/**: System prompts and LLM instruction templates
+- **i18n/**: Internationalization and language support
+
+### Site structure (pages/)
+
+- **pages/**: Documentation site and marketing pages
+- **pages/test-pages/**: Demo pages for testing agent capabilities
+
+### When adding features
+
+- New docs page: create `pages/docs/<section>/<slug>/page.tsx`, add route and sidebar link.
+- New tool: implement under `src/tools/`, export via `src/tools/index.ts`, wire into `PageAgent` if needed.
+- Visual tweaks: edit under `src/ui/` and keep styles in colocated CSS modules.
+

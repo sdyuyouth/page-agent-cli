@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient id="g1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#58C0FC" />
+			<stop offset="1" stop-color="#BD45FB" />
+		</linearGradient>
+	</defs>
+	<rect x="4" y="4" width="56" height="56" rx="14" fill="url(#g1)" />
+	<text x="32" y="36" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="42"
+		font-weight="bold" fill="#fff" dominant-baseline="middle">P</text>
+</svg>

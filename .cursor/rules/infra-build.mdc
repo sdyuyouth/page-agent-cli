@@ -1,0 +1,27 @@
+---
+globs: *.ts,*.tsx,*.js,*.cjs,*.mjs
+description: Build, lint, and env guidance for this repo
+---
+### Build and env
+
+- **Dev**: `npm run dev` starts Vite with base `./` and React SWC, Tailwind v4 plugin. Hash routing is required; use `useHashLocation`.
+- **App build**: `npm run build` runs TypeScript build then Vite static build to `dist/` (site) and then `npm run build:lib`.
+- **Library build**: `vite.lib.config.ts` builds UMD and ES to `dist/lib/` with entry `src/entry.ts`, file name `page-agent`.
+- **Env injection**: `vite.config.ts` defines `import.meta.env.OPEN_ROUTER_*` from real env. When adding new env vars, add them under `define` in `vite.config.ts` and reference via `import.meta.env.*`.
+- **Base path**: keep `base: './'` in both dev and build to make hash routing work under static hosting. If you change it, review `pages/main.tsx` URL logic.
+
+### ESLint & TypeScript
+
+- **Lint**: Config in `eslint.config.js` uses TypeScript ESLint with type‑aware rules, React plugins, and relaxed unsafe checks for rapid iteration. Run `npm run lint` or rely on lint‑staged.
+- **TypeScript**: `tsconfig.app.json` is strict with `noEmit` and bundler resolution. Use `@/*` alias per config. Prefer explicit types on exported functions and public classes.
+
+### Output hygiene
+
+- Never commit changes under `dist/` manually. If you need to test CDN/UMD output locally, run library build and open `dist/index.html` or consume `dist/lib/page-agent.umd.cjs`.
+- Do not import from `dist/` in source files. Always import from `src/`.
+
+### Routing & deploy gotchas
+
+- This site is SPA with hash routing. Ensure hosting serves `index.html` and does not rewrite hash routes.
+- When embedding via CDN bookmarklet, the script is `dist/lib/page-agent.umd.cjs`. Query param `?model=` is parsed in `src/entry.ts`.
+
