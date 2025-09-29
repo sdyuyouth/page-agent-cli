@@ -10,7 +10,7 @@ An in-page UI agent in javascript. Control web interfaces with natural language.
 
 🌐 **English** | [中文](./README-zh.md)
 
-👉 [📖 **Documentation**](#) | [🚀 **Try Demo**](#)
+👉 [🚀 **Demo**](https://alibaba.github.io/page-agent/) | [📖 **Documentation**](https://alibaba.github.io/page-agent/#/docs/introduction/overview)
 
 ---
 

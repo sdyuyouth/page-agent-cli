@@ -56,13 +56,13 @@ export default function Footer() {
 
 					{/* Contact */}
 					<section className="space-y-4">
-						<h4 className="font-semibold text-foreground uppercase tracking-wider">联系我们</h4>
+						{/* <h4 className="font-semibold text-foreground uppercase tracking-wider">联系我们</h4>
 						<div className="space-y-2">
 							<div className="flex items-center space-x-2">
 								<span className="text-foreground/80 text-sm">钉钉:</span>
 								<span className="text-blue-600 dark:text-blue-400 font-medium">@TODO</span>
 							</div>
-						</div>
+						</div> */}
 					</section>
 				</div>
 
@@ -72,7 +72,7 @@ export default function Footer() {
 						<p className="text-foreground/80 text-sm">© 2025 page-agent. All rights reserved.</p>
 						<div className="flex items-center space-x-6">
 							<a
-								href="TODO"
+								href="https://github.com/alibaba/page-agent"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-foreground/80 hover:text-foreground transition-colors duration-200"

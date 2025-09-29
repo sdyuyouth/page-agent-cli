@@ -10,7 +10,7 @@
 
 🌐 [English](./README.md) | **中文**
 
-👉 [📖 **文档**](#) | [🚀 **试用**](#)
+👉 [🚀 **Demo**](https://alibaba.github.io/page-agent/) | [📖 **Documentation**](https://alibaba.github.io/page-agent/#/docs/introduction/overview)
 
 ---
 
