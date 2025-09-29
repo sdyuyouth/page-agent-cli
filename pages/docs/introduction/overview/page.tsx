@@ -4,7 +4,7 @@ export default function Overview() {
 			{/* 头图 */}
 			<figure className="mb-8 rounded-xl overflow-hidden">
 				<img
-					src="https://img.alicdn.com/imgextra/i4/O1CN01eppTGh27iefUEegnN_!!6000000007831-0-tps-3015-1024.jpg"
+					src="https://img.alicdn.com/imgextra/i1/O1CN01RY0Wvh26ATVeDIX7v_!!6000000007621-0-tps-1672-512.jpg"
 					alt="page-agent 概览图示"
 					className="w-full h-64 object-cover"
 				/>
