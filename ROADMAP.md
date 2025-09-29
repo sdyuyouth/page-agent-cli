@@ -9,12 +9,13 @@ The development progress and future plans for PageAgent.
 - [x] **Reasoning and (short) memory**
 - [x] **Multi model provider integration and testing**
 - [x] **UI with HITL** - Human-in-the-loop user interface
-- [x] **Landing and testing page**
+- [x] **Landing and doc pages**
 - [ ] **Testing suits**
 - [ ] **Custom knowledge base and instructions**
 - [ ] **Black/white-list safeguard**
 - [ ] **Data-masking**
 - [ ] **Custom actions and hooks**
+- [ ] **Optimize for popular UI frameworks**
 - [ ] **Free evaluation plan?**
 - [ ] **Working homepage with live LLM API**
 - [ ] **free CDN**
