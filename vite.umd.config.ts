@@ -1,5 +1,4 @@
 import { dirname, resolve } from 'path'
-import dts from 'unplugin-dts/vite'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
@@ -9,10 +8,7 @@ const __dirname = dirname(__filename)
 
 // Library build configuration
 export default defineConfig({
-	plugins: [
-		dts({ tsconfigPath: './tsconfig.lib.json' }),
-		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
-	],
+	plugins: [cssInjectedByJsPlugin({ relativeCSSInjection: true })],
 	resolve: {
 		alias: {
 			'@': resolve(__dirname, 'src'),
@@ -25,14 +21,13 @@ export default defineConfig({
 	},
 	build: {
 		lib: {
-			entry: resolve(__dirname, 'src/PageAgent.ts'),
+			entry: resolve(__dirname, 'src/entry.ts'),
 			name: 'PageAgent',
 			fileName: 'page-agent',
-			formats: ['es'],
+			formats: ['umd'],
 		},
-		outDir: resolve(__dirname, 'dist', 'lib'),
+		outDir: resolve(__dirname, 'dist', 'umd'),
 		rollupOptions: {
-			external: ['@ai-sdk/openai', 'ai', 'ai-motion', 'chalk', 'zod'],
 			output: {
 				globals: {
 					// 定义全局变量映射
@@ -40,8 +35,7 @@ export default defineConfig({
 			},
 		},
 		// minify: 'terser',
-		minify: false,
-		sourcemap: true,
+		// sourcemap: true,
 	},
 	define: {
 		// 替换环境变量
