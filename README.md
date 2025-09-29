@@ -16,8 +16,8 @@ An in-page UI agent in javascript. Control web interfaces with natural language.
 
 ## ✨ Features
 
-- **🎯 Easy Integration** - Add to any webpage via CDN or npm
-- **🔐 Client-Side Processing** - No data leaves the browser
+- **🎯 Easy Integration**
+- **🔐 Client-Side Processing**
 - **🧠 DOM Extraction**
 - **💬 Natural Language Interface**
 - **🎨 UI with Human in the loop**
