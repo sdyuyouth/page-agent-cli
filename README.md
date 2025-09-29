@@ -6,7 +6,7 @@
 
 **Transform any webpage into an AI-powered application with a single script tag.**
 
-PageAgent is an intelligent UI agent for web automation and DOM interaction. Built on browser-use architecture, it enables natural language control of web interfaces through LLM integration.
+An in-page UI agent in javascript. Control web interfaces with natural language.
 
 🌐 **English** | [中文](./README-zh.md)
 
