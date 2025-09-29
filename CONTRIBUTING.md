@@ -8,7 +8,7 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 
 1. **Prerequisites**
    - Node.js 20+
-   - npm
+   - npm 10+
 
 2. **Install Dependencies**
    ```bash
@@ -17,9 +17,7 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 
 3. **Development Commands**
    ```bash
-   npm run dev          # Start documentation site
-   npm run build:lib:watch  # Library development with auto-rebuild
-   npm run lint         # Run linting
+   npm start          # Start documentation site
    ```
 
 ### Project Structure
@@ -42,14 +40,13 @@ This project has **two separate parts**:
 
 1. **Fork and Clone**
    ```bash
-   git fork https://github.com/your-username/page-agent
    git clone https://github.com/your-username/page-agent.git
    cd page-agent
    ```
 
 2. **Create Feature Branch**
    ```bash
-   git checkout -b feature/your-feature-name
+   git checkout -b feat/your-feature-name
    ```
 
 3. **Make Changes**
@@ -59,16 +56,14 @@ This project has **two separate parts**:
 
 4. **Test Your Changes**
    ```bash
-   npm run lint
-   npm run build
-   npm run build:lib
+   # TODO
    ```
 
 5. **Commit and Push**
    ```bash
    git add .
    git commit -m "feat: add awesome feature"
-   git push origin feature/your-feature-name
+   git push origin feat/your-feature-name
    ```
 
 6. **Create Pull Request**
@@ -104,16 +99,20 @@ This project has **two separate parts**:
 
 ### Library Development
 
-```bash
-npm run build:lib:watch    # Auto-rebuild on changes
-# Test via: <script src="dist/lib/page-agent.umd.js"></script>
-```
+- Config your LLM API
+- Start a local script
+   ```bash
+   npm run build:lib:watch    # Auto-rebuild on changes
+   ```
+- Add a new bookmark enable it on other website
+   ```
+   javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5173/dist/lib/page-agent.umd.cjs?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
+   ```
 
 ### Website Development
 
 ```bash
-npm run dev                # React development server
-# Import from src/ via @/ alias to demo library features
+npm start                # React development server
 ```
 
 ### Adding Documentation
@@ -136,13 +135,15 @@ We especially welcome contributions in:
 ## 🚫 What We Don't Accept
 
 - Changes that break existing API compatibility
-- Features that add React dependencies to core library
+- Heavy dependencies to core library
 - Contributions without proper testing
 - Code that doesn't follow project conventions
 
 ## 📄 Legal
 
 By contributing to this project, you agree that your contributions will be licensed under the MIT License.
+
+You may need to sign a github CLA before you create a PR.
 
 ### Browser-Use Attribution
 
