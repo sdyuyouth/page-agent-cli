@@ -47,7 +47,7 @@ npm install page-agent
 import { PageAgent } from 'page-agent'
 
 const agent = new PageAgent({
-  modelName: 'gpt-4.1-mini'
+  modelName: 'gpt-4.1-mini',
   baseURL: 'xxxx',
   apiKey: 'xxxx'
 })
