@@ -8,9 +8,7 @@ export default function QuickStart() {
 
 			<BetaNotice />
 
-			<p className=" mb-6 leading-relaxed">
-				几分钟内完成 page-agent 的集成，让你的网站拥有 AI 操作员。
-			</p>
+			<p className=" mb-6 leading-relaxed">几分钟内完成 page-agent 的集成。</p>
 
 			<h2 className="text-2xl font-bold mb-3">安装步骤</h2>
 
@@ -68,7 +66,7 @@ pageAgent.panel.show()
 
 			<div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg">
 				<h3 className="text-lg font-semibold mb-2">🎉 完成！</h3>
-				<p className="mb-3 ">现在你的网站已经拥有了 AI 操作员能力。</p>
+				<p className="mb-3 ">可参考《知识库注入》来优化任务成功率。</p>
 				<a
 					href="/docs/features/security-permissions"
 					className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"

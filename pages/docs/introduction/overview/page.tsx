@@ -13,8 +13,7 @@ export default function Overview() {
 			<h1 className="text-4xl font-bold mb-6">Overview</h1>
 
 			<p className="text-xl text-foreground/80 mb-8 leading-relaxed">
-				page-agent 是一个完全基于Web技术的 UI Agent，让你的网站拥有 AI 操作员。简单引入，为你的 Web
-				应用注入智能化能力。
+				page-agent 是一个完全基于Web技术的 UI Agent，简单引入，让你的网站拥有 AI 操作员。
 			</p>
 
 			<section>
@@ -52,7 +51,7 @@ export default function Overview() {
 						<h3 className="text-lg font-semibold mb-2 text-green-900 dark:text-green-300">
 							⚡ 零后端部署
 						</h3>
-						<p className="">CDN 直接引入，自定义 LLM 接入点。从 OpenAI 到 qwen3，完全由你掌控。</p>
+						<p className="">CDN 或 NPM 引入，自定义 LLM 接入点。</p>
 					</div>
 
 					<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
