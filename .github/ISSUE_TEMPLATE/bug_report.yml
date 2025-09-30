@@ -3,6 +3,36 @@ description: Report a bug
 title: '[Bug] '
 labels: ['bug']
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Please follow our community communication guidelines when filing issues.
+        - Be polite and respectful.
+        - Prefer constructive, actionable feedback over venting.
+        - Include clear reproduction steps and environment details.
+        - Consider contributing a fix if possible — PRs are welcome.
+
+        提交 Issue 时请遵守社区沟通规范：
+        - 保持礼貌与尊重。
+        - 提供建设性、可行动的反馈，避免情绪化表达。
+        - 请包含清晰的复现步骤与环境信息。
+        - 如果可以，欢迎直接提交修复 PR。
+
+        See: CODE_OF_CONDUCT.md / CODE_OF_CONDUCT_zh.md, CONTRIBUTING.md
+
+  - type: checkboxes
+    id: community
+    attributes:
+      label: Community Communication / 社区沟通
+      description: Confirm you will communicate respectfully and constructively / 确认将以礼貌、建设性的方式沟通
+      options:
+        - label: I will be polite and respectful. / 我会保持礼貌与尊重。
+          required: true
+        - label: I will share constructive, actionable details. / 我会提供建设性、可行动的细节。
+          required: true
+        - label: I have read the Code of Conduct. / 我已阅读行为准则。
+          required: true
+
   - type: textarea
     id: description
     attributes:

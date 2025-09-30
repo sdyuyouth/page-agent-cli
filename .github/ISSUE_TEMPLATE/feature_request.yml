@@ -3,6 +3,36 @@ description: Suggest a feature
 title: '[Feature] '
 labels: ['enhancement']
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Please follow our community communication guidelines when proposing features.
+        - Be polite and respectful.
+        - Explain the problem first, then propose solutions.
+        - Prefer constructive, actionable suggestions.
+        - Contributions are encouraged — consider opening a PR.
+
+        提交功能建议时请遵守社区沟通规范：
+        - 保持礼貌与尊重。
+        - 先阐述问题，再提出解决方案。
+        - 提供建设性、可行动的建议。
+        - 鼓励代码贡献，欢迎直接提交 PR。
+
+        See: CODE_OF_CONDUCT.md / CODE_OF_CONDUCT_zh.md, CONTRIBUTING.md
+
+  - type: checkboxes
+    id: community
+    attributes:
+      label: Community Communication / 社区沟通
+      description: Confirm you will communicate respectfully and constructively / 确认将以礼貌、建设性的方式沟通
+      options:
+        - label: I will be polite and respectful. / 我会保持礼貌与尊重。
+          required: true
+        - label: I will share constructive, actionable suggestions. / 我会提供建设性、可行动的建议。
+          required: true
+        - label: I have read the CODE_OF_CONDUCT.md and CONTRIBUTING.md. / 我已阅读行为准则。
+          required: true
+
   - type: textarea
     id: problem
     attributes:
