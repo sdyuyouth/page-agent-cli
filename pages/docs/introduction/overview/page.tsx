@@ -36,9 +36,7 @@ export default function Overview() {
 						<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
 							🧠 智能 DOM 理解
 						</h3>
-						<p className="">
-							节约每一个 token。基于 DOM 分析，高强度脱水。无需视觉识别，纯文本实现精准操作。
-						</p>
+						<p className="">基于 DOM 分析，高强度脱水。无需视觉识别，纯文本实现精准操作。</p>
 					</div>
 
 					<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
