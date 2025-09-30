@@ -9,7 +9,7 @@ export default function ModelIntegration() {
 			<BetaNotice />
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-				支持所有符合 OpenAI 接口规范且支持 tool call 的模型，包括公有云服务和私有部署方案。
+				当前支持符合 OpenAI 接口规范且支持 tool call 的模型，包括公有云服务和私有部署方案。
 			</p>
 
 			<h2 className="text-2xl font-bold mb-3">兼容性说明</h2>
@@ -34,7 +34,7 @@ export default function ModelIntegration() {
 					<h3 className="text-lg font-semibold mb-2 text-green-900 dark:text-green-300">
 						⚡ gpt-4.1-mini
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">测试使用的默认模型，评估基准 ✅</p>
+					<p className="text-sm text-foreground/80 mb-2">评估基准 ✅</p>
 					<ul className="text-sm text-foreground/70 space-y-1">
 						<li>• 性价比高</li>
 						<li>• 速度快，成功率较高</li>
@@ -46,7 +46,7 @@ export default function ModelIntegration() {
 					<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
 						🚀 gpt-4.1
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">效果最佳的推荐模型</p>
+					<p className="text-sm text-foreground/80 mb-2">适用于生产</p>
 					<ul className="text-sm text-foreground/70 space-y-1">
 						<li>• 效果和速度均衡</li>
 						<li>• 价格贵，4.1-mini 的 5 倍</li>

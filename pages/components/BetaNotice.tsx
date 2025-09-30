@@ -10,7 +10,7 @@ export default function BetaNotice() {
 						Beta 阶段
 					</h3>
 					<p className="text-sm text-orange-700 dark:text-orange-300">
-						当前功能仅用于演示，接口可能随时变更。正式版本发布前请勿用于生产环境。
+						当前功能未完成，接口可能随时变更。正式版本发布前请勿用于生产环境。
 					</p>
 				</div>
 			</div>

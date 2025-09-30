@@ -13,8 +13,8 @@ export default function Overview() {
 			<h1 className="text-4xl font-bold mb-6">Overview</h1>
 
 			<p className="text-xl text-foreground/80 mb-8 leading-relaxed">
-				page-agent 是一个完全基于Web技术的 UI Agent，让任何网站都能拥有 AI 操作员。 通过简单的 CDN
-				引入，为你的 Web 应用注入智能化能力。
+				page-agent 是一个完全基于Web技术的 UI Agent，让你的网站拥有 AI 操作员。简单引入，为你的 Web
+				应用注入智能化能力。
 			</p>
 
 			<section>
