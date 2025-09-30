@@ -100,7 +100,7 @@ export default function HomePage() {
 								<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">
 									🪄 一行 CDN 引入
 								</span>
-								，为任何网站添加智能 UI Agent。
+								，为你的网站添加智能 UI Agent。
 								<br />
 								用户/答疑机器人给出文字指示，AI 帮你操作页面。
 							</p>
@@ -147,7 +147,8 @@ export default function HomePage() {
 														/>
 														<button
 															onClick={handleExecute}
-															disabled={!task.trim()}
+															disabled
+															// disabled={!task.trim()}
 															className="absolute right-2 top-2 px-5 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-md hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
 															data-page-agent-not-interactive
 														>
@@ -183,10 +184,10 @@ export default function HomePage() {
 																<span className="font-semibold">步骤 2:</span>{' '}
 																拖拽下面按钮到收藏夹栏
 															</p>
-															<div
+															{/* <div
 																className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400"
 																dangerouslySetInnerHTML={{ __html: injectionA }}
-															></div>
+															></div> */}
 														</div>
 
 														{/* Usage Instructions */}
