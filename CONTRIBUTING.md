@@ -14,6 +14,7 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
    - make sure `eslint`, `auto-format` and `commit-lint` all work
 
 2. **Setup**
+
    ```bash
    npm install
    npm start          # Start demo and documentation site
@@ -38,12 +39,14 @@ This project has **two separate parts**:
 ### Code Contributions
 
 1. **Fork and Clone**
+
    ```bash
    git clone https://github.com/your-username/page-agent.git
    cd page-agent
    ```
 
 2. **Create Feature Branch**
+
    ```bash
    git checkout -b feat/your-feature-name
    ```
@@ -54,11 +57,13 @@ This project has **two separate parts**:
    - Update documentation as needed
 
 4. **Test Your Changes**
+
    ```bash
    # TODO
    ```
 
 5. **Commit and Push**
+
    ```bash
    git add .
    git commit -m "feat: add awesome feature"
@@ -80,12 +85,12 @@ This project has **two separate parts**:
 - Keep functions small and focused
 - Add JSDoc for public APIs
 
-### ✨ AI coder/copilot
+### Vibe coding with AI
 
-- It's **recommended** to heavily rely on AI when maintaining **the webpages and tests**.
-- BUT **NOT the core lib!!!** Be very careful if AI touched any code in the core lib.
+- It's **recommended** to heavily rely on AI (aka "vibe coding") when maintaining **demo pages and tests**.
+- BUT **NOT the core lib!!!** Be very careful if AI ever touched the core lib!!!
 - Review anything AI wrote before make a commit. You are the author of anything you commit. NOT AI.
-- Update the AI instructions.
+- Update the AI instructions when structure changed.
    - Cursor and Cline: `./.cursor/rules`
    - Github Copilot: `./.github/copilot-instructions.md`
    - Claude Code: `./CLAUDE.md`
@@ -96,7 +101,7 @@ This project has **two separate parts**:
 - Use event bus for component communication
 - Follow browser-use patterns for DOM operations
 
-### Documentation Site (`pages/`)
+### Doc&demo Site (`pages/`)
 
 - Use React 19 + TypeScript
 - Follow hash routing patterns (`useHashLocation`)
@@ -115,15 +120,16 @@ npm start                # React development server
 
 - Config your LLM API
 - Start a local script
+
    ```bash
    npm run build:lib:watch    # Auto-rebuild on changes
    ```
+
 - Add a new bookmark enable it on other website
+
    ```
    javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5173/dist/lib/page-agent.umd.cjs?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
    ```
-
-
 
 ### Adding Documentation
 

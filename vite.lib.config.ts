@@ -10,7 +10,7 @@ const __dirname = dirname(__filename)
 // Library build configuration
 export default defineConfig({
 	plugins: [
-		dts({ tsconfigPath: './tsconfig.lib.json', bundleTypes: true }),
+		dts({ tsconfigPath: './tsconfig.app.json', bundleTypes: true }),
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
 	],
 	resolve: {
@@ -20,7 +20,6 @@ export default defineConfig({
 	},
 	publicDir: false,
 	esbuild: {
-		// 禁用严格的未使用变量检查
 		keepNames: true,
 	},
 	build: {
@@ -33,18 +32,12 @@ export default defineConfig({
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
 			external: ['@ai-sdk/openai', 'ai', 'ai-motion', 'chalk', 'zod'],
-			output: {
-				globals: {
-					// 定义全局变量映射
-				},
-			},
 		},
 		// minify: 'terser',
 		minify: false,
 		sourcemap: true,
 	},
 	define: {
-		// 替换环境变量
 		'process.env.NODE_ENV': '"production"',
 	},
 })

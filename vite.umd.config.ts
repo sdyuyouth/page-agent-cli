@@ -16,7 +16,6 @@ export default defineConfig({
 	},
 	publicDir: false,
 	esbuild: {
-		// 禁用严格的未使用变量检查
 		keepNames: true,
 	},
 	build: {
@@ -27,18 +26,8 @@ export default defineConfig({
 			formats: ['umd'],
 		},
 		outDir: resolve(__dirname, 'dist', 'umd'),
-		rollupOptions: {
-			output: {
-				globals: {
-					// 定义全局变量映射
-				},
-			},
-		},
-		// minify: 'terser',
-		// sourcemap: true,
 	},
 	define: {
-		// 替换环境变量
 		'process.env.NODE_ENV': '"production"',
 	},
 })

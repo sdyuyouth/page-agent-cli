@@ -99,7 +99,22 @@ PageAgent 专为**客户端网页增强**设计，不是服务端自动化工具
 
 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
-DOM 处理与提示词参考了 [browser-use](https://github.com/browser-use/browser-use)（MIT 许可证）。完整归属请见 [NOTICE](NOTICE)。
+```
+DOM processing components and prompt are derived from browser-use: 
+
+Browser Use
+Copyright (c) 2024 Gregor Zunic
+Licensed under the MIT License
+
+Original browser-use project: <https://github.com/browser-use/browser-use>
+
+We gratefully acknowledge the browser-use project and its contributors for their
+excellent work on web automation and DOM interaction patterns that helped make
+this project possible.
+
+Third-party dependencies and their licenses can be found in the package.json
+file and in the node_modules directory after installation.
+```
 
 ---
 

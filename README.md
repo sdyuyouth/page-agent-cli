@@ -99,7 +99,23 @@ PageAgent is designed for **client-side web enhancement**, not server-side autom
 
 MIT License - see the [LICENSE](LICENSE) file for details.
 
-DOM processing components and prompt are derived from [browser-use](https://github.com/browser-use/browser-use) (MIT License). See [NOTICE](NOTICE) for full attribution.
+
+```
+DOM processing components and prompt are derived from browser-use: 
+
+Browser Use
+Copyright (c) 2024 Gregor Zunic
+Licensed under the MIT License
+
+Original browser-use project: <https://github.com/browser-use/browser-use>
+
+We gratefully acknowledge the browser-use project and its contributors for their
+excellent work on web automation and DOM interaction patterns that helped make
+this project possible.
+
+Third-party dependencies and their licenses can be found in the package.json
+file and in the node_modules directory after installation.
+```
 
 ---
 
