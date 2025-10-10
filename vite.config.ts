@@ -20,8 +20,8 @@ export default defineConfig({
 		},
 	},
 	define: {
-		'import.meta.env.OPEN_ROUTER_MODEL': JSON.stringify(process.env.OPEN_ROUTER_MODEL),
-		'import.meta.env.OPEN_ROUTER_KEY': JSON.stringify(process.env.OPEN_ROUTER_KEY),
-		'import.meta.env.OPEN_ROUTER_BASE_URL': JSON.stringify(process.env.OPEN_ROUTER_BASE_URL),
+		'import.meta.env.LLM_MODEL_NAME': JSON.stringify(process.env.LLM_MODEL_NAME),
+		'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
+		'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
 	},
 })

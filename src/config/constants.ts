@@ -8,7 +8,7 @@ export const VIEWPORT_EXPANSION = -1
 // models
 
 // 🥇 GPT-4.1 (best so far)
-export const DEFAULT_MODEL_NAME: string = 'gpt-41-mini-0414-global' // baseline 🌟
+// export const DEFAULT_MODEL_NAME: string = 'gpt-41-mini-0414-global' // baseline 🌟
 // export const DEFAULT_MODEL_NAME: string = 'gpt-41-0414-global' // unnecessary
 
 // 🤞 qwen (tool call format often irregular)
@@ -32,15 +32,19 @@ export const DEFAULT_MODEL_NAME: string = 'gpt-41-mini-0414-global' // baseline 
 // @todo need a special client for gemini
 // export const DEFAULT_MODEL_NAME: string = 'gemini-2.5-pro-06-17'
 
-// export const DEFAULT_MODEL_NAME: string = import.meta.env.OPEN_ROUTER_MODEL!
+// Dev environment: use .env config if available, otherwise fallback to defaults
+export const DEFAULT_MODEL_NAME: string =
+	import.meta.env.DEV && import.meta.env.LLM_MODEL_NAME
+		? import.meta.env.LLM_MODEL_NAME
+		: 'gpt-41-mini-0414-global'
 
-// ak
-export const DEFAULT_API_KEY: string = 'not-needed'
-// export const DEFAULT_API_KEY: string = import.meta.env.OPEN_ROUTER_KEY!
+export const DEFAULT_API_KEY: string =
+	import.meta.env.DEV && import.meta.env.LLM_API_KEY ? import.meta.env.LLM_API_KEY : 'not-needed'
 
-// base url
-export const DEFAULT_BASE_URL: string = 'http://localhost:3000/api/agent'
-// export const DEFAULT_BASE_URL: string = import.meta.env.OPEN_ROUTER_BASE_URL!
+export const DEFAULT_BASE_URL: string =
+	import.meta.env.DEV && import.meta.env.LLM_BASE_URL
+		? import.meta.env.LLM_BASE_URL
+		: 'http://localhost:3000/api/agent'
 
 // internal
 
