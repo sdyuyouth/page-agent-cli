@@ -37,13 +37,8 @@ import type { LanguageModelUsage, ModelMessage, TypedToolCall, TypedToolResult }
 import { ToolSet, generateText, stepCountIs } from 'ai'
 import chalk from 'chalk'
 
-import {
-	DEFAULT_API_KEY,
-	DEFAULT_BASE_URL,
-	DEFAULT_MODEL_NAME,
-	LLM_MAX_RETRIES,
-	MACRO_TOOL_NAME,
-} from '@/config/constants'
+import { parseLLMConfig } from '@/config'
+import { MACRO_TOOL_NAME } from '@/config/constants'
 import { assert } from '@/utils/assert'
 import { EventBus, getEventBus } from '@/utils/bus'
 
@@ -62,13 +57,7 @@ export class LLM {
 	#bus: EventBus
 
 	constructor(config: LLMConfig, id: string) {
-		this.config = {
-			baseURL: DEFAULT_BASE_URL,
-			apiKey: DEFAULT_API_KEY,
-			modelName: DEFAULT_MODEL_NAME,
-			maxRetries: LLM_MAX_RETRIES,
-			...config,
-		}
+		this.config = parseLLMConfig(config)
 		this.id = id
 
 		this.#bus = getEventBus(id)
