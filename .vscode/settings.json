@@ -1,6 +1,6 @@
 {
 	"editor.fontLigatures": true,
-	"cSpell.words": ["retryable"],
+	"cSpell.words": ["opensource", "retryable"],
 	"markdownlint.config": {
 		// "comment": "Relaxed rules",
 		"default": true,
