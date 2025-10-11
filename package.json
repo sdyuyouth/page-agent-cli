@@ -43,9 +43,9 @@
 		"dev": "vite",
 		"start": "vite",
 		"build": "tsc -b && vite build && npm run build:lib && npm run build:umd",
-		"build:lib": "vite build --config vite.lib.config.js",
-		"build:lib:watch": "vite build --config vite.lib.config.js --watch",
-		"build:umd": "vite build --config vite.umd.config.js",
+		"build:lib": "MODE=lib vite build",
+		"build:lib:watch": "MODE=lib vite build --watch",
+		"build:umd": "MODE=umd vite build",
 		"lint": "eslint .",
 		"prepare": "husky"
 	},
