@@ -20,6 +20,8 @@ The development progress and future plans for PageAgent.
 - [ ] **Working homepage with live LLM API**
 - [ ] **free CDN**
 - [ ] **Testing suits**
+- [ ] **Remove ai-sdk** - Only one function is being used
+- [ ] **Support custom llm fetch**
 
 
 ♻️ Following browser-use's update and contribute back
@@ -32,6 +34,4 @@ The development progress and future plans for PageAgent.
 
 ## 🤔 To Be Decided
 
-- [ ] **Remove ai-sdk?** - Only one function is being used
 - [ ] **Cross-origin multi-page?** - Tricky
-- [ ] **Support custom llm fetch?**

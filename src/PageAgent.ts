@@ -218,42 +218,6 @@ export class PageAgent extends EventTarget {
 	 * - next_goal: string
 	 * - action: { toolName: toolInput }
 	 * where action must be selected from tools defined in this.tools
-	 *
-	 * @topic 要不要合并成一个 tool？
-	 * @facts
-	 * - 我们需要模型每步返回 evaluation/memory/goal 等思考过程
-	 * - browser use 合并成一个巨大的 tool
-	 * ```json
-	 * {
-	 *  "memory": "...",
-	 *  "goal": "...",
-	 *  "actions": [
-	 *    {
-	 *      "name": "...",
-	 *      "args": "..."
-	 *    }
-	 *    // ...
-	 *  ]
-	 * }
-	 * ```
-	 * - qwen 目前必须指定 function name 来确保 tool call
-	 * @reasoning
-	 * - 不能为了 qwen 的缺陷而设计系统
-	 * - 更复杂的 tool 更容易出错
-	 * - 分散的 tool 更容易利用 ai-sdk 的重试机制，也更容易处理错误
-	 * - 不能用额外的步骤生成这些数据，不仅性能过差，而且 goal 之类的必须和 call 一起生成
-	 * @options
-	 * - Plan @A
-	 *   - 和 browser use 使用完全一致的做法，合并成一个大 tool，要求每次调用
-	 *   - 会把 tool 定义变得非常复杂，增加出错率
-	 * - Plan @B
-	 *   - 每次调用两个 tool，其中一个用来输出思考
-	 *   - 很难用提示词 enforce 这么复杂的规则
-	 * - Plan @C
-	 *   - 自动为每个 tool 增加固定的 reasoning/memory/goal 等输入，并自动拦截提取这些数据
-	 *   - 会让 tool 定义变得很长
-	 * @conclusion
-	 * - 使用 @A
 	 */
 	#packMacroTool(): ToolSet {
 		const tools = this.tools
