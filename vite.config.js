@@ -1,3 +1,4 @@
+// @ts-check
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
 import 'dotenv/config'
@@ -9,8 +10,9 @@ import { defineConfig } from 'vite'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-// https://vite.dev/config/
-export default defineConfig({
+/** @type {import('vite').UserConfig} */
+const config = {
+	// https://vite.dev/config/
 	base: './',
 	plugins: [react(), tailwindcss()],
 	resolve: {
@@ -24,4 +26,6 @@ export default defineConfig({
 		'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
 		'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
 	},
-})
+}
+
+export default defineConfig(config)

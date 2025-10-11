@@ -23,8 +23,8 @@ npm run lint                 # ESLint with TypeScript strict rules
 
 ### Dual Build System
 
-- **Website build**: `vite.config.ts` → React SPA with hash routing → `dist/`
-- **Library build**: `vite.lib.config.ts` → UMD/ES modules → `dist/lib/`
+- **Website build**: `vite.config.js` → React SPA with hash routing → `dist/`
+- **Library build**: `vite.lib.config.js` → UMD/ES modules → `dist/lib/`
 - **Entry points**: `src/entry.ts` (library), `pages/main.tsx` (website)
 
 ### Module Boundaries (Critical)
@@ -142,7 +142,7 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 - `src/dom/dom_tree/index.js` - DOM extraction engine
 - `src/utils/bus.ts` - Type-safe event bus system
 - `src/entry.ts` - Library entry point for CDN usage
-- `vite.config.ts` / `vite.lib.config.ts` - Dual build configuration
+- `vite.config.js` / `vite.lib.config.js` - Dual build configuration
 
 ## Debugging Common Issues
 
