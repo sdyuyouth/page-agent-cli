@@ -84,12 +84,11 @@ export class LLM {
 		usage: LanguageModelUsage
 	}> {
 		const isClaude = this.config.modelName.slice(0, 8).includes('claude')
-		const isQwen = this.config.modelName.slice(0, 6).includes('qwen')
-		const isGPT = this.config.modelName.slice(0, 5).includes('gpt')
+		// const isQwen = this.config.modelName.slice(0, 6).includes('qwen')
+		// const isGPT = this.config.modelName.slice(0, 5).includes('gpt')
 
 		return await withRetry(
 			async () => {
-				// try {
 				const result = await generateText({
 					model: this.#model,
 					messages,
@@ -165,16 +164,6 @@ export class LLM {
 					toolResult,
 					usage,
 				}
-
-				// } catch (error) {
-				// 	// handle ai-sdk internal error here
-				// 	// currently useless since we bypassed most of ai-sdk logic
-				// 	console.log('generateText error', error)
-				// 	console.log('APICallError', APICallError.isInstance(error))
-				// 	console.log('isNoSuchModelError', NoSuchModelError.isInstance(error))
-
-				// 	throw error
-				// }
 			},
 			// retry settings
 			{

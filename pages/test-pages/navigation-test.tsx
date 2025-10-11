@@ -10,7 +10,7 @@ export default function NavigationTestPage() {
 	const [notifications, setNotifications] = useState([
 		{ id: 1, title: '新消息', content: '您有一条新的私信', time: '2分钟前', unread: true },
 		{ id: 2, title: '系统通知', content: '系统将于今晚维护', time: '1小时前', unread: true },
-		{ id: 3, title: '订单更新', content: '您的订单已发货', time: '3小时前', unread: false }
+		{ id: 3, title: '订单更新', content: '您的订单已发货', time: '3小时前', unread: false },
 	])
 
 	const handleBreadcrumbClick = (index: number) => {
@@ -19,14 +19,12 @@ export default function NavigationTestPage() {
 	}
 
 	const markNotificationAsRead = (id: number) => {
-		setNotifications(prev => 
-			prev.map(notif => 
-				notif.id === id ? { ...notif, unread: false } : notif
-			)
+		setNotifications((prev) =>
+			prev.map((notif) => (notif.id === id ? { ...notif, unread: false } : notif))
 		)
 	}
 
-	const unreadCount = notifications.filter(n => n.unread).length
+	const unreadCount = notifications.filter((n) => n.unread).length
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -36,17 +34,18 @@ export default function NavigationTestPage() {
 					<div className="flex justify-between items-center h-16">
 						{/* Logo */}
 						<div className="flex items-center">
-							<div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-								TestNav
-							</div>
+							<div className="text-2xl font-bold text-blue-600 dark:text-blue-400">TestNav</div>
 						</div>
 
 						{/* 主导航菜单 */}
 						<div className="hidden md:flex space-x-8">
-							<a href="#" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+							<a
+								href="#"
+								className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+							>
 								首页
 							</a>
-							
+
 							{/* 产品下拉菜单 */}
 							<div className="relative">
 								<button
@@ -54,25 +53,47 @@ export default function NavigationTestPage() {
 									className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
 								>
 									产品
-									<svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									<svg
+										className="ml-1 h-4 w-4"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M19 9l-7 7-7-7"
+										/>
 									</svg>
 								</button>
-								
+
 								{isDropdownOpen && (
 									<div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
 										<div className="py-1">
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												手机
 											</a>
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												电脑
 											</a>
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												平板
 											</a>
 											<div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												配件
 											</a>
 										</div>
@@ -80,10 +101,16 @@ export default function NavigationTestPage() {
 								)}
 							</div>
 
-							<a href="#" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+							<a
+								href="#"
+								className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+							>
 								服务
 							</a>
-							<a href="#" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+							<a
+								href="#"
+								className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+							>
 								支持
 							</a>
 						</div>
@@ -94,7 +121,12 @@ export default function NavigationTestPage() {
 							<div className="relative">
 								<button className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-full transition-colors">
 									<svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.5 3.75a6 6 0 0 1 6 6v2.25l2.25 2.25v2.25H2.25V14.25L4.5 12V9.75a6 6 0 0 1 6-6z" />
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M15 17h5l-5 5v-5zM10.5 3.75a6 6 0 0 1 6 6v2.25l2.25 2.25v2.25H2.25V14.25L4.5 12V9.75a6 6 0 0 1 6-6z"
+										/>
 									</svg>
 									{unreadCount > 0 && (
 										<span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -114,24 +146,36 @@ export default function NavigationTestPage() {
 										U
 									</div>
 								</button>
-								
+
 								{isUserMenuOpen && (
 									<div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
 										<div className="py-1">
 											<div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600">
 												user@example.com
 											</div>
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												个人资料
 											</a>
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												设置
 											</a>
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												帮助
 											</a>
 											<div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
-											<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+											<a
+												href="#"
+												className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+											>
 												退出登录
 											</a>
 										</div>
@@ -148,25 +192,39 @@ export default function NavigationTestPage() {
 				<div className="max-w-7xl mx-auto px-4 py-3">
 					<nav className="flex" aria-label="Breadcrumb">
 						<ol className="flex items-center space-x-2">
-							{breadcrumbs.map((crumb, index) => (
-								<li key={index} className="flex items-center">
-									{index > 0 && (
-										<svg className="h-4 w-4 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-										</svg>
-									)}
-									<button
-										onClick={() => handleBreadcrumbClick(index)}
-										className={`text-sm font-medium transition-colors ${
-											index === breadcrumbs.length - 1
-												? 'text-gray-500 dark:text-gray-400 cursor-default'
-												: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300'
-										}`}
-									>
-										{crumb}
-									</button>
-								</li>
-							))}
+							{breadcrumbs.map((crumb, crumbIdx) => {
+								const isLast = crumbIdx === breadcrumbs.length - 1
+								const showSeparator = crumbIdx > 0
+								return (
+									<li key={`${crumb}-${crumbIdx + 1}`} className="flex items-center">
+										{showSeparator && (
+											<svg
+												className="h-4 w-4 text-gray-400 mx-2"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M9 5l7 7-7 7"
+												/>
+											</svg>
+										)}
+										<button
+											onClick={() => handleBreadcrumbClick(crumbIdx)}
+											className={`text-sm font-medium transition-colors ${
+												isLast
+													? 'text-gray-500 dark:text-gray-400 cursor-default'
+													: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300'
+											}`}
+										>
+											{crumb}
+										</button>
+									</li>
+								)
+							})}
 						</ol>
 					</nav>
 				</div>
@@ -183,7 +241,7 @@ export default function NavigationTestPage() {
 								{ id: 'products', label: '产品列表', icon: '📱' },
 								{ id: 'orders', label: '订单管理', icon: '📦' },
 								{ id: 'analytics', label: '数据分析', icon: '📊' },
-								{ id: 'settings', label: '设置', icon: '⚙️' }
+								{ id: 'settings', label: '设置', icon: '⚙️' },
 							].map((tab) => (
 								<button
 									key={tab.id}
@@ -231,8 +289,11 @@ export default function NavigationTestPage() {
 						<div>
 							<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">产品列表</h2>
 							<div className="space-y-4">
-								{['iPhone 15 Pro', 'MacBook Air', 'iPad Pro', 'Apple Watch'].map((product, index) => (
-									<div key={index} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+								{['iPhone 15 Pro', 'MacBook Air', 'iPad Pro', 'Apple Watch'].map((product) => (
+									<div
+										key={product}
+										className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg"
+									>
 										<div>
 											<h3 className="font-medium text-gray-900 dark:text-white">{product}</h3>
 											<p className="text-gray-500 dark:text-gray-400">产品描述...</p>
@@ -253,31 +314,49 @@ export default function NavigationTestPage() {
 								<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
 									<thead className="bg-gray-50 dark:bg-gray-700">
 										<tr>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">订单号</th>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">客户</th>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">状态</th>
-											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">金额</th>
+											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+												订单号
+											</th>
+											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+												客户
+											</th>
+											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+												状态
+											</th>
+											<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+												金额
+											</th>
 										</tr>
 									</thead>
 									<tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
 										{[
 											{ id: '#001', customer: '张三', status: '已发货', amount: '¥1,299' },
 											{ id: '#002', customer: '李四', status: '处理中', amount: '¥2,599' },
-											{ id: '#003', customer: '王五', status: '已完成', amount: '¥899' }
-										].map((order, index) => (
-											<tr key={index}>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{order.id}</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{order.customer}</td>
+											{ id: '#003', customer: '王五', status: '已完成', amount: '¥899' },
+										].map((order) => (
+											<tr key={order.id}>
+												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+													{order.id}
+												</td>
+												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+													{order.customer}
+												</td>
 												<td className="px-6 py-4 whitespace-nowrap">
-													<span className={`px-2 py-1 text-xs font-medium rounded-full ${
-														order.status === '已完成' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-														order.status === '已发货' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-														'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-													}`}>
+													<span
+														className={`px-2 py-1 text-xs font-medium rounded-full ${
+															order.status === '已完成'
+																? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+																: order.status === '已发货'
+																	? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+																	: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+														}`}
+													>
 														{order.status}
 													</span>
 												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{order.amount}</td>
+												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+													{order.amount}
+												</td>
 											</tr>
 										))}
 									</tbody>
@@ -291,13 +370,17 @@ export default function NavigationTestPage() {
 							<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">数据分析</h2>
 							<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 								<div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">销售趋势</h3>
+									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+										销售趋势
+									</h3>
 									<div className="h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-white">
 										📈 图表占位符
 									</div>
 								</div>
 								<div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">用户分布</h3>
+									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+										用户分布
+									</h3>
 									<div className="h-32 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center text-white">
 										🗺️ 地图占位符
 									</div>
@@ -311,27 +394,46 @@ export default function NavigationTestPage() {
 							<h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">设置</h2>
 							<div className="space-y-6">
 								<div>
-									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">通知设置</h3>
+									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+										通知设置
+									</h3>
 									<div className="space-y-2">
 										<label className="flex items-center">
-											<input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
+											<input
+												type="checkbox"
+												className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+												defaultChecked
+											/>
 											<span className="ml-2 text-gray-700 dark:text-gray-300">邮件通知</span>
 										</label>
 										<label className="flex items-center">
-											<input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+											<input
+												type="checkbox"
+												className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+											/>
 											<span className="ml-2 text-gray-700 dark:text-gray-300">短信通知</span>
 										</label>
 									</div>
 								</div>
 								<div>
-									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">隐私设置</h3>
+									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+										隐私设置
+									</h3>
 									<div className="space-y-2">
 										<label className="flex items-center">
-											<input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
+											<input
+												type="checkbox"
+												className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+												defaultChecked
+											/>
 											<span className="ml-2 text-gray-700 dark:text-gray-300">公开个人资料</span>
 										</label>
 										<label className="flex items-center">
-											<input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
+											<input
+												type="checkbox"
+												className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+												defaultChecked
+											/>
 											<span className="ml-2 text-gray-700 dark:text-gray-300">允许搜索</span>
 										</label>
 									</div>
@@ -362,9 +464,9 @@ export default function NavigationTestPage() {
 								title: '新通知',
 								content: `这是第 ${notifications.length + 1} 条通知`,
 								time: '刚刚',
-								unread: true
+								unread: true,
 							}
-							setNotifications(prev => [newNotif, ...prev])
+							setNotifications((prev) => [newNotif, ...prev])
 						}}
 						className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-md transition-colors"
 					>
@@ -389,11 +491,17 @@ export default function NavigationTestPage() {
 								>
 									<div className="flex justify-between items-start">
 										<div className="flex-1">
-											<h4 className="font-medium text-gray-900 dark:text-white">{notification.title}</h4>
-											<p className="text-gray-600 dark:text-gray-300 text-sm">{notification.content}</p>
+											<h4 className="font-medium text-gray-900 dark:text-white">
+												{notification.title}
+											</h4>
+											<p className="text-gray-600 dark:text-gray-300 text-sm">
+												{notification.content}
+											</p>
 										</div>
 										<div className="flex items-center space-x-2">
-											<span className="text-xs text-gray-500 dark:text-gray-400">{notification.time}</span>
+											<span className="text-xs text-gray-500 dark:text-gray-400">
+												{notification.time}
+											</span>
 											{notification.unread && (
 												<div className="w-2 h-2 bg-blue-500 rounded-full"></div>
 											)}
@@ -417,7 +525,12 @@ export default function NavigationTestPage() {
 								className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
 							>
 								<svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
 								</svg>
 							</button>
 						</div>
