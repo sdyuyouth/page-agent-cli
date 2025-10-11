@@ -10,7 +10,7 @@ The development progress and future plans for PageAgent.
 - [x] **Multi model provider integration and testing**
 - [x] **UI with HITL** - Human-in-the-loop user interface
 - [x] **Landing and doc pages**
-- [ ] **Testing suits**
+- [ ] **Support structure output**
 - [ ] **Custom knowledge base and instructions**
 - [ ] **Black/white-list safeguard**
 - [ ] **Data-masking**
@@ -19,6 +19,7 @@ The development progress and future plans for PageAgent.
 - [ ] **Free evaluation plan?**
 - [ ] **Working homepage with live LLM API**
 - [ ] **free CDN**
+- [ ] **Testing suits**
 
 
 ♻️ Following browser-use's update and contribute back
@@ -33,3 +34,4 @@ The development progress and future plans for PageAgent.
 
 - [ ] **Remove ai-sdk?** - Only one function is being used
 - [ ] **Cross-origin multi-page?** - Tricky
+- [ ] **Support custom llm fetch?**
