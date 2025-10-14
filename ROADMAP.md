@@ -16,6 +16,7 @@ The development progress and future plans for PageAgent.
 - [ ] **Data-masking**
 - [ ] **Custom actions and hooks**
 - [ ] **Optimize for popular UI frameworks**
+- [ ] **Handling page open event**
 - [ ] **Free evaluation plan?**
 - [ ] **Working homepage with live LLM API**
 - [ ] **free CDN**
