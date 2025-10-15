@@ -70,10 +70,8 @@ export class Panel {
 			// Update state to `running`
 			this.#update({
 				type: 'output',
-				displayText: `询问: ${question}`,
-			})
-
-			// Expand history panel
+				displayText: this.#pageAgent.i18n.t('ui.panel.question', { question }),
+			}) // Expand history panel
 			if (!this.#isExpanded) {
 				this.#expand()
 			}
@@ -132,7 +130,7 @@ export class Panel {
 	}
 
 	/**
-	 * 隐藏面板
+	 * Hide panel
 	 */
 	#hide(): void {
 		this.wrapper.style.opacity = '0'
@@ -141,7 +139,7 @@ export class Panel {
 	}
 
 	/**
-	 * 重置状态
+	 * Reset state
 	 */
 	#reset(): void {
 		this.#state.reset()
@@ -168,44 +166,44 @@ export class Panel {
 
 		// Update status display
 		if (this.#pageAgent.paused) {
-			this.#statusText.textContent = '暂停中，稍后'
+			this.#statusText.textContent = this.#pageAgent.i18n.t('ui.panel.paused')
 			this.#updateStatusIndicator('thinking') // Use existing thinking state
 		} else {
-			this.#statusText.textContent = '继续执行'
+			this.#statusText.textContent = this.#pageAgent.i18n.t('ui.panel.continueExecution')
 			this.#updateStatusIndicator('tool_executing') // Restore to execution state
 		}
 	}
 
 	/**
-	 * 更新暂停按钮状态
+	 * Update pause button state
 	 */
 	#updatePauseButton(): void {
 		if (this.#pageAgent.paused) {
 			this.#pauseButton.textContent = '▶'
-			this.#pauseButton.title = '继续'
+			this.#pauseButton.title = this.#pageAgent.i18n.t('ui.panel.continue')
 			this.#pauseButton.classList.add(styles.paused)
 		} else {
 			this.#pauseButton.textContent = '⏸︎'
-			this.#pauseButton.title = '暂停'
+			this.#pauseButton.title = this.#pageAgent.i18n.t('ui.panel.pause')
 			this.#pauseButton.classList.remove(styles.paused)
 		}
 	}
 
 	/**
-	 * 终止 Agent
+	 * Stop Agent
 	 */
 	#stopAgent(): void {
 		// Update status display
 		this.#update({
 			type: 'error',
-			displayText: '任务已终止',
+			displayText: this.#pageAgent.i18n.t('ui.panel.taskTerminated'),
 		})
 
 		this.#pageAgent.dispose()
 	}
 
 	/**
-	 * 提交任务
+	 * Submit task
 	 */
 	#submitTask() {
 		const input = this.#taskInput.value.trim()
@@ -223,13 +221,13 @@ export class Panel {
 	}
 
 	/**
-	 * 处理用户回答
+	 * Handle user answer
 	 */
 	#handleUserAnswer(input: string): void {
 		// Add user input to history
 		this.#update({
 			type: 'input',
-			displayText: `用户回答: ${input}`,
+			displayText: this.#pageAgent.i18n.t('ui.panel.userAnswer', { input }),
 		})
 
 		// Reset state
@@ -243,12 +241,12 @@ export class Panel {
 	}
 
 	/**
-	 * 显示输入区域
+	 * Show input area
 	 */
 	#showInputArea(placeholder?: string): void {
 		// Clear input field
 		this.#taskInput.value = ''
-		this.#taskInput.placeholder = placeholder || '输入新任务，详细描述步骤，回车提交'
+		this.#taskInput.placeholder = placeholder || this.#pageAgent.i18n.t('ui.panel.taskInput')
 		this.#inputSection.classList.remove(styles.hidden)
 		// Focus on input field
 		setTimeout(() => {
@@ -257,14 +255,14 @@ export class Panel {
 	}
 
 	/**
-	 * 隐藏输入区域
+	 * Hide input area
 	 */
 	#hideInputArea(): void {
 		this.#inputSection.classList.add(styles.hidden)
 	}
 
 	/**
-	 * 检查是否应该显示输入区域
+	 * Check if input area should be shown
 	 */
 	#shouldShowInputArea(): boolean {
 		// Always show input area if waiting for user input
@@ -294,23 +292,23 @@ export class Panel {
 						stepNumber: 0,
 						timestamp: new Date(),
 						type: 'thinking',
-						displayText: '等待任务开始...',
+						displayText: this.#pageAgent.i18n.t('ui.panel.waitingPlaceholder'),
 					})}
 				</div>
 			</div>
 			<div class="${styles.header}">
 				<div class="${styles.statusSection}">
 					<div class="${styles.indicator} ${styles.thinking}"></div>
-					<div class="${styles.statusText}">准备就绪</div>
+					<div class="${styles.statusText}">${this.#pageAgent.i18n.t('ui.panel.ready')}</div>
 				</div>
 				<div class="${styles.controls}">
-					<button class="${styles.controlButton} ${styles.expandButton}" title="展开历史">
+					<button class="${styles.controlButton} ${styles.expandButton}" title="${this.#pageAgent.i18n.t('ui.panel.expand')}">
 						▼
 					</button>
-					<button class="${styles.controlButton} ${styles.pauseButton}" title="暂停">
+					<button class="${styles.controlButton} ${styles.pauseButton}" title="${this.#pageAgent.i18n.t('ui.panel.pause')}">
 						⏸︎
 					</button>
-					<button class="${styles.controlButton} ${styles.stopButton}" title="终止">
+					<button class="${styles.controlButton} ${styles.stopButton}" title="${this.#pageAgent.i18n.t('ui.panel.stop')}">
 						X
 					</button>
 				</div>
@@ -459,11 +457,12 @@ export class Panel {
 		if (step.type === 'completed') {
 			// Check if this is a result from done tool
 			if (step.toolName === 'done') {
-				// @todo not right
 				// Judge success or failure based on result
+				const failureKeyword = this.#pageAgent.i18n.t('ui.tools.resultFailure')
+				const errorKeyword = this.#pageAgent.i18n.t('ui.tools.resultError')
 				const isSuccess =
 					!step.toolResult ||
-					(!step.toolResult.includes('失败') && !step.toolResult.includes('错误'))
+					(!step.toolResult.includes(failureKeyword) && !step.toolResult.includes(errorKeyword))
 				typeClass = isSuccess ? styles.doneSuccess : styles.doneError
 				statusIcon = isSuccess ? '🎉' : '❌'
 			} else {
@@ -488,6 +487,13 @@ export class Panel {
 			statusIcon = '🧠'
 		}
 
+		const durationText = step.duration ? ` · ${step.duration}ms` : ''
+		const stepLabel = this.#pageAgent.i18n.t('ui.panel.step', {
+			number: step.stepNumber.toString(),
+			time,
+			duration: durationText,
+		})
+
 		return `
 			<div class="${styles.historyItem} ${typeClass}">
 				<div class="${styles.historyContent}">
@@ -495,8 +501,7 @@ export class Panel {
 					<span>${step.displayText}</span>
 				</div>
 				<div class="${styles.historyMeta}">
-					步骤 ${step.stepNumber} · ${time}
-					${step.duration ? ` · ${step.duration}ms` : ''}
+					${stepLabel}
 				</div>
 			</div>
 		`
@@ -504,7 +509,7 @@ export class Panel {
 }
 
 /**
- * 获取工具执行时的显示文本
+ * Get display text for tool execution
  */
 export function getToolExecutingText(toolName: string, args: any, i18n: I18n): string {
 	switch (toolName) {
@@ -526,7 +531,7 @@ export function getToolExecutingText(toolName: string, args: any, i18n: I18n): s
 }
 
 /**
- * 获取工具完成时的显示文本
+ * Get display text for tool completion
  */
 export function getToolCompletedText(toolName: string, args: any, i18n: I18n): string | null {
 	switch (toolName) {

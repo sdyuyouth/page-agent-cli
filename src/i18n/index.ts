@@ -1,5 +1,10 @@
-import { type SupportedLanguage, locales } from './locales'
-import type { TranslationKey, TranslationParams, TranslationSchema } from './types'
+import {
+	type SupportedLanguage,
+	type TranslationKey,
+	type TranslationParams,
+	type TranslationSchema,
+	locales,
+} from './locales'
 
 export class I18n {
 	private language: SupportedLanguage
