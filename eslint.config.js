@@ -9,7 +9,12 @@ import tseslint from 'typescript-eslint'
 
 export default defineConfig([
 	globalIgnores(['dist', 'test-pages']),
-	reactHooks.configs.flat.recommended,
+	{
+		plugins: {
+			'react-hooks': reactHooks,
+		},
+		rules: reactHooks.configs.recommended.rules,
+	},
 	{
 		files: ['**/*.{ts,tsx}'],
 		extends: [
