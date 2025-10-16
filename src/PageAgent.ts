@@ -53,6 +53,7 @@ export class PageAgent extends EventTarget {
 	id = uid()
 	bus = getEventBus(this.id)
 	i18n: I18n
+	panel: Panel
 	paused = false
 	disposed = false
 	task = ''
@@ -79,8 +80,6 @@ export class PageAgent extends EventTarget {
 	tools = new Map(tools)
 	/** Fullscreen mask */
 	mask = new SimulatorMask()
-	/** Interactive panel */
-	panel = new Panel(this)
 	/** History records */
 	history: AgentHistory[] = []
 
@@ -90,6 +89,7 @@ export class PageAgent extends EventTarget {
 		this.config = config
 		this.#llm = new LLM(this.config, this.id)
 		this.i18n = new I18n(this.config.language)
+		this.panel = new Panel(this)
 
 		patchReact(this)
 	}
