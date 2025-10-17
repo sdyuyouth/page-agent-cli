@@ -10,18 +10,19 @@ The development progress and future plans for PageAgent.
 - [x] **Multi model provider integration and testing**
 - [x] **UI with HITL** - Human-in-the-loop user interface
 - [x] **Landing and doc pages**
+- [x] **Remove ai-sdk** - Only one function is being used
 - [ ] **Robust LLM output**
+- [ ] **Hooks for Task and HITL**
+- [ ] **Hijacking `page_open` event**
 - [ ] **Custom knowledge base and instructions**
 - [ ] **Black/white-list safeguard**
 - [ ] **Data-masking**
-- [ ] **Custom actions and hooks**
+- [ ] **Custom actions**
 - [ ] **Optimize for popular UI frameworks**
-- [ ] **Handling page open event**
 - [ ] **Free evaluation plan?**
 - [ ] **Working homepage with live LLM API**
 - [ ] **free CDN**
 - [ ] **Testing suits**
-- [ ] **Remove ai-sdk** - Only one function is being used
 - [ ] **Support custom llm fetch**
 - [ ] **Refactor: Separate Agent and Page-Controller** - Agent can run w/o dom
 
