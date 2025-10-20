@@ -11,7 +11,7 @@ The development progress and future plans for PageAgent.
 - [x] **UI with HITL** - Human-in-the-loop user interface
 - [x] **Landing and doc pages**
 - [x] **Remove ai-sdk** - Only one function is being used
-- [ ] **Robust LLM output**
+- [x] **Robust LLM output**
 - [ ] **Working homepage with live LLM API**
 - [ ] **Hooks for Task and HITL**
 - [ ] **Hijacking `page_open` event**

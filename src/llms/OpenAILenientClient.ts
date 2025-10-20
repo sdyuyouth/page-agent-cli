@@ -1,9 +1,11 @@
 /**
  * OpenAI Client implementation
  */
+import type { MacroToolInput } from '@/PageAgent'
+
 import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeResult, LLMClient, Message, OpenAIClientConfig, Tool } from './types'
-import { zodToOpenAITool } from './utils'
+import { lenientParseMacroToolCall, zodToOpenAITool } from './utils'
 
 // Claude's openAI-API has different format for some fields
 const CLAUDE_PATCH = {
@@ -20,7 +22,7 @@ export class OpenAIClient implements LLMClient {
 
 	async invoke(
 		messages: Message[],
-		tools: Record<string, Tool>,
+		tools: { AgentOutput: Tool<MacroToolInput> },
 		abortSignal?: AbortSignal
 	): Promise<InvokeResult> {
 		// 1. Convert tools to OpenAI format
@@ -100,75 +102,14 @@ export class OpenAIClient implements LLMClient {
 
 		const data = await response.json()
 
-		// 5. Check finish_reason
-		const choice = data.choices?.[0]
-		if (!choice) {
-			throw new InvokeError(InvokeErrorType.UNKNOWN, 'No choices in response', data)
-		}
+		const tool = tools.AgentOutput
 
-		switch (choice.finish_reason) {
-			case 'tool_calls':
-				// ✅ Normal
-				break
-			case 'length':
-				// ⚠️ Token limit reached
-				throw new InvokeError(
-					InvokeErrorType.CONTEXT_LENGTH,
-					'Response truncated: max tokens reached',
-					data
-				)
-			case 'content_filter':
-				// ❌ Content filtered
-				throw new InvokeError(
-					InvokeErrorType.CONTENT_FILTER,
-					'Content filtered by safety system',
-					data
-				)
-			case 'stop':
-				// ❌ Did not call tool (we require tool call)
-				throw new InvokeError(InvokeErrorType.NO_TOOL_CALL, 'Model did not call any tool', data)
-			default:
-				throw new InvokeError(
-					InvokeErrorType.UNKNOWN,
-					`Unexpected finish_reason: ${choice.finish_reason}`,
-					data
-				)
-		}
+		const macroToolInput = lenientParseMacroToolCall(data, tool.inputSchema as any)
 
-		// 6. Parse tool call
-		const toolCall = choice.message?.tool_calls?.[0]
-		if (!toolCall) {
-			throw new InvokeError(InvokeErrorType.NO_TOOL_CALL, 'No tool call found in response', data)
-		}
-
-		const toolName = toolCall.function.name
-		const tool = tools[toolName]
-		if (!tool) {
-			throw new InvokeError(InvokeErrorType.UNKNOWN, `Tool ${toolName} not found`, data)
-		}
-
-		// 7. Parse and validate arguments
-		let toolArgs: unknown
-		try {
-			toolArgs = JSON.parse(toolCall.function.arguments)
-		} catch (e) {
-			throw new InvokeError(InvokeErrorType.INVALID_TOOL_ARGS, 'Invalid JSON in tool arguments', e)
-		}
-
-		// Validate against zod schema
-		const validation = tool.inputSchema.safeParse(toolArgs)
-		if (!validation.success) {
-			throw new InvokeError(
-				InvokeErrorType.INVALID_TOOL_ARGS,
-				`Tool arguments validation failed: ${validation.error.message}`,
-				validation.error
-			)
-		}
-
-		// 8. Execute tool
+		// Execute tool
 		let toolResult: unknown
 		try {
-			toolResult = await tool.execute(validation.data)
+			toolResult = await tool.execute(macroToolInput)
 		} catch (e) {
 			throw new InvokeError(
 				InvokeErrorType.TOOL_EXECUTION_ERROR,
@@ -181,8 +122,8 @@ export class OpenAIClient implements LLMClient {
 		return {
 			toolCall: {
 				// id: toolCall.id,
-				name: toolName,
-				args: validation.data as Record<string, unknown>,
+				name: 'AgentOutput',
+				args: macroToolInput,
 			},
 			toolResult,
 			usage: {

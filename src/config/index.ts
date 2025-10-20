@@ -24,7 +24,7 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 		baseURL: config.baseURL ?? DEFAULT_BASE_URL,
 		apiKey: config.apiKey ?? DEFAULT_API_KEY,
 		modelName: config.modelName ?? DEFAULT_MODEL_NAME,
-		temperature: config.temperature ?? 0.5, // higher randomness helps auto-recovery
+		temperature: config.temperature ?? 0.7, // higher randomness helps auto-recovery
 		maxTokens: config.maxTokens ?? 4096,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
 	}

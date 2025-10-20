@@ -35,7 +35,7 @@ import type { LLMConfig } from '@/config'
 import { parseLLMConfig } from '@/config'
 import { EventBus, getEventBus } from '@/utils/bus'
 
-import { OpenAIClient } from './OpenAIClient'
+import { OpenAIClient } from './OpenAILenientClient'
 import { InvokeError } from './errors'
 import type { InvokeResult, LLMClient, Message, Tool } from './types'
 

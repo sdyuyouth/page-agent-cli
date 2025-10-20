@@ -49,9 +49,9 @@ export interface LLMClient {
  */
 export interface InvokeResult<TResult = unknown> {
 	toolCall: {
-		id?: string // OpenAI's tool_call_id
+		// id?: string // OpenAI's tool_call_id
 		name: string
-		args: Record<string, unknown>
+		args: any
 	}
 	toolResult: TResult // Supports generics, but defaults to unknown
 	usage: {
