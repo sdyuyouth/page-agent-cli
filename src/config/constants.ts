@@ -50,3 +50,5 @@ export const DEFAULT_BASE_URL: string =
 
 export const LLM_MAX_RETRIES = 2
 export const MAX_STEPS = 20
+export const DEFAULT_TEMPERATURE = 0.7 // higher randomness helps auto-recovery
+export const DEFAULT_MAX_TOKENS = 4096
