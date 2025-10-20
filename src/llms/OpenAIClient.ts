@@ -20,12 +20,7 @@ export class OpenAIClient implements LLMClient {
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, tool]) => zodToOpenAITool(name, tool))
 
-		// 2. Detect patch (auto-compatibility)
-		// TODO: Gemini also uses slightly different format than OpenAI
-		const isClaude = this.config.model.toLowerCase().startsWith('claude')
-		const isGrok = this.config.model.toLowerCase().startsWith('grok')
-
-		// 3. Call API
+		// 2. Call API
 		let response: Response
 		try {
 			response = await fetch(`${this.config.baseURL}/chat/completions`, {
@@ -59,9 +54,9 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(InvokeErrorType.NETWORK_ERROR, 'Network request failed', error)
 		}
 
-		// 4. Handle HTTP errors
+		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({}))
+			const errorData = await response.json().catch()
 			const errorMessage =
 				(errorData as { error?: { message?: string } }).error?.message || response.statusText
 
@@ -95,7 +90,7 @@ export class OpenAIClient implements LLMClient {
 
 		const data = await response.json()
 
-		// 5. Check finish_reason
+		// 4. Check finish_reason
 		const choice = data.choices?.[0]
 		if (!choice) {
 			throw new InvokeError(InvokeErrorType.UNKNOWN, 'No choices in response', data)
@@ -130,7 +125,7 @@ export class OpenAIClient implements LLMClient {
 				)
 		}
 
-		// 6. Parse tool call
+		// 5. Parse tool call
 		const toolCall = choice.message?.tool_calls?.[0]
 		if (!toolCall) {
 			throw new InvokeError(InvokeErrorType.NO_TOOL_CALL, 'No tool call found in response', data)
@@ -142,7 +137,7 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(InvokeErrorType.UNKNOWN, `Tool ${toolName} not found`, data)
 		}
 
-		// 7. Parse and validate arguments
+		// 6. Parse and validate arguments
 		let toolArgs: unknown
 		try {
 			toolArgs = JSON.parse(toolCall.function.arguments)
@@ -160,7 +155,7 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
-		// 8. Execute tool
+		// 7. Execute tool
 		let toolResult: unknown
 		try {
 			toolResult = await tool.execute(validation.data)
@@ -172,7 +167,7 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
-		// 9. Return result (including cache tokens)
+		// 8. Return result (including cache tokens)
 		return {
 			toolCall: {
 				// id: toolCall.id,

@@ -22,11 +22,7 @@ export class OpenAIClient implements LLMClient {
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, tool]) => zodToOpenAITool(name, tool))
 
-		// 2. Detect if Claude (auto-compatibility)
-		// TODO: Gemini also uses slightly different format than OpenAI
-		const isClaude = this.config.model.toLowerCase().startsWith('claude')
-
-		// 3. Call API
+		// 2. Call API
 		let response: Response
 		try {
 			response = await fetch(`${this.config.baseURL}/chat/completions`, {
@@ -60,9 +56,9 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(InvokeErrorType.NETWORK_ERROR, 'Network request failed', error)
 		}
 
-		// 4. Handle HTTP errors
+		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({}))
+			const errorData = await response.json().catch()
 			const errorMessage =
 				(errorData as { error?: { message?: string } }).error?.message || response.statusText
 
@@ -94,10 +90,10 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
+		// parse response
+
 		const data = await response.json()
-
 		const tool = tools.AgentOutput
-
 		const macroToolInput = lenientParseMacroToolCall(data, tool.inputSchema as any)
 
 		// Execute tool
@@ -112,7 +108,7 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
-		// 9. Return result (including cache tokens)
+		// Return result (including cache tokens)
 		return {
 			toolCall: {
 				// id: toolCall.id,
