@@ -27,6 +27,7 @@ export class OpenAIClient implements LLMClient {
 		const openaiTools = Object.entries(tools).map(([name, tool]) => zodToOpenAITool(name, tool))
 
 		// 2. Detect if Claude (auto-compatibility)
+		// TODO: Gemini also uses slightly different format than OpenAI
 		const isClaude = this.config.model.toLowerCase().startsWith('claude')
 
 		// 3. Call API
