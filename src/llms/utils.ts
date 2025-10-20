@@ -192,3 +192,23 @@ export function lenientParseMacroToolCall(
 		)
 	}
 }
+
+export function modelPatch(body: Record<string, any>) {
+	const model: string = body.model || ''
+
+	if (model.toLowerCase().startsWith('claude')) {
+		body.tool_choice = { type: 'tool', name: 'AgentOutput' }
+		body.thinking = { type: 'disabled' }
+		// body.reasoning = { enabled: 'disabled' }
+	}
+
+	if (model.toLowerCase().includes('grok')) {
+		console.log('Applying Grok patch: removing tool_choice')
+		delete body.tool_choice
+		console.log('Applying Grok patch: disable reasoning and thinking')
+		body.thinking = { type: 'disabled', effort: 'minimal' }
+		body.reasoning = { enabled: false, effort: 'low' }
+	}
+
+	return body
+}

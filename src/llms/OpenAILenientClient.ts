@@ -5,13 +5,7 @@ import type { MacroToolInput } from '@/PageAgent'
 
 import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeResult, LLMClient, Message, OpenAIClientConfig, Tool } from './types'
-import { lenientParseMacroToolCall, zodToOpenAITool } from './utils'
-
-// Claude's openAI-API has different format for some fields
-const CLAUDE_PATCH = {
-	tool_choice: { type: 'tool', name: 'AgentOutput' },
-	thinking: { type: 'disabled' },
-}
+import { lenientParseMacroToolCall, modelPatch, zodToOpenAITool } from './utils'
 
 export class OpenAIClient implements LLMClient {
 	config: OpenAIClientConfig
@@ -41,24 +35,24 @@ export class OpenAIClient implements LLMClient {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${this.config.apiKey}`,
 				},
-				body: JSON.stringify({
-					model: this.config.model,
-					temperature: this.config.temperature,
-					max_tokens: this.config.maxTokens,
-					messages,
+				body: JSON.stringify(
+					modelPatch({
+						model: this.config.model,
+						temperature: this.config.temperature,
+						max_tokens: this.config.maxTokens,
+						messages,
 
-					tools: openaiTools,
-					// tool_choice: 'required',
-					tool_choice: { type: 'function', function: { name: 'AgentOutput' } },
+						tools: openaiTools,
+						// tool_choice: 'required',
+						tool_choice: { type: 'function', function: { name: 'AgentOutput' } },
 
-					// model specific params
+						// model specific params
 
-					// reasoning_effort: 'minimal',
-					// verbosity: 'low',
-					parallel_tool_calls: false,
-
-					...(isClaude ? CLAUDE_PATCH : {}),
-				}),
+						// reasoning_effort: 'minimal',
+						// verbosity: 'low',
+						parallel_tool_calls: false,
+					})
+				),
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {

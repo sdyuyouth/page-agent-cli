@@ -3,13 +3,7 @@
  */
 import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeResult, LLMClient, Message, OpenAIClientConfig, Tool } from './types'
-import { zodToOpenAITool } from './utils'
-
-// Claude's openAI-API has different format for some fields
-const CLAUDE_PATCH = {
-	tool_choice: { type: 'tool', name: 'AgentOutput' },
-	thinking: { type: 'disabled' },
-}
+import { modelPatch, zodToOpenAITool } from './utils'
 
 export class OpenAIClient implements LLMClient {
 	config: OpenAIClientConfig
@@ -26,9 +20,10 @@ export class OpenAIClient implements LLMClient {
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, tool]) => zodToOpenAITool(name, tool))
 
-		// 2. Detect if Claude (auto-compatibility)
+		// 2. Detect patch (auto-compatibility)
 		// TODO: Gemini also uses slightly different format than OpenAI
 		const isClaude = this.config.model.toLowerCase().startsWith('claude')
+		const isGrok = this.config.model.toLowerCase().startsWith('grok')
 
 		// 3. Call API
 		let response: Response
@@ -39,24 +34,24 @@ export class OpenAIClient implements LLMClient {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${this.config.apiKey}`,
 				},
-				body: JSON.stringify({
-					model: this.config.model,
-					temperature: this.config.temperature,
-					max_tokens: this.config.maxTokens,
-					messages,
+				body: JSON.stringify(
+					modelPatch({
+						model: this.config.model,
+						temperature: this.config.temperature,
+						max_tokens: this.config.maxTokens,
+						messages,
 
-					tools: openaiTools,
-					// tool_choice: 'required',
-					tool_choice: { type: 'function', function: { name: 'AgentOutput' } },
+						tools: openaiTools,
+						// tool_choice: 'required',
+						tool_choice: { type: 'function', function: { name: 'AgentOutput' } },
 
-					// model specific params
+						// model specific params
 
-					// reasoning_effort: 'minimal',
-					// verbosity: 'low',
-					parallel_tool_calls: false,
-
-					...(isClaude ? CLAUDE_PATCH : {}),
-				}),
+						// reasoning_effort: 'minimal',
+						// verbosity: 'low',
+						parallel_tool_calls: false,
+					})
+				),
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
