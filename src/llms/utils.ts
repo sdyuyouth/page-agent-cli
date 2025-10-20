@@ -25,10 +25,9 @@ export function zodToOpenAITool(name: string, tool: Tool) {
 }
 
 /**
- * Although we require tool calls to be returned following the specified format,
- * some models cannot guarantee correctness:
- * - Don't return tool calls at all but instead return tool call parameters as a JSON string in the message.
- * - Returned tool calls or messages don't follow the correct nested MacroToolInput format.
+ * Although some models cannot guarantee correct response. Common issues are fixable:
+ * - Instead of returning a proper tool call. Return the tool call parameters in the message content.
+ * - Returned tool calls or messages don't follow the nested MacroToolInput format.
  */
 export function lenientParseMacroToolCall(
 	responseData: any,
@@ -77,11 +76,7 @@ export function lenientParseMacroToolCall(
 	arg = toolCall?.arguments ?? null
 
 	if (arg && toolCall.name !== 'AgentOutput') {
-		// throw new InvokeError(
-		// 	InvokeErrorType.INVALID_TOOL_ARGS,
-		// 	`Expected function name "AgentOutput", got "${toolCall.name}"`,
-		// 	null
-		// )
+		// TODO: check if toolCall.name is a valid action name
 		// case: instead of AgentOutput, the model returned a action name as tool call
 		console.log(chalk.yellow('lenientParseMacroToolCall: #1 fixing incorrect tool call'))
 		let tmpArg
@@ -137,6 +132,7 @@ export function lenientParseMacroToolCall(
 		}
 	} else if (parsedArgs.type && parsedArgs.function) {
 		// case: upper level function call format provided. only keep its arguments
+		// TODO: check if function name is a valid action name
 		if (parsedArgs.function.name !== 'AgentOutput')
 			throw new InvokeError(
 				InvokeErrorType.INVALID_TOOL_ARGS,
@@ -148,6 +144,7 @@ export function lenientParseMacroToolCall(
 		parsedArgs = parsedArgs.function.arguments
 	} else if (parsedArgs.name && parsedArgs.arguments) {
 		// case: upper level function call format provided. only keep its arguments
+		// TODO: check if function name is a valid action name
 		if (parsedArgs.name !== 'AgentOutput')
 			throw new InvokeError(
 				InvokeErrorType.INVALID_TOOL_ARGS,
@@ -159,6 +156,7 @@ export function lenientParseMacroToolCall(
 		parsedArgs = parsedArgs.arguments
 	} else {
 		// case: only action parameters provided, wrap into MacroToolInput
+		// TODO: check if action name is valid
 		console.log(chalk.yellow('lenientParseMacroToolCall: #5 fixing incorrect tool call'))
 		parsedArgs = { action: parsedArgs } as MacroToolInput
 	}
@@ -184,6 +182,8 @@ export function lenientParseMacroToolCall(
 		const action = parsedArgs.action ?? {}
 		const actionName = Object.keys(action)[0] || 'unknown'
 		const actionArgs = JSON.stringify(action[actionName] || 'unknown')
+
+		// TODO: check if action name is valid. give a readable error message
 
 		throw new InvokeError(
 			InvokeErrorType.INVALID_TOOL_ARGS,
