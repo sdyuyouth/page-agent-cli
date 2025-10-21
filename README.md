@@ -97,7 +97,6 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing Guide](C
 This project builds upon the excellent work of:
 
 - **[browser-use](https://github.com/browser-use/browser-use)**
-- **[ai-sdk](https://ai-sdk.dev/)**
 
 PageAgent is designed for **client-side web enhancement**, not server-side automation.
 

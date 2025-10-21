@@ -97,7 +97,6 @@ src/
 本项目基于以下优秀项目构建：
 
 - **[browser-use](https://github.com/browser-use/browser-use)**
-- **[ai-sdk](https://ai-sdk.dev/)**
 
 PageAgent 专为**客户端网页增强**设计，不是服务端自动化工具。
 
