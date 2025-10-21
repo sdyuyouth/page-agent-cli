@@ -10,19 +10,6 @@ export default function ModelIntegration() {
 				当前支持符合 OpenAI 接口规范且支持 tool call 的模型，包括公有云服务和私有部署方案。
 			</p>
 
-			<h2 className="text-2xl font-bold mb-3">兼容性说明</h2>
-
-			<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-6">
-				<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
-					🔌 OpenAI 接口兼容
-				</h3>
-				<p className="text-foreground/80">
-					支持所有遵循 OpenAI API chat/completions 接口规范的服务，包括但不限于
-					OpenAI、AWS、阿里云等各大云厂商的模型服务，以及使用 vLLM、Ollama 等框架部署的私有模型。
-				</p>
-				<p className="text-foreground/80">模型需要支持 tool call。</p>
-			</div>
-
 			<h2 className="text-2xl font-bold mb-3">推荐模型</h2>
 
 			<div className="grid md:grid-cols-3 gap-4 mb-6">
@@ -93,7 +80,7 @@ export default function ModelIntegration() {
 				</div>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-3">斟酌</h2>
+			<h2 className="text-2xl font-bold mb-3">提示</h2>
 
 			<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg mb-6">
 				<ul className="text-sm text-foreground/80 space-y-1 list-disc pl-5">
