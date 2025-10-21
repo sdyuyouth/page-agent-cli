@@ -35,7 +35,8 @@ export class I18n {
 
 	private interpolate(template: string, params: TranslationParams): string {
 		return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-			return params[key]?.toString() || match
+			// Use != null to check for both null and undefined, allow empty strings
+			return params[key] != null ? params[key].toString() : match
 		})
 	}
 

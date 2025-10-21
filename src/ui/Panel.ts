@@ -426,10 +426,7 @@ export class Panel {
 	#updateHistory(): void {
 		const steps = this.#state.getAllSteps()
 
-		this.#historySection.innerHTML = steps
-			.slice(-10) // Only show last 10 items
-			.map((step) => this.#createHistoryItem(step))
-			.join('')
+		this.#historySection.innerHTML = steps.map((step) => this.#createHistoryItem(step)).join('')
 
 		// Scroll to bottom to show latest records
 		this.#scrollToBottom()
@@ -491,7 +488,7 @@ export class Panel {
 		const stepLabel = this.#pageAgent.i18n.t('ui.panel.step', {
 			number: step.stepNumber.toString(),
 			time,
-			duration: durationText,
+			duration: durationText || '', // Explicitly pass empty string to replace template
 		})
 
 		return `
