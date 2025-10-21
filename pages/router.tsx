@@ -8,7 +8,6 @@ import DataMasking from './docs/features/data-masking/page'
 import KnowledgeInjection from './docs/features/knowledge-injection/page'
 import ModelIntegration from './docs/features/model-integration/page'
 import SecurityPermissions from './docs/features/security-permissions/page'
-import ApiReference from './docs/integration/api-reference/page'
 import BestPractices from './docs/integration/best-practices/page'
 // Integration pages
 import CdnSetup from './docs/integration/cdn-setup/page'
@@ -113,15 +112,6 @@ export default function Router() {
 					<Header />
 					<DocsLayout>
 						<Configuration />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/integration/api-reference">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
-						<ApiReference />
 					</DocsLayout>
 				</div>
 			</Route>

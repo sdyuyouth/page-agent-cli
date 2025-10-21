@@ -28,10 +28,10 @@ const navigationSections: NavSection[] = [
 		title: 'Features',
 		items: [
 			{ title: '模型接入', path: '/docs/features/model-integration' },
+			{ title: '自定义工具', path: '/docs/features/custom-tools' },
+			{ title: '知识库注入', path: '/docs/features/knowledge-injection' },
 			{ title: '安全与权限', path: '/docs/features/security-permissions' },
 			{ title: '数据脱敏', path: '/docs/features/data-masking' },
-			{ title: '知识库注入', path: '/docs/features/knowledge-injection' },
-			{ title: '自定义工具', path: '/docs/features/custom-tools' },
 		],
 	},
 	{
@@ -39,7 +39,6 @@ const navigationSections: NavSection[] = [
 		items: [
 			{ title: 'CDN 引入', path: '/docs/integration/cdn-setup' },
 			{ title: '配置选项', path: '/docs/integration/configuration' },
-			{ title: 'API 参考', path: '/docs/integration/api-reference' },
 			{ title: '最佳实践', path: '/docs/integration/best-practices' },
 			{ title: '接入第三方 Agent', path: '/docs/integration/third-party-agent' },
 		],

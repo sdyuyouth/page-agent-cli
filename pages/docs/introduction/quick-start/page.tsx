@@ -73,17 +73,6 @@ pageAgent.panel.show()
 					/>
 				</div>
 			</div>
-
-			<div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg">
-				<h3 className="text-lg font-semibold mb-2">🎉 完成！</h3>
-				<p className="mb-3 ">可参考《知识库注入》来优化任务成功率。</p>
-				<a
-					href="/docs/features/security-permissions"
-					className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
-				>
-					了解更多功能 →
-				</a>
-			</div>
 		</div>
 	)
 }
