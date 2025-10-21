@@ -12,18 +12,26 @@ if (window.pageAgent) {
 window.PageAgent = PageAgent
 
 // Export for ES module usage
-export { PageAgent }
+// export { PageAgent }
 
 console.log('🚀 page-agent.js loaded!')
 
+const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
+const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+
 const currentScript = document.currentScript as HTMLScriptElement | null
 if (currentScript) {
+	console.log('🚀 page-agent.js detected current script:', currentScript.src)
 	const url = new URL(currentScript.src)
-	const model = url.searchParams.get('model')
+	const model = url.searchParams.get('model') || DEMO_MODEL
+	const baseURL = url.searchParams.get('baseURL') || DEMO_BASE_URL
+	const apiKey = url.searchParams.get('apiKey') || DEMO_API_KEY
 	const language = (url.searchParams.get('lang') as 'zh-CN' | 'en-US') || 'zh-CN'
-	const config = { model, language } as PageAgentConfig
+	const config: PageAgentConfig = { model, baseURL, apiKey, language }
 	window.pageAgent = new PageAgent(config)
 } else {
+	console.log('🚀 page-agent.js no current script detected, using default demo config')
 	window.pageAgent = new PageAgent()
 }
 

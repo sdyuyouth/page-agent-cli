@@ -13,6 +13,8 @@ The development progress and future plans for PageAgent.
 - [x] **Remove ai-sdk** - Only one function is being used
 - [x] **Robust LLM output**
 - [x] **Working homepage with live LLM API**
+- [x] **~~free~~ CDN**
+- [x] **Free evaluation plan?**
 - [ ] **Hooks for Task and HITL**
 - [ ] **Hijacking `page_open` event**
 - [ ] **Custom knowledge base and instructions**
@@ -20,8 +22,6 @@ The development progress and future plans for PageAgent.
 - [ ] **Data-masking**
 - [ ] **Custom actions**
 - [ ] **Optimize for popular UI frameworks**
-- [ ] **Free evaluation plan?**
-- [ ] **free CDN**
 - [ ] **Testing suits**
 - [ ] **Support custom llm fetch**
 - [ ] **Refactor: Separate Agent and Page-Controller** - Agent can run w/o dom

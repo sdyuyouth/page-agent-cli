@@ -7,12 +7,12 @@ import { PageAgent } from '@/PageAgent.js'
 import Footer from './components/Footer'
 import Header from './components/Header'
 
-const injection = encodeURI(
-	"javascript:(function(){var s=document.createElement('script');s.src=`https://dev.g.alicdn.com/dt/page-use.js/0.0.1/lib/page-agent.umd.cjs?t=${Math.random()}`;s.setAttribute('crossorigin', true);s.onload=()=>console.log('PageAgent ready!');document.head.appendChild(s);})();"
-)
+const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
+const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 
-const injectionQwen = encodeURI(
-	"javascript:(function(){var s=document.createElement('script');s.src=`https://dev.g.alicdn.com/dt/page-use.js/0.0.1/lib/page-agent.umd.cjs?t=${Math.random()}&model=qwen-plus-latest`;s.setAttribute('crossorigin', true);s.onload=()=>console.log('PageAgent ready!');document.head.appendChild(s);})();"
+const injection = encodeURI(
+	"javascript:(function(){var s=document.createElement('script');s.src=`https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.1/page-agent.js?t=${Math.random()}`;s.setAttribute('crossorigin', true);s.type=`text/javascript`;s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();"
 )
 
 const injectionA = `
@@ -20,19 +20,12 @@ const injectionA = `
 	href=${injection}
 	class="inline-flex items-center text-xs px-3 py-2 bg-blue-500 text-white font-medium rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-move border-2 border-dashed border-green-300"
 	draggable="true"
+	onclick="return false;"
 	title="拖拽我到收藏夹栏"
 >
 	✨PageAgent
 </a>
-或
-<a
-	href=${injectionQwen}
-	class="inline-flex items-center text-xs px-3 py-2 bg-purple-500 text-white font-medium rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-move border-2 border-dashed border-green-300"
-	draggable="true"
-	title="拖拽我到收藏夹栏"
->
-	✨PageAgent (Qwen)
-</a>
+
 `
 
 export default function HomePage() {
@@ -58,9 +51,9 @@ export default function HomePage() {
 
 				// testing server
 				// @note: rate limit. prompt limit.
-				model: 'PAGE-AGENT-FREE-TESTING-RANDOM',
-				baseURL: 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy',
-				apiKey: 'PAGE-AGENT-FREE-TESTING-RANDOM',
+				model: DEMO_MODEL,
+				baseURL: DEMO_BASE_URL,
+				apiKey: DEMO_API_KEY,
 			})
 			window.pageAgent = pageAgent
 		}
@@ -190,17 +183,17 @@ export default function HomePage() {
 																<span className="font-semibold">步骤 2:</span>{' '}
 																拖拽下面按钮到收藏夹栏
 															</p>
-															{/* <div
+															<div
 																className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400"
 																dangerouslySetInnerHTML={{ __html: injectionA }}
-															></div> */}
+															></div>
 														</div>
 
 														{/* Usage Instructions */}
 														<div className="bg-purple-50 dark:bg-gray-700 p-4 rounded-lg">
 															<p className="text-gray-700 dark:text-gray-300 text-sm">
 																<span className="font-semibold">步骤 3:</span>{' '}
-																在任何网页点击收藏夹中的按钮即可使用
+																在其他网站点击收藏夹中的按钮即可使用
 															</p>
 														</div>
 													</div>
@@ -213,7 +206,15 @@ export default function HomePage() {
 														<ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
-																仅做技术评估，链接定期失效，成功率待提升
+																仅做技术评估，链接定期失效
+															</li>
+															<li className="flex items-start text-left">
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																使用 DeepSeek 模型，参考 DeepSeek 用户协议和隐私政策
+															</li>
+															<li className="flex items-start text-left">
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																部分网站屏蔽了链接嵌入，将无反应
 															</li>
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
@@ -232,14 +233,6 @@ export default function HomePage() {
 																>
 																	《文档》
 																</Link>
-															</li>
-															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
-																部分网站通过 CSP 屏蔽了链接嵌入，无法注入
-															</li>
-															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
-																基准测试使用 gpt-4.1-mini ，qwen 成功率略低，若卡住请刷新
 															</li>
 														</ul>
 													</div>
