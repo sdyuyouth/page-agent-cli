@@ -34,7 +34,7 @@ An in-page UI agent in javascript. Control web interfaces with natural language.
 
 ```html
 <!-- temporary CDN URL. May change in the future -->
-<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.1/page-agent.js" crossorigin="true" type="text/javascript"></script>
+<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js" crossorigin="true" type="text/javascript"></script>
 ```
 
 ### NPM Installation
