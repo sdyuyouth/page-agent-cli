@@ -55,7 +55,7 @@ export class LLM {
 
 		// Default to OpenAI client
 		this.client = new OpenAIClient({
-			model: this.config.modelName,
+			model: this.config.model,
 			apiKey: this.config.apiKey,
 			baseURL: this.config.baseURL,
 			temperature: this.config.temperature,

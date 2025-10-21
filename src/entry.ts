@@ -19,9 +19,9 @@ console.log('🚀 page-agent.js loaded!')
 const currentScript = document.currentScript as HTMLScriptElement | null
 if (currentScript) {
 	const url = new URL(currentScript.src)
-	const modelName = url.searchParams.get('model')
+	const model = url.searchParams.get('model')
 	const language = (url.searchParams.get('lang') as 'zh-CN' | 'en-US') || 'zh-CN'
-	const config = { modelName, language } as PageAgentConfig
+	const config = { model, language } as PageAgentConfig
 	window.pageAgent = new PageAgent(config)
 } else {
 	window.pageAgent = new PageAgent()

@@ -13,7 +13,7 @@ import {
 export interface LLMConfig {
 	baseURL?: string
 	apiKey?: string
-	modelName?: string
+	model?: string
 	temperature?: number
 	maxTokens?: number
 	maxRetries?: number
@@ -30,7 +30,7 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 	return {
 		baseURL: config.baseURL ?? DEFAULT_BASE_URL,
 		apiKey: config.apiKey ?? DEFAULT_API_KEY,
-		modelName: config.modelName ?? DEFAULT_MODEL_NAME,
+		model: config.model ?? DEFAULT_MODEL_NAME,
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
 		maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
