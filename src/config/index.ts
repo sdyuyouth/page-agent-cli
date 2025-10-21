@@ -1,3 +1,4 @@
+import type { AgentHistory, PageAgent } from '@/PageAgent'
 import type { DomConfig } from '@/dom'
 import type { SupportedLanguage } from '@/i18n'
 import type { PageAgentTool } from '@/tools'
@@ -47,6 +48,11 @@ export interface UIConfig {
 	 * }
 	 */
 	customTools?: Record<string, PageAgentTool | null>
+
+	// hooks
+
+	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
+	onAfterStep?: (this: PageAgent, stepCnt: number, history: AgentHistory[]) => Promise<void> | void
 }
 
 export type PageAgentConfig = LLMConfig & DomConfig & UIConfig

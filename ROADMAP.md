@@ -17,6 +17,7 @@ The development progress and future plans for PageAgent.
 - [x] **Free evaluation plan?**
 - [x] **Custom actions and HITL**
 - [ ] **Hooks and Events**
+	- [x] **Step lifecycle**
 - [ ] **Hijacking `page_open` event**
 - [ ] **Custom knowledge base and instructions**
 - [ ] **Black/white-list safeguard**

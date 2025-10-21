@@ -156,6 +156,8 @@ export class PageAgent extends EventTarget {
 			let step = 0
 
 			while (true) {
+				if (this.config.onBeforeStep) await this.config.onBeforeStep.call(this, step)
+
 				console.group(`step: ${step + 1}`)
 
 				// abort
@@ -208,6 +210,8 @@ export class PageAgent extends EventTarget {
 
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
+
+				if (this.config.onAfterStep) await this.config.onAfterStep.call(this, step, this.history)
 
 				step++
 				if (step > MAX_STEPS) {
