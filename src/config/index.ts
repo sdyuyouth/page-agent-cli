@@ -57,15 +57,34 @@ export interface UIConfig {
 	customTools?: Record<string, PageAgentTool | null>
 
 	// lifecycle hooks
+	// @todo: use event instead of hooks
 
 	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
 	onAfterStep?: (this: PageAgent, stepCnt: number, history: AgentHistory[]) => Promise<void> | void
-	onBeforeTask?: (this: PageAgent, task: string) => Promise<void> | void
-	onAfterTask?: (this: PageAgent, task: string, result: ExecutionResult) => Promise<void> | void
+	onBeforeTask?: (this: PageAgent) => Promise<void> | void
+	onAfterTask?: (this: PageAgent, result: ExecutionResult) => Promise<void> | void
+
+	/**
+	 * @note this hook can block the disposal process
+	 * @note when dispose caused by page unload, `reason` will be 'PAGE_UNLOADING'. this method CANNOT block the unload process. async operations may be cut.
+	 */
+	onDispose?: (this: PageAgent, reason?: string) => void
 
 	// page behavior hooks
 
-	onPageUnload?: (this: PageAgent) => Promise<void> | void
+	/**
+	 * TODO: @unimplemented
+	 * hook when action causes a new page to be opened
+	 * @note PageAgent will try to detect new pages and decide if it's caused by an action. But not very reliable.
+	 */
+	onNewPageOpen?: (this: PageAgent, url: string) => Promise<void> | void
+
+	/**
+	 * TODO: @unimplemented
+	 * try to navigate to a new page instead of opening a new tab/window.
+	 * @note will unload the current page when a action tries to open a new page. so that things keep in the same tab/window.
+	 */
+	experimentalPreventNewPage?: boolean
 }
 
 export type PageAgentConfig = LLMConfig & DomConfig & UIConfig

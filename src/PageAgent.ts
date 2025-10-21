@@ -81,6 +81,7 @@ export class PageAgent extends EventTarget {
 	paused = false
 	disposed = false
 	task = ''
+	taskId = ''
 
 	#llm: LLM
 	#totalWaitTime = 0
@@ -125,6 +126,10 @@ export class PageAgent extends EventTarget {
 		}
 
 		patchReact(this)
+
+		window.addEventListener('beforeunload', (e) => {
+			if (!this.disposed) this.dispose('PAGE_UNLOADING')
+		})
 	}
 
 	/**
@@ -133,13 +138,14 @@ export class PageAgent extends EventTarget {
 	async execute(task: string): Promise<ExecutionResult> {
 		if (!task) throw new Error('Task is required')
 		this.task = task
+		this.taskId = uid()
 
 		const onBeforeStep = this.config.onBeforeStep || (() => void 0)
 		const onAfterStep = this.config.onAfterStep || (() => void 0)
 		const onBeforeTask = this.config.onBeforeTask || (() => void 0)
 		const onAfterTask = this.config.onAfterTask || (() => void 0)
 
-		await onBeforeTask.call(this, task)
+		await onBeforeTask.call(this)
 
 		// Show mask and panel
 		this.mask.show()
@@ -228,7 +234,7 @@ export class PageAgent extends EventTarget {
 						data: 'Step count exceeded maximum limit',
 						history: this.history,
 					}
-					await onAfterTask.call(this, task, result)
+					await onAfterTask.call(this, result)
 					return result
 				}
 				if (actionName === 'done') {
@@ -241,7 +247,7 @@ export class PageAgent extends EventTarget {
 						data: text,
 						history: this.history,
 					}
-					await onAfterTask.call(this, task, result)
+					await onAfterTask.call(this, result)
 					return result
 				}
 			}
@@ -253,7 +259,7 @@ export class PageAgent extends EventTarget {
 				data: String(error),
 				history: this.history,
 			}
-			await onAfterTask.call(this, task, result)
+			await onAfterTask.call(this, result)
 			return result
 		}
 	}
@@ -269,7 +275,7 @@ export class PageAgent extends EventTarget {
 	 */
 	#packMacroTool(): Tool<MacroToolInput, MacroToolResult> {
 		const tools = this.tools
-		// union version
+
 		const actionSchemas = Array.from(tools.entries()).map(([toolName, tool]) => {
 			return zod.object({
 				[toolName]: tool.inputSchema,
@@ -289,8 +295,6 @@ export class PageAgent extends EventTarget {
 		})
 
 		return {
-			// name: MACRO_TOOL_NAME,
-			// description: 'Execute agent action', // @todo remote
 			inputSchema: macroToolSchema as zod.ZodType<MacroToolInput>,
 			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
 				// abort
@@ -512,7 +516,7 @@ export class PageAgent extends EventTarget {
 		this.dispatchEvent(new Event('afterUpdate'))
 	}
 
-	dispose() {
+	dispose(reason?: string) {
 		console.log('Disposing PageAgent...')
 		this.disposed = true
 		dom.cleanUpHighlights()
@@ -522,6 +526,8 @@ export class PageAgent extends EventTarget {
 		this.panel.dispose()
 		this.mask.dispose()
 		this.history = []
-		this.#abortController.abort('PageAgent disposed')
+		this.#abortController.abort(reason ?? 'PageAgent disposed')
+
+		this.config.onDispose?.call(this, reason)
 	}
 }
