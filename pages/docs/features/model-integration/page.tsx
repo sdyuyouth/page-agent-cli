@@ -43,12 +43,19 @@ export default function ModelIntegration() {
 					</h3>
 					<p className="text-sm text-foreground/80 mb-2">安全合规</p>
 					<ul className="text-sm text-foreground/70 space-y-1">
-						<li>• 可控、效果尚可</li>
+						<li>• 可控、效果尚可，价格合理</li>
 						<li>• ToolCall 有出错率，通常能够自动修复</li>
 						<li>
 							• 适合能给出<strong>详细步骤</strong>的场景
 						</li>
 					</ul>
+				</div>
+
+				<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+					<h3 className="text-lg font-semibold mb-2 text-orange-900 dark:text-orange-300">
+						⚡ gemini-2.5-flash
+					</h3>
+					<p className="text-sm text-foreground/80 mb-2">极其高效，成功率高，价格合理</p>
 				</div>
 			</div>
 
@@ -72,10 +79,10 @@ export default function ModelIntegration() {
 						deepseek-v3.1/3.2
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						claude-4-sonnet/4.5/3.7/haiku-4.5
+						claude-sonnet-4/4.5/haiku-4.5
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						gemini-2.5-pro
+						gemini-2.5
 					</span>
 				</div>
 			</div>
