@@ -27,6 +27,9 @@ export class Panel {
 	#pageAgent: PageAgent
 	#userAnswerResolver: ((input: string) => void) | null = null
 	#isWaitingForUserAnswer: boolean = false
+	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
+	#pendingHeaderText: string | null = null
+	#isAnimating = false
 
 	get wrapper(): HTMLElement {
 		return this.#wrapper
@@ -46,6 +49,7 @@ export class Panel {
 		this.#taskInput = this.#wrapper.querySelector(`.${styles.taskInput}`)!
 
 		this.#setupEventListeners()
+		this.#startHeaderUpdateLoop()
 		// this.#expand() // debug
 
 		this.#showInputArea()
@@ -85,20 +89,19 @@ export class Panel {
 	 */
 	dispose(): void {
 		this.#isWaitingForUserAnswer = false
+		this.#stopHeaderUpdateLoop()
 		this.wrapper.remove()
 	}
 
 	/**
 	 * Update status
 	 */
-	async #update(stepData: Omit<Step, 'id' | 'stepNumber' | 'timestamp'>): Promise<void> {
+	#update(stepData: Omit<Step, 'id' | 'stepNumber' | 'timestamp'>): void {
 		const step = this.#state.addStep(stepData)
 
-		// Show animation if text changes
+		// Queue header text update (will be processed by periodic check)
 		const headerText = truncate(step.displayText, 20)
-		if (this.#statusText.textContent !== headerText) {
-			await this.#animateTextChange(headerText)
-		}
+		this.#pendingHeaderText = headerText
 
 		this.#updateStatusIndicator(step.type)
 		this.#updateHistory()
@@ -394,25 +397,69 @@ export class Panel {
 		this.#expandButton.textContent = '▼'
 	}
 
-	async #animateTextChange(newText: string): Promise<void> {
-		return new Promise((resolve) => {
-			// Fade out current text
-			this.#statusText.classList.add(styles.fadeOut)
+	/**
+	 * Start periodic header update loop
+	 */
+	#startHeaderUpdateLoop(): void {
+		// Check every 450ms (same as total animation duration)
+		this.#headerUpdateTimer = setInterval(() => {
+			this.#checkAndUpdateHeader()
+		}, 450)
+	}
+
+	/**
+	 * Stop periodic header update loop
+	 */
+	#stopHeaderUpdateLoop(): void {
+		if (this.#headerUpdateTimer) {
+			clearInterval(this.#headerUpdateTimer)
+			this.#headerUpdateTimer = null
+		}
+	}
+
+	/**
+	 * Check if header needs update and trigger animation if not currently animating
+	 */
+	#checkAndUpdateHeader(): void {
+		// If no pending text or currently animating, skip
+		if (!this.#pendingHeaderText || this.#isAnimating) {
+			return
+		}
+
+		// If text is already displayed, clear pending and skip
+		if (this.#statusText.textContent === this.#pendingHeaderText) {
+			this.#pendingHeaderText = null
+			return
+		}
+
+		// Start animation
+		const textToShow = this.#pendingHeaderText
+		this.#pendingHeaderText = null
+		this.#animateTextChange(textToShow)
+	}
+
+	/**
+	 * Animate text change with fade out/in effect
+	 */
+	#animateTextChange(newText: string): void {
+		this.#isAnimating = true
+
+		// Fade out current text
+		this.#statusText.classList.add(styles.fadeOut)
+
+		setTimeout(() => {
+			// Update text content
+			this.#statusText.textContent = newText
+
+			// Fade in new text
+			this.#statusText.classList.remove(styles.fadeOut)
+			this.#statusText.classList.add(styles.fadeIn)
 
 			setTimeout(() => {
-				// Update text content
-				this.#statusText.textContent = newText
-
-				// Fade in new text
-				this.#statusText.classList.remove(styles.fadeOut)
-				this.#statusText.classList.add(styles.fadeIn)
-
-				setTimeout(() => {
-					this.#statusText.classList.remove(styles.fadeIn)
-					resolve()
-				}, 300)
-			}, 150) // Half the duration of fade out animation
-		})
+				this.#statusText.classList.remove(styles.fadeIn)
+				this.#isAnimating = false
+			}, 300)
+		}, 150) // Half the duration of fade out animation
 	}
 
 	#updateStatusIndicator(type: Step['type']): void {
