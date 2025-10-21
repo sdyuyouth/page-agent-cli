@@ -21,7 +21,7 @@ export interface LLMConfig {
 	maxRetries?: number
 }
 
-export interface UIConfig {
+export interface AgentConfig {
 	// theme?: 'light' | 'dark'
 	language?: SupportedLanguage
 
@@ -43,7 +43,7 @@ export interface UIConfig {
 	 * 	}),
 	 * 	execute: async function (this: PageAgent, input) {
 	 * 		const answer = await do_some_thing(input.question)
-	 * 		return `✅ Received user answer: ${answer}`
+	 * 		return "✅ Received user answer: " + answer
 	 * 	},
 	 * })
 	 * }
@@ -66,7 +66,7 @@ export interface UIConfig {
 
 	/**
 	 * @note this hook can block the disposal process
-	 * @note when dispose caused by page unload, `reason` will be 'PAGE_UNLOADING'. this method CANNOT block unloading. async operations may be cut.
+	 * @note when dispose caused by page unload, reason will be 'PAGE_UNLOADING'. this method CANNOT block unloading. async operations may be cut.
 	 */
 	onDispose?: (this: PageAgent, reason?: string) => void
 
@@ -87,7 +87,7 @@ export interface UIConfig {
 	experimentalPreventNewPage?: boolean
 }
 
-export type PageAgentConfig = LLMConfig & DomConfig & UIConfig
+export type PageAgentConfig = LLMConfig & AgentConfig & DomConfig
 
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 	return {

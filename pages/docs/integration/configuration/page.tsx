@@ -1,4 +1,3 @@
-import BetaNotice from '@pages/components/BetaNotice'
 import CodeEditor from '@pages/components/CodeEditor'
 
 export default function Configuration() {
@@ -6,33 +5,96 @@ export default function Configuration() {
 		<div>
 			<h1 className="text-4xl font-bold mb-6">配置选项</h1>
 
-			<BetaNotice />
+			<CodeEditor
+				className="mb-8"
+				language="typescript"
+				code={`// config
+type PageAgentConfig = LLMConfig & AgentConfig & DomConfig
 
-			<p className="text-xl text-foreground/80 mb-6 leading-relaxed">
-				详细的配置选项说明，帮助你定制 page-agent 的行为。
-			</p>
+interface LLMConfig {
+	baseURL?: string
+	apiKey?: string
+	model?: string
+	temperature?: number
+	maxTokens?: number
+	maxRetries?: number
+}
 
-			<h2 className="text-2xl font-bold mb-3">基础配置</h2>
+interface AgentConfig {
+	language?: "en-US" | "zh-CN"
 
-			<CodeEditor className="mb-8" code={`// TODO`} />
+	/**
+	 * Custom tools to extend PageAgent capabilities
+	 * @experimental
+	 * @note You can also override or remove internal tools by using the same name.
+	 * @see [tools](../tools/index.ts)
+	 *
+	 * @example
+	 * // override internal tool
+	 * import { tool } from 'page-agent'
+	 * const customTools = {
+	 * ask_user: tool({
+	 * 	description:
+	 * 		'Ask the user or parent model a question and wait for their answer. Use this if you need more information or clarification.',
+	 * 	inputSchema: zod.object({
+	 * 		question: zod.string(),
+	 * 	}),
+	 * 	execute: async function (this: PageAgent, input) {
+	 * 		const answer = await do_some_thing(input.question)
+	 * 		return "✅ Received user answer: " + answer
+	 * 	},
+	 * })
+	 * }
+	 *
+	 * @example
+	 * // remove internal tool
+	 * const customTools = {
+	 * 	ask_user: null // never ask user questions
+	 * }
+	 */
+	customTools?: Record<string, PageAgentTool | null>
 
-			<h2 className="text-2xl font-bold mb-3">高级选项</h2>
+	// lifecycle hooks
+	// @todo: use event instead of hooks
 
-			<div className="space-y-4">
-				<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
-						🎯 元素选择策略
-					</h3>
-					<p className="text-foreground/80">配置 AI 如何选择和操作页面元素的策略。</p>
-				</div>
+	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
+	onAfterStep?: (this: PageAgent, stepCnt: number, history: AgentHistory[]) => Promise<void> | void
+	onBeforeTask?: (this: PageAgent) => Promise<void> | void
+	onAfterTask?: (this: PageAgent, result: ExecutionResult) => Promise<void> | void
 
-				<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2 text-green-900 dark:text-green-300">
-						⏱️ 超时设置
-					</h3>
-					<p className="text-foreground/80">设置操作超时时间，避免长时间等待。</p>
-				</div>
-			</div>
+	/**
+	 * @note this hook can block the disposal process
+	 * @note when dispose caused by page unload, "reason" will be 'PAGE_UNLOADING'. this method CANNOT block unloading. async operations may be cut.
+	 */
+	onDispose?: (this: PageAgent, reason?: string) => void
+
+	// page behavior hooks
+
+	/**
+	 * TODO: @unimplemented
+	 * hook when action causes a new page to be opened
+	 * @note PageAgent will try to detect new pages and decide if it's caused by an action. But not very reliable.
+	 */
+	onNewPageOpen?: (this: PageAgent, url: string) => Promise<void> | void
+
+	/**
+	 * TODO: @unimplemented
+	 * try to navigate to a new page instead of opening a new tab/window.
+	 * @note will unload the current page when a action tries to open a new page. so that things keep in the same tab/window.
+	 */
+	experimentalPreventNewPage?: boolean
+}
+
+interface DomConfig {
+	interactiveBlacklist?: (Element | (() => Element))[]
+	interactiveWhitelist?: (Element | (() => Element))[]
+	include_attributes?: string[]
+	highlightOpacity?: number
+	highlightLabelOpacity?: number
+}
+
+`}
+			/>
 		</div>
 	)
 }

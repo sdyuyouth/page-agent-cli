@@ -6,8 +6,6 @@ export default function CdnSetup() {
 		<div>
 			<h1 className="text-4xl font-bold mb-6">CDN 引入</h1>
 
-			<BetaNotice />
-
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
 				通过 CDN 快速集成 page-agent，无需复杂的构建配置。
 			</p>
@@ -16,13 +14,12 @@ export default function CdnSetup() {
 
 			<CodeEditor
 				className="mb-8"
-				code={`<!-- 在 HTML 中引入 -->
-// @todo find a cdn
-<script src="https://some-cdn.com/page-agent.umd.js"></script>
+				code={`
+// 仅供测试使用，稳定 CDN 待定
+<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js" crossorigin="true" type="text/javascript"></script>
 
 <script>
-	const pageAgent = new PageAgent()
-	pageAgent.panel.show()
+	window.pageAgent.panel.show()
 </script>`}
 			/>
 
