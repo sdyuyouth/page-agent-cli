@@ -66,7 +66,7 @@ export interface UIConfig {
 
 	/**
 	 * @note this hook can block the disposal process
-	 * @note when dispose caused by page unload, `reason` will be 'PAGE_UNLOADING'. this method CANNOT block the unload process. async operations may be cut.
+	 * @note when dispose caused by page unload, `reason` will be 'PAGE_UNLOADING'. this method CANNOT block unloading. async operations may be cut.
 	 */
 	onDispose?: (this: PageAgent, reason?: string) => void
 
