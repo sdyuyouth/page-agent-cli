@@ -55,6 +55,12 @@ export default function HomePage() {
 				// 把 react 根元素排除掉，挂了很多冒泡时间导致假阳
 				interactiveBlacklist: [document.getElementById('root')!],
 				language: 'zh-CN',
+
+				// testing server
+				// @note: rate limit. prompt limit.
+				model: 'PAGE-AGENT-FREE-TESTING-RANDOM',
+				baseURL: 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy',
+				apiKey: 'PAGE-AGENT-FREE-TESTING-RANDOM',
 			})
 			window.pageAgent = pageAgent
 		}
@@ -147,7 +153,7 @@ export default function HomePage() {
 														/>
 														<button
 															onClick={handleExecute}
-															disabled
+															// disabled
 															// disabled={!task.trim()}
 															className="absolute right-2 top-2 px-5 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-md hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
 															data-page-agent-not-interactive
