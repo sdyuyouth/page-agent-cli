@@ -1,5 +1,6 @@
 import type { DomConfig } from '@/dom'
 import type { SupportedLanguage } from '@/i18n'
+import type { PageAgentTool } from '@/tools'
 
 import {
 	DEFAULT_API_KEY,
@@ -22,6 +23,30 @@ export interface LLMConfig {
 export interface UIConfig {
 	// theme?: 'light' | 'dark'
 	language?: SupportedLanguage
+
+	/**
+	 * Custom tools to extend PageAgent capabilities
+	 * @experimental
+	 * @note You can also override or remove internal tools by using the same name.
+	 * @see [tools](../tools/index.ts)
+	 *
+	 * @example
+	 * import { tool } from 'page-agent'
+	 * const customTools = {
+	 * ask_user: tool({
+	 * 	description:
+	 * 		'Ask the user or parent model a question and wait for their answer. Use this if you need more information or clarification.',
+	 * 	inputSchema: zod.object({
+	 * 		question: zod.string(),
+	 * 	}),
+	 * 	execute: async function (this: PageAgent, input) {
+	 * 		const answer = await do_some_thing(input.question)
+	 * 		return `✅ Received user answer: ${answer}` + (await getSystemInfo())
+	 * 	},
+	 * })
+	 * }
+	 */
+	customTools?: Record<string, PageAgentTool | null>
 }
 
 export type PageAgentConfig = LLMConfig & DomConfig & UIConfig

@@ -15,23 +15,23 @@ The development progress and future plans for PageAgent.
 - [x] **Working homepage with live LLM API**
 - [x] **~~free~~ CDN**
 - [x] **Free evaluation plan?**
-- [ ] **Hooks for Task and HITL**
+- [x] **Custom actions and HITL**
+- [ ] **Hooks and Events**
 - [ ] **Hijacking `page_open` event**
 - [ ] **Custom knowledge base and instructions**
 - [ ] **Black/white-list safeguard**
 - [ ] **Data-masking**
-- [ ] **Custom actions**
 - [ ] **Optimize for popular UI frameworks**
 - [ ] **Testing suits**
 - [ ] **Support custom llm fetch**
-- [ ] **Refactor: Separate Agent and Page-Controller** - Agent can run w/o dom
+- [ ] **Refactor: Separate Agent and Page-Controller** - Agent should run w/o dom
 
 ♻️ Following browser-use's update and contribute back
 
 ## 📋 Pending Features
 
-- [ ] **Same-origin multi-page-app rally**
 - [ ] **Chrome-ext wrapper**
+- [ ] **Same-origin multi-page-app rally**
 - [ ] **Local MCP proxy**
 
 ## 🤔 To Be Decided

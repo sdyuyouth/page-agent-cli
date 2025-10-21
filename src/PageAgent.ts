@@ -22,6 +22,7 @@ import { assert } from './utils/assert'
 import { getEventBus } from './utils/bus'
 
 export type { PageAgentConfig }
+export { tool, type PageAgentTool } from './tools'
 
 export interface AgentBrain {
 	// thinking?: string
@@ -76,6 +77,7 @@ export class PageAgent extends EventTarget {
 	bus = getEventBus(this.id)
 	i18n: I18n
 	panel: Panel
+	tools: typeof tools
 	paused = false
 	disposed = false
 	task = ''
@@ -98,8 +100,6 @@ export class PageAgent extends EventTarget {
 	/** last time the tree was updated */
 	lastTimeUpdate = 0
 
-	/** Corresponds to actions in browser-use */
-	tools = new Map(tools)
 	/** Fullscreen mask */
 	mask = new SimulatorMask()
 	/** History records */
@@ -112,6 +112,17 @@ export class PageAgent extends EventTarget {
 		this.#llm = new LLM(this.config, this.id)
 		this.i18n = new I18n(this.config.language)
 		this.panel = new Panel(this)
+		this.tools = new Map(tools)
+
+		if (this.config.customTools) {
+			for (const [name, tool] of Object.entries(this.config.customTools)) {
+				if (tool === null) {
+					this.tools.delete(name)
+					continue
+				}
+				this.tools.set(name, tool)
+			}
+		}
 
 		patchReact(this)
 	}
