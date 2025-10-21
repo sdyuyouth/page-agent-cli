@@ -12,7 +12,7 @@ The development progress and future plans for PageAgent.
 - [x] **Landing and doc pages**
 - [x] **Remove ai-sdk** - Only one function is being used
 - [x] **Robust LLM output**
-- [ ] **Working homepage with live LLM API**
+- [x] **Working homepage with live LLM API**
 - [ ] **Hooks for Task and HITL**
 - [ ] **Hijacking `page_open` event**
 - [ ] **Custom knowledge base and instructions**
