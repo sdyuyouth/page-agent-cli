@@ -6,8 +6,6 @@ export default function QuickStart() {
 		<div>
 			<h1 className="text-4xl font-bold mb-6">Quick Start</h1>
 
-			<BetaNotice />
-
 			<p className=" mb-6 leading-relaxed">几分钟内完成 page-agent 的集成。</p>
 
 			<h2 className="text-2xl font-bold mb-3">安装步骤</h2>

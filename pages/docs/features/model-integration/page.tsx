@@ -6,8 +6,6 @@ export default function ModelIntegration() {
 		<div>
 			<h1 className="text-4xl font-bold mb-6">模型接入</h1>
 
-			<BetaNotice />
-
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
 				当前支持符合 OpenAI 接口规范且支持 tool call 的模型，包括公有云服务和私有部署方案。
 			</p>

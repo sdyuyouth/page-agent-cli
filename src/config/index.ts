@@ -43,7 +43,7 @@ export interface UIConfig {
 	 * 	}),
 	 * 	execute: async function (this: PageAgent, input) {
 	 * 		const answer = await do_some_thing(input.question)
-	 * 		return `✅ Received user answer: ${answer}` + (await getSystemInfo())
+	 * 		return `✅ Received user answer: ${answer}`
 	 * 	},
 	 * })
 	 * }
