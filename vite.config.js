@@ -64,7 +64,7 @@ const libConfig = {
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
-			external: ['@ai-sdk/openai', 'ai', 'ai-motion', 'chalk', 'zod'],
+			external: ['ai', 'ai-motion', 'chalk', 'zod'],
 		},
 		// minify: 'terser',
 		minify: false,
