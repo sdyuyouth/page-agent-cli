@@ -66,6 +66,7 @@ export default defineConfig([
 			'@typescript-eslint/restrict-plus-operands': 'off',
 			'react-dom/no-missing-button-type': 'off',
 			'react-x/no-nested-component-definitions': 'off',
+			'@typescript-eslint/prefer-optional-chain': 'off',
 		},
 	},
 ])
