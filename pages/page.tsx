@@ -7,10 +7,6 @@ import { PageAgent } from '@/PageAgent.js'
 import Footer from './components/Footer'
 import Header from './components/Header'
 
-const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-
 const injection = encodeURI(
 	"javascript:(function(){var s=document.createElement('script');s.src=`https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js?t=${Math.random()}`;s.setAttribute('crossorigin', true);s.type=`text/javascript`;s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();"
 )
@@ -51,9 +47,9 @@ export default function HomePage() {
 
 				// testing server
 				// @note: rate limit. prompt limit.
-				model: DEMO_MODEL,
-				baseURL: DEMO_BASE_URL,
-				apiKey: DEMO_API_KEY,
+				// model: DEMO_MODEL,
+				// baseURL: DEMO_BASE_URL,
+				// apiKey: DEMO_API_KEY,
 			})
 			window.pageAgent = pageAgent
 		}

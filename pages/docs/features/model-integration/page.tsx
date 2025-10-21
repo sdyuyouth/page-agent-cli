@@ -60,10 +60,7 @@ export default function ModelIntegration() {
 				</h3>
 				<div className="flex flex-wrap gap-2">
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						gpt-4.1-mini/4.1
-					</span>
-					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						gpt-5
+						gpt-4.1-mini/4.1/5
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
 						grok-4/grok-code-fast
@@ -76,6 +73,9 @@ export default function ModelIntegration() {
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
 						claude-4-sonnet/4.5/3.7/haiku-4.5
+					</span>
+					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
+						gemini-2.5-pro
 					</span>
 				</div>
 			</div>
@@ -91,7 +91,6 @@ export default function ModelIntegration() {
 						有概率出错，通常能自动修复，建议 temperature 设置高一些
 					</li>
 					<li>小模型、nano 模型，效果不佳</li>
-					<li>TODO: Gemini 官方提供的 OpenAI 接口 tool call 部分不兼容</li>
 				</ul>
 			</div>
 
