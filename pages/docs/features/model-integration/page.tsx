@@ -56,12 +56,12 @@ export default function ModelIntegration() {
 
 				<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-orange-900 dark:text-orange-300">
-						🛡️ qwen-plus (qwen3)
+						🛡️ qwen3
 					</h3>
 					<p className="text-sm text-foreground/80 mb-2">合规，低成本</p>
 					<ul className="text-sm text-foreground/70 space-y-1">
-						<li>• 安全合规，便宜，速度快</li>
-						<li>• ToolCall 有出错率，不出错时效果尚可</li>
+						<li>• 安全合规</li>
+						<li>• ToolCall 有出错率，自动重试</li>
 						<li>
 							• 适合能给出<strong>详细步骤</strong>的场景
 						</li>
@@ -77,28 +77,22 @@ export default function ModelIntegration() {
 				</h3>
 				<div className="flex flex-wrap gap-2">
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						gpt-4.1-mini
-					</span>
-					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						gpt-4.1
+						gpt-4.1-mini/4.1
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
 						gpt-5
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						gpt-5-mini
+						grok-4/grok-code-fast
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						qwen-plus
+						qwen3
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						deepseek-v3.1
+						deepseek-v3.1/3.2
 					</span>
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						claude-4-sonnet
-					</span>
-					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
-						claude-3.7-sonnet
+						claude-4-sonnet/4.5/3.7/haiku-4.5
 					</span>
 				</div>
 			</div>
@@ -118,7 +112,7 @@ export default function ModelIntegration() {
 						有概率出错，需要频繁重试
 					</li>
 					<li>小模型、nano 模型，效果不佳</li>
-					<li>Gemini 官方提供的 OpenAI 接口 tool call 部分不兼容</li>
+					<li>TODO: Gemini 官方提供的 OpenAI 接口 tool call 部分不兼容</li>
 				</ul>
 			</div>
 
@@ -130,33 +124,16 @@ export default function ModelIntegration() {
 const pageAgent = new PageAgent({
   baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   apiKey: 'your-api-key',
-  modelName: 'qwen-plus'
+  model: 'qwen-plus'
 });
 
 // 私有部署模型
 const pageAgent = new PageAgent({
   baseURL: 'http://localhost:11434/v1',
-  apiKey: 'ollama',  // Ollama 通常使用任意值
-  modelName: 'qwen3:latest'
+  apiKey: 'N/A',  // Ollama 通常使用任意值
+  model: 'qwen3:latest'
 });`}
 			/>
-
-			<div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-				<h3 className="text-lg font-semibold mb-2 text-yellow-900 dark:text-yellow-300">
-					💡 配置说明
-				</h3>
-				<ul className="text-sm text-foreground/80 space-y-2">
-					<li>
-						<strong>baseURL</strong>: API 服务地址，默认为 OpenAI 官方地址
-					</li>
-					<li>
-						<strong>apiKey</strong>: API 密钥，必填参数
-					</li>
-					<li>
-						<strong>modelName</strong>: 模型名称，默认为 gpt-4.1-mini
-					</li>
-				</ul>
-			</div>
 		</div>
 	)
 }
