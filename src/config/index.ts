@@ -1,4 +1,4 @@
-import type { AgentHistory, PageAgent } from '@/PageAgent'
+import type { AgentHistory, ExecutionResult, PageAgent } from '@/PageAgent'
 import type { DomConfig } from '@/dom'
 import type { SupportedLanguage } from '@/i18n'
 import type { PageAgentTool } from '@/tools'
@@ -32,6 +32,7 @@ export interface UIConfig {
 	 * @see [tools](../tools/index.ts)
 	 *
 	 * @example
+	 * // override internal tool
 	 * import { tool } from 'page-agent'
 	 * const customTools = {
 	 * ask_user: tool({
@@ -46,13 +47,25 @@ export interface UIConfig {
 	 * 	},
 	 * })
 	 * }
+	 *
+	 * @example
+	 * // remove internal tool
+	 * const customTools = {
+	 * 	ask_user: null // never ask user questions
+	 * }
 	 */
 	customTools?: Record<string, PageAgentTool | null>
 
-	// hooks
+	// lifecycle hooks
 
 	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
 	onAfterStep?: (this: PageAgent, stepCnt: number, history: AgentHistory[]) => Promise<void> | void
+	onBeforeTask?: (this: PageAgent, task: string) => Promise<void> | void
+	onAfterTask?: (this: PageAgent, task: string, result: ExecutionResult) => Promise<void> | void
+
+	// page behavior hooks
+
+	onPageUnload?: (this: PageAgent) => Promise<void> | void
 }
 
 export type PageAgentConfig = LLMConfig & DomConfig & UIConfig

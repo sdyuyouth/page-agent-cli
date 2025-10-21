@@ -134,6 +134,13 @@ export class PageAgent extends EventTarget {
 		if (!task) throw new Error('Task is required')
 		this.task = task
 
+		const onBeforeStep = this.config.onBeforeStep || (() => void 0)
+		const onAfterStep = this.config.onAfterStep || (() => void 0)
+		const onBeforeTask = this.config.onBeforeTask || (() => void 0)
+		const onAfterTask = this.config.onAfterTask || (() => void 0)
+
+		await onBeforeTask.call(this, task)
+
 		// Show mask and panel
 		this.mask.show()
 
@@ -142,7 +149,7 @@ export class PageAgent extends EventTarget {
 
 		this.bus.emit('panel:update', {
 			type: 'input',
-			displayText: task,
+			displayText: this.task,
 		})
 
 		if (this.#abortController) {
@@ -156,7 +163,7 @@ export class PageAgent extends EventTarget {
 			let step = 0
 
 			while (true) {
-				if (this.config.onBeforeStep) await this.config.onBeforeStep.call(this, step)
+				await onBeforeStep.call(this, step)
 
 				console.group(`step: ${step + 1}`)
 
@@ -211,37 +218,43 @@ export class PageAgent extends EventTarget {
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
 
-				if (this.config.onAfterStep) await this.config.onAfterStep.call(this, step, this.history)
+				await onAfterStep.call(this, step, this.history)
 
 				step++
 				if (step > MAX_STEPS) {
 					this.#onDone('Step count exceeded maximum limit', false)
-					return {
+					const result: ExecutionResult = {
 						success: false,
 						data: 'Step count exceeded maximum limit',
 						history: this.history,
 					}
+					await onAfterTask.call(this, task, result)
+					return result
 				}
 				if (actionName === 'done') {
 					const success = action.input?.success ?? false
 					const text = action.input?.text || 'no text provided'
 					console.log(chalk.green.bold('Task completed'), success, text)
 					this.#onDone(text, success)
-					return {
+					const result: ExecutionResult = {
 						success,
 						data: text,
 						history: this.history,
 					}
+					await onAfterTask.call(this, task, result)
+					return result
 				}
 			}
 		} catch (error: unknown) {
 			console.error('Task failed', error)
 			this.#onDone(String(error), false)
-			return {
+			const result: ExecutionResult = {
 				success: false,
 				data: String(error),
 				history: this.history,
 			}
+			await onAfterTask.call(this, task, result)
+			return result
 		}
 	}
 
