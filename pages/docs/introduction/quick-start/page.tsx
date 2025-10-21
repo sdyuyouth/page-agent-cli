@@ -21,8 +21,8 @@ export default function QuickStart() {
 						<div>
 							<p className="text-sm font-medium mb-2">CDN 引入</p>
 							<CodeEditor
-								code={`// 仅供测试使用，生产环境联系 @西萌
-<script src="https://dev.g.alicdn.com/dt/page-use.js/0.0.1/lib/page-agent.umd.cjs"></script>`}
+								code={`// 仅供测试使用
+<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.1/page-agent.js" crossorigin="true" type="text/javascript"></script>`}
 								language="html"
 							/>
 						</div>
@@ -43,7 +43,19 @@ import PageAgent from 'page-agent'`}
 					</h3>
 					<CodeEditor
 						code={`// 仅供测试使用，生产环境需要配置 LLM 接入点，本工具不提供 LLM 服务
-const pageAgent = new PageAgent()`}
+// 测试接口
+// @note: 限流，限制 prompt 内容，限制来源，随时变更，请替换成你自己的
+// @note: 使用 DeepSeek-chat(3.2) 官方版本，使用协议和隐私策略见 DeepSeek 网站
+const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
+const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+
+const agent = new PageAgent({
+  modelName: DEMO_MODEL,
+  baseURL: DEMO_BASE_URL,
+  apiKey: DEMO_API_KEY,
+  language: 'zh-CN'
+})`}
 						language="javascript"
 					/>
 				</div>

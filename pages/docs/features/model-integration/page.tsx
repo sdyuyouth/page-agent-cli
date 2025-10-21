@@ -132,7 +132,15 @@ const pageAgent = new PageAgent({
   baseURL: 'http://localhost:11434/v1',
   apiKey: 'N/A',  // Ollama 通常使用任意值
   model: 'qwen3:latest'
-});`}
+});
+
+// 测试接口
+// @note: 限流，限制 prompt 内容，限制来源，随时变更，请替换成你自己的
+// @note: 使用 DeepSeek-chat(3.2) 官方版本，使用协议和隐私策略见 DeepSeek 网站
+const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
+const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+`}
 			/>
 		</div>
 	)

@@ -1,6 +1,6 @@
 # PageAgent 🤖🪄
 
-> Unfinished Project. See [**Roadmap**](./ROADMAP.md)
+> ⚠️ See [**Roadmap**](./ROADMAP.md)
 
 ![banner](https://img.alicdn.com/imgextra/i1/O1CN01RY0Wvh26ATVeDIX7v_!!6000000007621-0-tps-1672-512.jpg)
 
@@ -32,11 +32,9 @@ An in-page UI agent in javascript. Control web interfaces with natural language.
 
 ### CDN Integration
 
-> **TODO**: CDN endpoint to be determined.
-
 ```html
-<!-- CDN script tag - URL to be updated -->
-<script src="TODO-CDN-URL"></script>
+<!-- temporary CDN URL. May change in the future -->
+<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.1/page-agent.js" crossorigin="true" type="text/javascript"></script>
 ```
 
 ### NPM Installation
@@ -48,10 +46,18 @@ npm install page-agent
 ```javascript
 import { PageAgent } from 'page-agent'
 
+// test server
+// @note: rate limit. prompt limit. Origin limit. May change anytime. Use your own llm!
+// @note Using official DeepSeek-chat(3.2). Go to DeepSeek website for privacy policy.
+const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
+const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+
 const agent = new PageAgent({
-  modelName: 'gpt-4.1-mini',
-  baseURL: 'xxxx',
-  apiKey: 'xxxx'
+  modelName: DEMO_MODEL,
+  baseURL: DEMO_BASE_URL,
+  apiKey: DEMO_API_KEY,
+  language: 'en-US'
 })
 
 await agent.execute("Click the login button")

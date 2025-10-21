@@ -1,6 +1,6 @@
 # PageAgent 🤖🪄
 
-> Unfinished Project. See [**Roadmap**](./ROADMAP.md)
+> ⚠️ See [**Roadmap**](./ROADMAP.md)
 
 ![banner](https://img.alicdn.com/imgextra/i1/O1CN01RY0Wvh26ATVeDIX7v_!!6000000007621-0-tps-1672-512.jpg)
 
@@ -32,11 +32,9 @@
 
 ### CDN 集成
 
-> **TODO**: CDN 地址待确定。
-
 ```html
-<!-- CDN 脚本标签 - URL 待更新 -->
-<script src="TODO-CDN-URL"></script>
+<!-- 临时 CDN URL. 未来会变更 -->
+<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.1/page-agent.js" crossorigin="true" type="text/javascript"></script>
 ```
 
 ### NPM 安装
@@ -48,10 +46,18 @@ npm install page-agent
 ```javascript
 import { PageAgent } from 'page-agent'
 
+// 测试接口
+// @note: 限流，限制 prompt 内容，限制来源，随时变更，请替换成你自己的
+// @note: 使用 DeepSeek-chat(3.2) 官方版本，使用协议和隐私策略见 DeepSeek 网站
+const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
+const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+
 const agent = new PageAgent({
-  modelName: 'gpt-4.1-mini',
-  baseURL: 'xxxx',
-  apiKey: 'xxxx'
+  modelName: DEMO_MODEL,
+  baseURL: DEMO_BASE_URL,
+  apiKey: DEMO_API_KEY,
+  language: 'zh-CN'
 })
 
 await agent.execute("点击登录按钮")
