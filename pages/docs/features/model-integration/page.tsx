@@ -17,12 +17,10 @@ export default function ModelIntegration() {
 					🔌 OpenAI 接口兼容
 				</h3>
 				<p className="text-foreground/80">
-					支持所有遵循 OpenAI API chat/completions 接口规范的服务，包括但不限于 OpenAI、Azure
-					阿里云等各大云厂商的模型服务，以及使用 vLLM、Ollama 等框架部署的私有模型。
+					支持所有遵循 OpenAI API chat/completions 接口规范的服务，包括但不限于
+					OpenAI、AWS、阿里云等各大云厂商的模型服务，以及使用 vLLM、Ollama 等框架部署的私有模型。
 				</p>
-				<p className="text-foreground/80">
-					模型需要支持 tool call ，并且能够通过 json schema 制定 tool call 格式。
-				</p>
+				<p className="text-foreground/80">模型需要支持 tool call。</p>
 			</div>
 
 			<h2 className="text-2xl font-bold mb-3">推荐模型</h2>
@@ -35,20 +33,20 @@ export default function ModelIntegration() {
 					<p className="text-sm text-foreground/80 mb-2">评估基准 ✅</p>
 					<ul className="text-sm text-foreground/70 space-y-1">
 						<li>• 性价比高</li>
-						<li>• 速度快，成功率较高</li>
-						<li>• i/o $0.4/$1.6 (每 M token)</li>
+						<li>• 速度快</li>
+						<li>• 成功率高</li>
 					</ul>
 				</div>
 
 				<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
-						🚀 gpt-4.1
+						💰 DeepSeek-3.2
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">适用于生产</p>
+					<p className="text-sm text-foreground/80 mb-2">经济实惠</p>
 					<ul className="text-sm text-foreground/70 space-y-1">
-						<li>• 效果和速度均衡</li>
-						<li>• 价格贵，4.1-mini 的 5 倍</li>
-						<li>• 适合不缺钱的生产环境</li>
+						<li>• 价格远低于同等级其他模型</li>
+						<li>• ToolCall 有出错率，通常能够自动修复</li>
+						<li>• 本网站提供的免费试用为 DeepSeek</li>
 					</ul>
 				</div>
 
@@ -56,10 +54,10 @@ export default function ModelIntegration() {
 					<h3 className="text-lg font-semibold mb-2 text-orange-900 dark:text-orange-300">
 						🛡️ qwen3
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">合规，低成本</p>
+					<p className="text-sm text-foreground/80 mb-2">安全合规</p>
 					<ul className="text-sm text-foreground/70 space-y-1">
-						<li>• 安全合规</li>
-						<li>• ToolCall 有出错率，自动重试</li>
+						<li>• 可控、效果尚可</li>
+						<li>• ToolCall 有出错率，通常能够自动修复</li>
 						<li>
 							• 适合能给出<strong>详细步骤</strong>的场景
 						</li>
@@ -95,19 +93,15 @@ export default function ModelIntegration() {
 				</div>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-3">问题</h2>
+			<h2 className="text-2xl font-bold mb-3">斟酌</h2>
 
 			<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg mb-6">
-				<h3 className="text-lg font-semibold mb-2 text-red-900 dark:text-red-300">
-					🚫 根据你的场景斟酌
-				</h3>
 				<ul className="text-sm text-foreground/80 space-y-1 list-disc pl-5">
 					<li>reasoning 模型，速度偏慢，没有必要</li>
-					<li>GPT-5 全系列，速度过慢，效果提升不明显</li>
-					<li>未针对 agent 优化的模型（如各类 coder 模型），效果不佳</li>
+					<li>GPT-5 reasoning 速度过慢，效果提升不明显</li>
 					<li>
 						不保证 json schema 的模型（openAI 以外的几乎所有模型），tool call
-						有概率出错，需要频繁重试
+						有概率出错，通常能自动修复，建议 temperature 设置高一些
 					</li>
 					<li>小模型、nano 模型，效果不佳</li>
 					<li>TODO: Gemini 官方提供的 OpenAI 接口 tool call 部分不兼容</li>
