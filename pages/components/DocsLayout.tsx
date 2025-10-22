@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'wouter'
 
 interface DocsLayoutProps {
@@ -15,38 +16,39 @@ interface NavSection {
 	items: NavItem[]
 }
 
-const navigationSections: NavSection[] = [
-	{
-		title: 'Introduction',
-		items: [
-			{ title: 'Overview', path: '/docs/introduction/overview' },
-			{ title: 'Quick Start', path: '/docs/introduction/quick-start' },
-			{ title: '使用限制', path: '/docs/introduction/limitations' },
-		],
-	},
-	{
-		title: 'Features',
-		items: [
-			{ title: '模型接入', path: '/docs/features/model-integration' },
-			{ title: '自定义工具', path: '/docs/features/custom-tools' },
-			{ title: '知识库注入', path: '/docs/features/knowledge-injection' },
-			{ title: '安全与权限', path: '/docs/features/security-permissions' },
-			{ title: '数据脱敏', path: '/docs/features/data-masking' },
-		],
-	},
-	{
-		title: 'Integration',
-		items: [
-			{ title: 'CDN 引入', path: '/docs/integration/cdn-setup' },
-			{ title: '配置选项', path: '/docs/integration/configuration' },
-			{ title: '最佳实践', path: '/docs/integration/best-practices' },
-			{ title: '接入第三方 Agent', path: '/docs/integration/third-party-agent' },
-		],
-	},
-]
-
 export default function DocsLayout({ children }: DocsLayoutProps) {
+	const { t } = useTranslation('common')
 	const [location] = useLocation()
+
+	const navigationSections: NavSection[] = [
+		{
+			title: t('nav.introduction'),
+			items: [
+				{ title: t('nav.overview'), path: '/docs/introduction/overview' },
+				{ title: t('nav.quick_start'), path: '/docs/introduction/quick-start' },
+				{ title: t('nav.limitations'), path: '/docs/introduction/limitations' },
+			],
+		},
+		{
+			title: t('nav.features'),
+			items: [
+				{ title: t('nav.model_integration'), path: '/docs/features/model-integration' },
+				{ title: t('nav.custom_tools'), path: '/docs/features/custom-tools' },
+				{ title: t('nav.knowledge_injection'), path: '/docs/features/knowledge-injection' },
+				{ title: t('nav.security_permissions'), path: '/docs/features/security-permissions' },
+				{ title: t('nav.data_masking'), path: '/docs/features/data-masking' },
+			],
+		},
+		{
+			title: t('nav.integration'),
+			items: [
+				{ title: t('nav.cdn_setup'), path: '/docs/integration/cdn-setup' },
+				{ title: t('nav.configuration'), path: '/docs/integration/configuration' },
+				{ title: t('nav.best_practices'), path: '/docs/integration/best-practices' },
+				{ title: t('nav.third_party_agent'), path: '/docs/integration/third-party-agent' },
+			],
+		},
+	]
 
 	return (
 		<div className="max-w-7xl mx-auto px-6 py-8">
@@ -57,7 +59,9 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 						<nav className="space-y-8" role="navigation" aria-label="文档章节">
 							{navigationSections.map((section) => (
 								<section key={section.title}>
-									<h3 className="font-semibold  uppercase tracking-wider mb-3">{section.title}</h3>
+									<h3 className="font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3">
+										{section.title}
+									</h3>
 									<ul className="space-y-2" role="list">
 										{section.items.map((item) => {
 											const isActive = location === item.path
@@ -68,7 +72,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 														className={`block px-3 py-2 rounded-lg transition-colors duration-200 ${
 															isActive
 																? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
-																: ' hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-800'
+																: 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
 														}`}
 														aria-current={isActive ? 'page' : undefined}
 													>

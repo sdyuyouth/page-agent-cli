@@ -8,7 +8,7 @@ export default function KnowledgeInjection() {
 
 			<BetaNotice />
 
-			<p className="text-xl text-foreground/80 mb-8 leading-relaxed">
+			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				通过多层次的知识注入，让 AI 深度理解你的业务场景和应用逻辑，实现更精准的自动化操作。
 			</p>
 
@@ -20,8 +20,10 @@ export default function KnowledgeInjection() {
 					<h3 className="text-xl font-semibold mb-3 text-purple-900 dark:text-purple-300">
 						🎯 系统级指令
 					</h3>
-					<p className="text-foreground/80 mb-4">为 AI 设定全局行为准则和工作风格。</p>
-					<ul className="list-disc list-inside space-y-2 text-foreground/70">
+					<p className="text-gray-600 dark:text-gray-300 mb-4">
+						为 AI 设定全局行为准则和工作风格。
+					</p>
+					<ul className="list-disc list-inside space-y-2 text-gray-500 dark:text-gray-400">
 						<li>定义 AI 的工作风格和交互方式</li>
 						<li>设置安全边界和操作限制</li>
 						<li>指定错误处理和异常情况的应对策略</li>
@@ -57,13 +59,13 @@ const pageAgent = new PageAgent({
 					<h3 className="text-xl font-semibold mb-3 text-blue-900 dark:text-blue-300">
 						� 业务领域知识
 					</h3>
-					<p className="text-foreground/80 mb-4">
+					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						注入应用的核心业务知识，包括产品介绍、操作流程、术语定义等，让 AI 理解业务上下文。
 					</p>
 					<div className="grid md:grid-cols-2 gap-4">
 						<div className="space-y-2">
 							<h4 className="font-semibold text-blue-800 dark:text-blue-200">产品知识</h4>
-							<ul className="list-disc list-inside text-sm text-foreground/70 space-y-1">
+							<ul className="list-disc list-inside text-sm text-gray-500 dark:text-gray-400 space-y-1">
 								<li>产品功能和特性介绍</li>
 								<li>用户角色和权限体系</li>
 								<li>业务规则和约束条件</li>
@@ -71,7 +73,7 @@ const pageAgent = new PageAgent({
 						</div>
 						<div className="space-y-2">
 							<h4 className="font-semibold text-blue-800 dark:text-blue-200">操作指南</h4>
-							<ul className="list-disc list-inside text-sm text-foreground/70 space-y-1">
+							<ul className="list-disc list-inside text-sm text-gray-500 dark:text-gray-400 space-y-1">
 								<li>标准操作流程定义</li>
 								<li>异常情况处理方案</li>
 								<li>术语和概念解释</li>
@@ -111,21 +113,25 @@ pageAgent.knowledge.setAppKnowledge(\`
 					<h3 className="text-xl font-semibold mb-3 text-green-900 dark:text-green-300">
 						📄 页面级精准指导
 					</h3>
-					<p className="text-foreground/80 mb-4">
+					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						为特定页面提供精确的操作指导和元素说明，让 AI 准确理解页面结构和交互逻辑。
 					</p>
 					<div className="grid md:grid-cols-3 gap-4">
 						<div className="space-y-2">
 							<h4 className="font-semibold text-green-800 dark:text-green-200">元素标注</h4>
-							<p className="text-sm text-foreground/70">为页面元素添加语义化描述</p>
+							<p className="text-sm text-gray-500 dark:text-gray-400">为页面元素添加语义化描述</p>
 						</div>
 						<div className="space-y-2">
 							<h4 className="font-semibold text-green-800 dark:text-green-200">交互说明</h4>
-							<p className="text-sm text-foreground/70">定义元素的交互行为和预期结果</p>
+							<p className="text-sm text-gray-500 dark:text-gray-400">
+								定义元素的交互行为和预期结果
+							</p>
 						</div>
 						<div className="space-y-2">
 							<h4 className="font-semibold text-green-800 dark:text-green-200">页面逻辑</h4>
-							<p className="text-sm text-foreground/70">说明页面的业务逻辑和状态变化</p>
+							<p className="text-sm text-gray-500 dark:text-gray-400">
+								说明页面的业务逻辑和状态变化
+							</p>
 						</div>
 					</div>
 				</div>

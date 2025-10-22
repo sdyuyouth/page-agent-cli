@@ -8,7 +8,7 @@ export default function DataMasking() {
 
 			<BetaNotice />
 
-			<p className="text-xl text-foreground/80 mb-6 leading-relaxed">
+			<p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
 				保护敏感数据，确保 AI 处理过程中的数据安全。
 			</p>
 
@@ -19,14 +19,18 @@ export default function DataMasking() {
 					<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
 						🔒 自动脱敏
 					</h3>
-					<p className="text-foreground/80">自动识别并脱敏手机号、身份证号、银行卡号等敏感信息。</p>
+					<p className="text-gray-600 dark:text-gray-300">
+						自动识别并脱敏手机号、身份证号、银行卡号等敏感信息。
+					</p>
 				</div>
 
 				<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
 						⚙️ 自定义规则
 					</h3>
-					<p className="text-foreground/80">支持自定义脱敏规则，适应不同业务场景的数据保护需求。</p>
+					<p className="text-gray-600 dark:text-gray-300">
+						支持自定义脱敏规则，适应不同业务场景的数据保护需求。
+					</p>
 				</div>
 			</div>
 

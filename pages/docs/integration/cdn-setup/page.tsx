@@ -27,7 +27,7 @@ export default function CdnSetup() {
 				<h3 className="text-lg font-semibold mb-2 text-yellow-900 dark:text-yellow-300">
 					⚠️ 注意事项
 				</h3>
-				<ul className="text-foreground/80 space-y-1">
+				<ul className="text-gray-600 dark:text-gray-300 space-y-1">
 					<li>• 生产环境建议使用固定版本号</li>
 					<li>• 确保 HTTPS 环境下使用</li>
 					<li>• 配置 CSP 策略允许脚本执行</li>

@@ -1,23 +1,26 @@
 import BetaNotice from '@pages/components/BetaNotice'
 import CodeEditor from '@pages/components/CodeEditor'
+import { useTranslation } from 'react-i18next'
 
 export default function QuickStart() {
+	const { t } = useTranslation('docs')
+
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">Quick Start</h1>
+			<h1 className="text-4xl font-bold mb-6">{t('quick_start.title')}</h1>
 
-			<p className=" mb-6 leading-relaxed">几分钟内完成 page-agent 的集成。</p>
+			<p className=" mb-6 leading-relaxed">{t('quick_start.subtitle')}</p>
 
-			<h2 className="text-2xl font-bold mb-3">安装步骤</h2>
+			<h2 className="text-2xl font-bold mb-3">{t('quick_start.installation')}</h2>
 
 			<div className="space-y-4 mb-6">
 				<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
-						1. 引入方式
+						{t('quick_start.step1_title')}
 					</h3>
 					<div className="space-y-3">
 						<div>
-							<p className="text-sm font-medium mb-2">CDN 引入</p>
+							<p className="text-sm font-medium mb-2">{t('quick_start.step1_cdn')}</p>
 							<CodeEditor
 								code={`// 仅供测试使用
 <script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js" crossorigin="true" type="text/javascript"></script>`}
@@ -25,7 +28,7 @@ export default function QuickStart() {
 							/>
 						</div>
 						<div>
-							<p className="text-sm font-medium mb-2">NPM 安装</p>
+							<p className="text-sm font-medium mb-2">{t('quick_start.step1_npm')}</p>
 							<CodeEditor
 								code={`// npm install page-agent
 import PageAgent from 'page-agent'`}
@@ -37,7 +40,7 @@ import PageAgent from 'page-agent'`}
 
 				<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-green-900 dark:text-green-300">
-						2. 初始化配置
+						{t('quick_start.step2_title')}
 					</h3>
 					<CodeEditor
 						code={`// 仅供测试使用，生产环境需要配置 LLM 接入点，本工具不提供 LLM 服务
@@ -60,7 +63,7 @@ const agent = new PageAgent({
 
 				<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
-						3. 开始使用
+						{t('quick_start.step3_title')}
 					</h3>
 					<CodeEditor
 						code={`// 程序化执行自然语言指令

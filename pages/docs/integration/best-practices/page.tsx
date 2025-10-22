@@ -19,7 +19,9 @@ export default function BestPractices() {
 					<h3 className="text-lg font-semibold mb-2 text-green-900 dark:text-green-300">
 						⚡ 减少 API 调用
 					</h3>
-					<p className="text-foreground/80 mb-3">合并多个操作指令，减少与 AI 模型的交互次数。</p>
+					<p className="text-gray-600 dark:text-gray-300 mb-3">
+						合并多个操作指令，减少与 AI 模型的交互次数。
+					</p>
 
 					<CodeEditor
 						code={`// 推荐：合并操作
@@ -36,7 +38,9 @@ await pageAgent.execute('点击提交按钮');`}
 					<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
 						🎯 精确的元素描述
 					</h3>
-					<p className="text-foreground/80">使用具体、明确的元素描述，提高操作成功率。</p>
+					<p className="text-gray-600 dark:text-gray-300">
+						使用具体、明确的元素描述，提高操作成功率。
+					</p>
 				</div>
 			</div>
 
@@ -45,12 +49,12 @@ await pageAgent.execute('点击提交按钮');`}
 			<div className="space-y-3 mb-6">
 				<div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-red-500">
 					<h3 className="font-semibold mb-1 text-red-900 dark:text-red-300">重要操作保护</h3>
-					<p className="text-foreground/80">对删除、支付等敏感操作设置黑名单保护。</p>
+					<p className="text-gray-600 dark:text-gray-300">对删除、支付等敏感操作设置黑名单保护。</p>
 				</div>
 
 				<div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-l-4 border-yellow-500">
 					<h3 className="font-semibold mb-1 text-yellow-900 dark:text-yellow-300">数据脱敏</h3>
-					<p className="text-foreground/80">启用数据脱敏功能，保护用户隐私信息。</p>
+					<p className="text-gray-600 dark:text-gray-300">启用数据脱敏功能，保护用户隐私信息。</p>
 				</div>
 			</div>
 

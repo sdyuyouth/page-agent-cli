@@ -1,69 +1,78 @@
 import BetaNotice from '@pages/components/BetaNotice'
 import CodeEditor from '@pages/components/CodeEditor'
+import { useTranslation } from 'react-i18next'
 
 export default function ModelIntegration() {
+	const { t } = useTranslation('docs')
+
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">模型接入</h1>
+			<h1 className="text-4xl font-bold mb-6">{t('model_integration.title')}</h1>
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-				当前支持符合 OpenAI 接口规范且支持 tool call 的模型，包括公有云服务和私有部署方案。
+				{t('model_integration.subtitle')}
 			</p>
 
-			<h2 className="text-2xl font-bold mb-3">推荐模型</h2>
+			<h2 className="text-2xl font-bold mb-3">{t('model_integration.recommended')}</h2>
 
 			<div className="grid md:grid-cols-3 gap-4 mb-6">
 				<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-green-900 dark:text-green-300">
-						⚡ gpt-4.1-mini
+						{t('model_integration.model_gpt4_title')}
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">评估基准 ✅</p>
-					<ul className="text-sm text-foreground/70 space-y-1">
-						<li>• 性价比高</li>
-						<li>• 速度快</li>
-						<li>• 成功率高</li>
+					<p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+						{t('model_integration.model_gpt4_badge')}
+					</p>
+					<ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+						<li>{t('model_integration.model_gpt4_1')}</li>
+						<li>{t('model_integration.model_gpt4_2')}</li>
+						<li>{t('model_integration.model_gpt4_3')}</li>
 					</ul>
 				</div>
 
 				<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
-						💰 DeepSeek-3.2
+						{t('model_integration.model_deepseek_title')}
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">经济实惠</p>
-					<ul className="text-sm text-foreground/70 space-y-1">
-						<li>• 价格远低于同等级其他模型</li>
-						<li>• ToolCall 有出错率，通常能够自动修复</li>
-						<li>• 本网站提供的免费试用为 DeepSeek</li>
+					<p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+						{t('model_integration.model_deepseek_badge')}
+					</p>
+					<ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+						<li>{t('model_integration.model_deepseek_1')}</li>
+						<li>{t('model_integration.model_deepseek_2')}</li>
+						<li>{t('model_integration.model_deepseek_3')}</li>
 					</ul>
 				</div>
 
 				<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-orange-900 dark:text-orange-300">
-						🛡️ qwen3
+						{t('model_integration.model_qwen_title')}
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">安全合规</p>
-					<ul className="text-sm text-foreground/70 space-y-1">
-						<li>• 可控、效果尚可，价格合理</li>
-						<li>• ToolCall 有出错率，通常能够自动修复</li>
-						<li>
-							• 适合能给出<strong>详细步骤</strong>的场景
-						</li>
+					<p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+						{t('model_integration.model_qwen_badge')}
+					</p>
+					<ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+						<li>{t('model_integration.model_qwen_1')}</li>
+						<li>{t('model_integration.model_qwen_2')}</li>
+						<li>{t('model_integration.model_qwen_3')}</li>
 					</ul>
 				</div>
 
 				<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-orange-900 dark:text-orange-300">
-						⚡ gemini-2.5-flash
+						{t('model_integration.model_gemini_title')}
 					</h3>
-					<p className="text-sm text-foreground/80 mb-2">极其高效，成功率高，价格合理</p>
+					<p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+						{t('model_integration.model_gemini_badge')}
+					</p>
 				</div>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-3">可用模型</h2>
+			<h2 className="text-2xl font-bold mb-3">{t('model_integration.available')}</h2>
 
 			<div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg mb-6">
 				<h3 className="text-lg font-semibold mb-3 text-emerald-900 dark:text-emerald-300">
-					✅ 已验证可用
+					{t('model_integration.available_verified')}
 				</h3>
 				<div className="flex flex-wrap gap-2">
 					<span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 px-3 py-1 text-sm">
@@ -87,20 +96,17 @@ export default function ModelIntegration() {
 				</div>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-3">提示</h2>
+			<h2 className="text-2xl font-bold mb-3">{t('model_integration.tips')}</h2>
 
 			<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg mb-6">
-				<ul className="text-sm text-foreground/80 space-y-1 list-disc pl-5">
-					<li>reasoning 模型（如 GPT-5），速度偏慢，没有必要</li>
-					<li>
-						不保证 json schema 的模型（openAI 以外的几乎所有模型），tool call
-						有概率出错，通常能自动修复，建议 temperature 设置高一些
-					</li>
-					<li>小模型、nano 模型，效果不佳</li>
+				<ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 list-disc pl-5">
+					<li>{t('model_integration.tip_1')}</li>
+					<li>{t('model_integration.tip_2')}</li>
+					<li>{t('model_integration.tip_3')}</li>
 				</ul>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-3">配置方式</h2>
+			<h2 className="text-2xl font-bold mb-3">{t('model_integration.configuration')}</h2>
 
 			<CodeEditor
 				code={`

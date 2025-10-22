@@ -3,19 +3,43 @@
 	word-break: break-word;
 	overflow-wrap: break-word;
 	font-family: monospace;
+	color: #171717;
+}
+
+:global(.dark) .syntax {
+	color: #e0e0e0;
 }
 
 .keyword {
 	color: #d73a49;
 	font-weight: 600;
 }
+
+:global(.dark) .keyword {
+	color: #ff6b6b;
+}
+
 .string {
 	color: #1d6eca;
 }
+
+:global(.dark) .string {
+	color: #4fc3f7;
+}
+
 .number {
 	color: #00c583;
 }
+
+:global(.dark) .number {
+	color: #66bb6a;
+}
+
 .comment {
 	color: #6a737d;
 	font-style: italic;
+}
+
+:global(.dark) .comment {
+	color: #9e9e9e;
 }

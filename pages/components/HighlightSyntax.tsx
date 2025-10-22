@@ -46,19 +46,19 @@ function highlightSyntax(code: string): string {
 				/^'([^'\\]|\\.)*'$/.test(token) ||
 				/^`([^`\\]|\\.)*`$/.test(token)
 			) {
-				return `<span style="color: #1d6eca;">${token}</span>`
+				return `<span class="${styles.string}">${token}</span>`
 			}
 			if (/^\b\d+\.?\d*\b$/.test(token)) {
-				return `<span style="color: #00c583;">${token}</span>`
+				return `<span class="${styles.number}">${token}</span>`
 			}
 			if (/^\/\/.*$/.test(token)) {
-				return `<span style="color: #6a737d; font-style: italic;">${token}</span>`
+				return `<span class="${styles.comment}">${token}</span>`
 			}
 			if (/^\/\*[\s\S]*?\*\/$/.test(token)) {
-				return `<span style="color: #6a737d; font-style: italic;">${token}</span>`
+				return `<span class="${styles.comment}">${token}</span>`
 			}
 			if (new RegExp(`\\b(?:${keywords})\\b`).test(token)) {
-				return `<span style="color: #d73a49; font-weight: 600;">${token}</span>`
+				return `<span class="${styles.keyword}">${token}</span>`
 			}
 			return token
 		})

@@ -1,75 +1,117 @@
+import { useTranslation } from 'react-i18next'
+
 export default function Overview() {
+	const { t } = useTranslation('docs')
+
 	return (
 		<article>
 			{/* 头图 */}
 			<figure className="mb-8 rounded-xl overflow-hidden">
 				<img
 					src="https://img.alicdn.com/imgextra/i1/O1CN01RY0Wvh26ATVeDIX7v_!!6000000007621-0-tps-1672-512.jpg"
-					alt="page-agent 概览图示"
+					alt="page-agent"
 					className="w-full h-64 object-cover"
 				/>
 			</figure>
 
-			<h1 className="text-4xl font-bold mb-6">Overview</h1>
+			<div className="mb-8">
+				<h1 className="text-4xl font-bold mb-4">{t('overview.title')}</h1>
+				<p className="text-xl text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+					{t('overview.subtitle')}
+				</p>
 
-			<p className="text-xl text-foreground/80 mb-8 leading-relaxed">
-				page-agent 是一个完全基于Web技术的 UI Agent，简单引入，让你的网站拥有 AI 操作员。
-			</p>
+				{/* Status Badges */}
+				<div className="flex flex-wrap gap-2 items-center">
+					<a
+						href="https://www.npmjs.com/package/page-agent"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<img src="https://badge.fury.io/js/page-agent.svg" alt="npm version" />
+					</a>
+					<a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">
+						<img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" />
+					</a>
+					<a href="http://www.typescriptlang.org/" target="_blank" rel="noopener noreferrer">
+						<img
+							src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg"
+							alt="TypeScript"
+						/>
+					</a>
+					<a
+						href="https://www.npmjs.com/package/page-agent"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<img src="https://img.shields.io/npm/dt/page-agent.svg" alt="Downloads" />
+					</a>
+					<a
+						href="https://bundlephobia.com/package/page-agent"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<img src="https://img.shields.io/bundlephobia/minzip/page-agent" alt="Bundle Size" />
+					</a>
+					<a href="https://github.com/alibaba/page-agent" target="_blank" rel="noopener noreferrer">
+						<img
+							src="https://img.shields.io/github/stars/alibaba/page-agent.svg"
+							alt="GitHub stars"
+						/>
+					</a>
+				</div>
+			</div>
 
 			<section>
-				<h2 className="text-2xl font-bold mb-4">什么是 page-agent？</h2>
+				<h2 className="text-2xl font-bold mb-4">{t('overview.what_is')}</h2>
 
-				<p className="text-foreground/80 mb-8 leading-relaxed ">
-					page-agent 是一个<strong>页面内嵌式 UI Agent</strong>。
-					与传统的浏览器自动化工具不同，page-agent 面向<strong>网站开发者</strong>
-					，而非爬虫或通用Agent开发者，将 Agent 集成到你的网站中，
-					让用户可以通过自然语言与页面进行交互。
+				<p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed ">
+					{t('overview.what_is_desc')}
 				</p>
 			</section>
 
 			<section>
-				<h2 className="text-2xl font-bold mb-3">核心特性</h2>
+				<h2 className="text-2xl font-bold mb-3">{t('overview.features_title')}</h2>
 
 				<div className="grid md:grid-cols-2 gap-4 mb-8" role="list">
 					<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
 						<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
-							🧠 智能 DOM 理解
+							{t('overview.feature_dom.title')}
 						</h3>
-						<p className="">基于 DOM 分析，高强度脱水。无需视觉识别，纯文本实现精准操作。</p>
+						<p className="text-gray-700 dark:text-gray-300">{t('overview.feature_dom.desc')}</p>
 					</div>
 
 					<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
 						<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
-							🔒 安全可控
+							{t('overview.feature_secure.title')}
 						</h3>
-						<p className="">
-							支持操作黑白名单、数据脱敏保护。注入自定义知识库，让 AI 按你的规则工作。
-						</p>
+						<p className="text-gray-700 dark:text-gray-300">{t('overview.feature_secure.desc')}</p>
 					</div>
 
 					<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
 						<h3 className="text-lg font-semibold mb-2 text-green-900 dark:text-green-300">
-							⚡ 零后端部署
+							{t('overview.feature_backend.title')}
 						</h3>
-						<p className="">CDN 或 NPM 引入，自定义 LLM 接入点。</p>
+						<p className="text-gray-700 dark:text-gray-300">{t('overview.feature_backend.desc')}</p>
 					</div>
 
 					<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
 						<h3 className="text-lg font-semibold mb-2 text-orange-900 dark:text-orange-300">
-							♿ 普惠智能
+							{t('overview.feature_accessible.title')}
 						</h3>
-						<p className="">为复杂 B端系统、管理后台提供自然语言入口。让每个用户都能轻松上手。</p>
+						<p className="text-gray-700 dark:text-gray-300">
+							{t('overview.feature_accessible.desc')}
+						</p>
 					</div>
 				</div>
 
-				<h2 className="text-2xl font-bold mb-4">与 browser-use 的区别</h2>
+				<h2 className="text-2xl font-bold mb-4">{t('overview.vs_browser_use')}</h2>
 
 				<div className="overflow-x-auto mb-8">
 					<table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
 						<thead>
 							<tr className="bg-gray-50 dark:bg-gray-800">
 								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left">
-									特性
+									{t('overview.table_feature')}
 								</th>
 								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left">
 									page-agent
@@ -82,103 +124,88 @@ export default function Overview() {
 						<tbody>
 							<tr>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3 font-medium">
-									部署方式
+									{t('overview.table_deployment')}
 								</td>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
-									页面内嵌组件
+									{t('overview.table_deployment_pa')}
 								</td>
-								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">外部工具</td>
-							</tr>
-							<tr>
-								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3 font-medium">
-									操作范围
-								</td>
-								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">当前页面</td>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
-									整个浏览器
+									{t('overview.table_deployment_bu')}
 								</td>
 							</tr>
 							<tr>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3 font-medium">
-									目标用户
+									{t('overview.table_scope')}
 								</td>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
-									网站开发者
+									{t('overview.table_scope_pa')}
 								</td>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
-									爬虫/Agent 开发者
+									{t('overview.table_scope_bu')}
 								</td>
 							</tr>
 							<tr>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3 font-medium">
-									使用场景
+									{t('overview.table_user')}
 								</td>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
-									用户体验增强
+									{t('overview.table_user_pa')}
 								</td>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
-									自动化任务
+									{t('overview.table_user_bu')}
+								</td>
+							</tr>
+							<tr>
+								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3 font-medium">
+									{t('overview.table_scenario')}
+								</td>
+								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
+									{t('overview.table_scenario_pa')}
+								</td>
+								<td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
+									{t('overview.table_scenario_bu')}
 								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 
-				<h2 className="text-2xl font-bold mb-4">应用场景</h2>
+				<h2 className="text-2xl font-bold mb-4">{t('overview.use_cases_title')}</h2>
 
 				<ul className="space-y-4 mb-8">
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold mt-0.5">
+						<span className="w-6 h-6 min-w-6 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
 							1
 						</span>
-						<div className="">
-							<strong>对接答疑机器人：</strong>
-							把你的答疑助手变成全能Agent。客服机器人不再只说"请先点击设置按钮然后点击..."，而是直接帮用户现场操作。
+						<div className="text-gray-700 dark:text-gray-300">
+							<strong>{t('overview.use_case1_title')}</strong> {t('overview.use_case1_desc')}
 						</div>
 					</li>
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center font-bold mt-0.5">
+						<span className="w-6 h-6 min-w-6 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
 							2
 						</span>
-						<div className="">
-							<strong>交互升级/智能化改造：</strong>
-							一行代码，老应用变身Agent，产品专家帮用户操作复杂 B
-							端软件。降低人工支持成本，提高用户满意度。
+						<div className="text-gray-700 dark:text-gray-300">
+							<strong>{t('overview.use_case2_title')}</strong> {t('overview.use_case2_desc')}
 						</div>
 					</li>
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold mt-0.5">
+						<span className="w-6 h-6 min-w-6 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
 							3
 						</span>
-						<div className="">
-							<strong>产品教学：</strong>
-							向用户演示交互过程，边做边教。例如让AI演示"如何提交报销申请"的完整操作流程。
+						<div className="text-gray-700 dark:text-gray-300">
+							<strong>{t('overview.use_case3_title')}</strong> {t('overview.use_case3_desc')}
 						</div>
 					</li>
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold mt-0.5">
+						<span className="w-6 h-6 min-w-6 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
 							4
 						</span>
-						<div className="">
-							<strong>无障碍支持：</strong>
-							为视障用户、老年用户提供自然语言交互，对接屏幕阅读器或语音助理，让软件人人可用。
+						<div className="text-gray-700 dark:text-gray-300">
+							<strong>{t('overview.use_case4_title')}</strong> {t('overview.use_case4_desc')}
 						</div>
 					</li>
 				</ul>
-
-				<div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2">🚀 开始使用</h3>
-					<p className="mb-3 ">
-						准备好为你的网站添加 AI 操作员了吗？查看我们的快速开始指南，几分钟内完成集成。
-					</p>
-					<a
-						href="/docs/introduction/quick-start"
-						className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-						role="button"
-					>
-						快速开始 →
-					</a>
-				</div>
 			</section>
 		</article>
 	)
