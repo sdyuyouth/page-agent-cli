@@ -4,7 +4,7 @@ export default {
 		slogan: 'GUI Agent in your webpage',
 		nav_docs: 'Docs',
 		nav_source: 'GitHub',
-		mobile_menu: 'Open mobile menu',
+		mobile_menu: 'Open navigation',
 	},
 	footer: {
 		copyright: '© 2025 page-agent. All rights reserved.',
