@@ -17,8 +17,8 @@ The development progress and future plans for PageAgent.
 - [x] **Free evaluation plan?**
 - [x] **Custom actions and HITL**
 - [ ] **Hooks and Events**
-	- [x] **lifecycle hooks**
-	- [ ] **lifecycle events**
+  - [x] **lifecycle hooks**
+  - [ ] **lifecycle events**
 - [ ] **❗Pause and intervene**
 - [ ] **❗Hijack `page_open/page_change/page_unload` behavior**
 - [ ] **Custom knowledge base and instructions**
