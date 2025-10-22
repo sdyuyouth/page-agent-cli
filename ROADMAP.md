@@ -12,7 +12,7 @@ The development progress and future plans for PageAgent.
 - [x] **UI with HITL** 
   - Human-in-the-loop user interface. Agent can ask user questions.
 - [x] **Landing and doc pages**
-- [x] **Remove ai-sdk** 
+- [x] **Remove `ai-sdk`** 
   - Only one function of AI-ADK is being used.
   - Our agent memory and thinking mechanism does not suite ai-sdk.
 - [x] **Robust LLM output**
@@ -36,7 +36,7 @@ The development progress and future plans for PageAgent.
   - [ ] English version
 - [ ] **Testing suits**
 - [ ] **Support custom llm fetch**
-- [ ] **Refactor: Separate Agent and Page-Controller** 
+- [ ] **Refactor: Separate `Agent` and `Page-Controller`** 
   - Agent should be able to run w/o dom. 
   - Actions should be able to be injected through iframe.
 

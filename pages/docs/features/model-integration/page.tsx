@@ -91,8 +91,7 @@ export default function ModelIntegration() {
 
 			<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg mb-6">
 				<ul className="text-sm text-foreground/80 space-y-1 list-disc pl-5">
-					<li>reasoning 模型，速度偏慢，没有必要</li>
-					<li>GPT-5 reasoning 速度过慢，效果提升不明显</li>
+					<li>reasoning 模型（如 GPT-5），速度偏慢，没有必要</li>
 					<li>
 						不保证 json schema 的模型（openAI 以外的几乎所有模型），tool call
 						有概率出错，通常能自动修复，建议 temperature 设置高一些
