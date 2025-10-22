@@ -31,9 +31,9 @@ The development progress and future plans for PageAgent.
 - [ ] **Black/white-list safeguard**
 - [ ] **Data-masking**
 - [ ] **Optimize for popular UI frameworks**
-- [ ] **i18n of the website**
+- [x] **i18n of the website**
   - [x] Chinese version
-  - [ ] English version
+  - [x] English version
 - [ ] **Testing suits**
 - [ ] **Support custom llm fetch**
 - [ ] **Refactor: Separate `Agent` and `Page-Controller`** 
