@@ -32,7 +32,11 @@ An in-page UI agent in javascript. Control web interfaces with natural language.
 
 ```html
 <!-- temporary CDN URL. May change in the future -->
-<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js" crossorigin="true" type="text/javascript"></script>
+<script
+	src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js"
+	crossorigin="true"
+	type="text/javascript"
+></script>
 ```
 
 ### NPM Installation
@@ -52,13 +56,13 @@ const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm
 const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 
 const agent = new PageAgent({
-  modelName: DEMO_MODEL,
-  baseURL: DEMO_BASE_URL,
-  apiKey: DEMO_API_KEY,
-  language: 'en-US'
+	modelName: DEMO_MODEL,
+	baseURL: DEMO_BASE_URL,
+	apiKey: DEMO_API_KEY,
+	language: 'en-US',
 })
 
-await agent.execute("Click the login button")
+await agent.execute('Click the login button')
 ```
 
 ## 🏗️ Structure
@@ -102,9 +106,8 @@ PageAgent is designed for **client-side web enhancement**, not server-side autom
 
 MIT License - see the [LICENSE](LICENSE) file for details.
 
-
 ```
-DOM processing components and prompt are derived from browser-use: 
+DOM processing components and prompt are derived from browser-use:
 
 Browser Use
 Copyright (c) 2024 Gregor Zunic

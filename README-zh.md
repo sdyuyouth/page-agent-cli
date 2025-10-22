@@ -32,7 +32,11 @@
 
 ```html
 <!-- 临时 CDN URL. 未来会变更 -->
-<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js" crossorigin="true" type="text/javascript"></script>
+<script
+	src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js"
+	crossorigin="true"
+	type="text/javascript"
+></script>
 ```
 
 ### NPM 安装
@@ -52,13 +56,13 @@ const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm
 const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 
 const agent = new PageAgent({
-  modelName: DEMO_MODEL,
-  baseURL: DEMO_BASE_URL,
-  apiKey: DEMO_API_KEY,
-  language: 'zh-CN'
+	modelName: DEMO_MODEL,
+	baseURL: DEMO_BASE_URL,
+	apiKey: DEMO_API_KEY,
+	language: 'zh-CN',
 })
 
-await agent.execute("点击登录按钮")
+await agent.execute('点击登录按钮')
 ```
 
 ## 🏗️ 架构设计
@@ -103,7 +107,7 @@ PageAgent 专为**客户端网页增强**设计，不是服务端自动化工具
 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
 ```
-DOM processing components and prompt are derived from browser-use: 
+DOM processing components and prompt are derived from browser-use:
 
 Browser Use
 Copyright (c) 2024 Gregor Zunic
