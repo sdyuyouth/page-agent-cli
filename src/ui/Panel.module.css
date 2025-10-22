@@ -33,8 +33,7 @@
 	/* 响应式设计 */
 	@media (max-width: 480px) {
 		width: calc(100vw - 40px);
-		left: 20px;
-		transform: none;
+		--width: calc(100vw - 40px);
 	}
 
 	.background {
