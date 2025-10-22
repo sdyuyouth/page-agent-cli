@@ -51,7 +51,7 @@ export default function HomePage() {
 			pageAgent = new PageAgent({
 				// 把 react 根元素排除掉，挂了很多冒泡时间导致假阳
 				interactiveBlacklist: [document.getElementById('root')!],
-				language: 'zh-CN',
+				language: i18n.language as any,
 
 				// testing server
 				// @note: rate limit. prompt limit.
