@@ -125,6 +125,10 @@ export class PageAgent extends EventTarget {
 			}
 		}
 
+		if (!this.config.experimentalScriptExecutionTool) {
+			this.tools.delete('execute_javascript')
+		}
+
 		patchReact(this)
 
 		window.addEventListener('beforeunload', (e) => {

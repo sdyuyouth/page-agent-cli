@@ -73,6 +73,14 @@ export interface AgentConfig {
 	// page behavior hooks
 
 	/**
+	 * @experimental
+	 * Enable the experimental script execution tool that allows executing generated JavaScript code on the page.
+	 * @note Can cause unpredictable side effects.
+	 * @note May bypass some safe guards and data-masking mechanisms.
+	 */
+	experimentalScriptExecutionTool?: boolean
+
+	/**
 	 * TODO: @unimplemented
 	 * hook when action causes a new page to be opened
 	 * @note PageAgent will try to detect new pages and decide if it's caused by an action. But not very reliable.

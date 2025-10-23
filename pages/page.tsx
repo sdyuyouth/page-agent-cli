@@ -53,6 +53,8 @@ export default function HomePage() {
 				interactiveBlacklist: [document.getElementById('root')!],
 				language: i18n.language as any,
 
+				// experimentalScriptExecutionTool: true,
+
 				// testing server
 				// @note: rate limit. prompt limit.
 				// model: DEMO_MODEL,

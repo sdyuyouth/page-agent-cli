@@ -215,6 +215,27 @@ tools.set(
 	})
 )
 
+tools.set(
+	'execute_javascript',
+	tool({
+		description:
+			'Execute JavaScript code on the current page. Supports async/await syntax. Use with caution!',
+		inputSchema: zod.object({
+			script: zod.string(),
+		}),
+		execute: async function (this: PageAgent, input) {
+			try {
+				// Wrap script in async function to support await
+				const asyncFunction = eval(`(async () => { ${input.script} })`)
+				const result = await asyncFunction()
+				return `✅ Executed JavaScript. Result: ${result}` + (await getSystemInfo())
+			} catch (error) {
+				return `❌ Error executing JavaScript: ${error}` + (await getSystemInfo())
+			}
+		},
+	})
+)
+
 // @todo get_dropdown_options
 // @todo select_dropdown_option
 // @todo send_keys
