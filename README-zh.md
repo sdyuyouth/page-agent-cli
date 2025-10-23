@@ -8,7 +8,7 @@
 
 🌐 [English](./README.md) | **中文**
 
-👉 [🚀 **Demo**](https://alibaba.github.io/page-agent/) | [📖 **Documentation**](https://alibaba.github.io/page-agent/#/docs/introduction/overview)
+👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> 
 
 ---
 

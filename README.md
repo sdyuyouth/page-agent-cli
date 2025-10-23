@@ -8,7 +8,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 🌐 **English** | [中文](./README-zh.md)
 
-👉 [🚀 **Demo**](https://alibaba.github.io/page-agent/){:target="_blank"} | [📖 **Documentation**](https://alibaba.github.io/page-agent/#/docs/introduction/overview){:target="_blank"}
+👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> 
 
 ---
 
