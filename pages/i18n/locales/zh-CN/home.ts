@@ -31,7 +31,7 @@ export default {
 		},
 	},
 	benefits: {
-		no_backend: '无需后端',
+		no_backend: '纯前端方案',
 		private_model: '支持私有模型',
 		data_masking: '无痛脱敏',
 		open_source: 'MIT 开源',

@@ -32,7 +32,7 @@ export default {
 		},
 	},
 	benefits: {
-		no_backend: 'Zero Backend',
+		no_backend: 'Pure Front-end Solution',
 		private_model: 'Your Own Models',
 		data_masking: 'Built-in Privacy',
 		open_source: 'MIT Open Source',
