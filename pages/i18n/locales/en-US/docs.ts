@@ -141,6 +141,16 @@ export default {
 		tip_2:
 			"Non-OpenAI models don't guarantee JSON schema compliance—tool call may error but usually recovers. Higher temperature recommended",
 		tip_3: 'Small/nano models perform poorly',
+		security: '🔐 Production Authentication',
+		security_warning: '⚠️ Never commit real LLM API Keys to your frontend codebase',
+		security_desc:
+			'In production environments, to hide the real LLM API Keys, we recommend the following architecture:',
+		security_backend_proxy: 'Backend Proxy Pattern',
+		security_backend_desc:
+			'Set up a backend LLM proxy endpoint that uses the same authentication method as other APIs in your website, such as:',
+		security_method_1: '• Session/Cookie-based authentication',
+		security_method_2: '• OIDC (OpenID Connect) single sign-on',
+		security_method_3: '• Temporary Access Key or JWT Token',
 		configuration: 'Configuration',
 	},
 	custom_tools: {

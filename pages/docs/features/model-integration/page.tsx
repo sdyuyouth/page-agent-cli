@@ -106,6 +106,32 @@ export default function ModelIntegration() {
 				</ul>
 			</div>
 
+			<h2 className="text-2xl font-bold mb-3">{t('model_integration.security')}</h2>
+
+			<div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 mb-4">
+				<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
+					{t('model_integration.security_warning')}
+				</p>
+			</div>
+
+			<p className="text-gray-600 dark:text-gray-300 mb-4">
+				{t('model_integration.security_desc')}
+			</p>
+
+			<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-6">
+				<h3 className="text-lg font-semibold mb-3 text-blue-900 dark:text-blue-300">
+					{t('model_integration.security_backend_proxy')}
+				</h3>
+				<p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+					{t('model_integration.security_backend_desc')}
+				</p>
+				<ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 list-none pl-0">
+					<li>{t('model_integration.security_method_1')}</li>
+					<li>{t('model_integration.security_method_2')}</li>
+					<li>{t('model_integration.security_method_3')}</li>
+				</ul>
+			</div>
+
 			<h2 className="text-2xl font-bold mb-3">{t('model_integration.configuration')}</h2>
 
 			<CodeEditor
