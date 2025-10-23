@@ -23,7 +23,7 @@ export default function QuickStart() {
 							<p className="text-sm font-medium mb-2">{t('quick_start.step1_cdn')}</p>
 							<CodeEditor
 								code={`// 仅供测试使用
-<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js" crossorigin="true" type="text/javascript"></script>`}
+<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.4/page-agent.js" crossorigin="true" type="text/javascript"></script>`}
 								language="html"
 							/>
 						</div>

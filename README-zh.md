@@ -33,7 +33,7 @@
 ```html
 <!-- 临时 CDN URL. 未来会变更 -->
 <script
-	src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.2/page-agent.js"
+	src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.4/page-agent.js"
 	crossorigin="true"
 	type="text/javascript"
 ></script>
