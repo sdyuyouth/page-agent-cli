@@ -2,14 +2,14 @@ export default {
 	overview: {
 		title: 'Overview',
 		subtitle:
-			'page-agent is a pure web-based GUI Agent. Simple integration gives your website an AI operator.',
+			'page-agent is a purely web-based GUI Agent. Gives your website an AI operator in simple steps.',
 		what_is: 'What is page-agent?',
 		what_is_desc:
-			'page-agent is an embedded GUI Agent. Unlike traditional browser automation tools, page-agent targets web developers, not scrapers or generic agent builders. Integrate it into your site to let users interact with pages through natural language.',
+			'page-agent is an embedded GUI Agent. Unlike traditional browser automation tools, page-agent targets web developers, not scrapers or agent clients builders. Integrate it into your site to let users interact with pages through natural language.',
 		features_title: 'Core Features',
 		feature_dom: {
 			title: '🧠 Smart DOM Analysis',
-			desc: 'DOM-based analysis with high-intensity dehydration. No visual recognition needed—pure text for precise operations.',
+			desc: 'DOM-based analysis with high-intensity dehydration. No visual recognition needed. Pure text for fast and precise operations.',
 		},
 		feature_secure: {
 			title: '🔒 Secure & Controllable',
