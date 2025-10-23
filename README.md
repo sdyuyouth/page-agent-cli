@@ -6,8 +6,6 @@
 
 The GUI Agent Living in Your Webpage. Control web interfaces with natural language.
 
-**Transform your webpage into an AI-powered application with a single script tag.**
-
 🌐 **English** | [中文](./README-zh.md)
 
 👉 [🚀 **Demo**](https://alibaba.github.io/page-agent/) | [📖 **Documentation**](https://alibaba.github.io/page-agent/#/docs/introduction/overview)
@@ -16,7 +14,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## ✨ Features
 
-- **🎯 Easy Integration**
+- **🎯 Easy Integration** - Transform your webpage into an agent with a single script tag.
 - **🔐 Client-Side Processing**
 - **🧠 DOM Extraction**
 - **💬 Natural Language Interface**
