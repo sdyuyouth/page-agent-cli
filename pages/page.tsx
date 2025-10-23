@@ -92,7 +92,7 @@ export default function HomePage() {
 
 							<h1
 								id="hero-heading"
-								className="text-5xl lg:text-7xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+								className="text-5xl lg:text-7xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent pb-1"
 							>
 								{t('home:hero.title_line1')}
 								<br />

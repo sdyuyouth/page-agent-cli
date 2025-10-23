@@ -1,8 +1,8 @@
 export default {
 	hero: {
 		badge: 'GUI Agent in your webpage',
-		title_line1: 'An AI Operator',
-		title_line2: 'Living in Your Web Apps',
+		title_line1: 'The AI Operator',
+		title_line2: 'Living in Your Web App',
 		subtitle_emoji: '🪄 One line of CDN',
 		subtitle_main: ' adds intelligent GUI Agents to your website.',
 		subtitle_detail: 'Users give natural language commands, AI handles the rest.',
