@@ -10,7 +10,8 @@ export default {
 		tab_other: '🌐 Try on Other Sites',
 		input_placeholder: 'Describe what you want AI to do...',
 		execute_button: 'Run',
-		default_task: 'Navigate to docs, find data masking section, and summarize in markdown',
+		default_task:
+			'Goto docs in navigation bar, find Quick-Start section, and summarize in markdown',
 	},
 	try_other: {
 		step1_title: 'Step 1:',
