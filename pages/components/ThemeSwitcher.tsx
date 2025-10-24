@@ -56,7 +56,7 @@ export default function ThemeSwitcher() {
 			style={{
 				backgroundColor: theme === 'dark' ? '#1e293b' : '#e0f2fe',
 			}}
-			aria-label={theme === 'light' ? '切换到深色模式' : '切换到浅色模式'}
+			aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
 			role="switch"
 			aria-checked={theme === 'dark'}
 		>
