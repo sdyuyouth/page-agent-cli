@@ -30,6 +30,12 @@ The development progress and future plans for PageAgent.
 - [ ] **Custom knowledge base and instructions**
 - [ ] **Black/white-list safeguard**
 - [ ] **Data-masking**
+- [ ] **Improve Memory**
+  - Current phrasing can cause logic-loop for some models.
+  - Test adding `Action` to memory.
+- [ ] **Tools for more complex tasks**
+  - todo list
+  - file sys
 - [ ] **Optimize for popular UI frameworks**
 - [x] **i18n of the website**
   - [x] Chinese version
