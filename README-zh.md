@@ -10,7 +10,7 @@
 
 👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> 
 
-<video id="demo-video" src="https://cloud.video.taobao.com/vod/SOUYDNMavB5Tzn6Xt5zhJUXx3zP1ZO1w3MRmltAQFuw.mp4" width="640" crossorigin muted autoplay loop></video>
+<video id="demo-video" src="https://github.com/user-attachments/assets/141bbb01-8022-4d1f-919d-9efc9a1dc1cf" width="640" crossorigin muted autoplay loop></video>
 
 ---
 
