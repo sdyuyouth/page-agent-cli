@@ -42,6 +42,7 @@ export function lenientParseMacroToolCall(
 	// check
 	switch (choice.finish_reason) {
 		case 'tool_calls':
+		case 'function_call': // gemini
 		case 'stop': // will try a robust parse
 			// ✅ Normal
 			break
