@@ -6,19 +6,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        Please follow our community communication guidelines when filing issues.
-        - Be polite and respectful.
-        - Prefer constructive, actionable feedback over venting.
-        - Include clear reproduction steps and environment details.
-        - Consider contributing a fix if possible — PRs are welcome.
+        Thanks for your interest in improving the project! Before submitting, please read our guidelines.
+        感谢您对改进项目的兴趣！提交前请阅读我们的指南。
 
-        提交 Issue 时请遵守社区沟通规范：
-        - 保持礼貌与尊重。
-        - 提供建设性、可行动的反馈，避免情绪化表达。
-        - 请包含清晰的复现步骤与环境信息。
-        - 如果可以，欢迎直接提交修复 PR。
-
-        See: CODE_OF_CONDUCT.md / CODE_OF_CONDUCT_zh.md, CONTRIBUTING.md
+        - [Code of Conduct](https://github.com/alibaba/page-agent/blob/main/CODE_OF_CONDUCT.md)
+        - [Contributing Guide](https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md)
 
   - type: checkboxes
     id: community
@@ -28,10 +20,12 @@ body:
       options:
         - label: I will be polite and respectful. / 我会保持礼貌与尊重。
           required: true
-        - label: I will share constructive, actionable details. / 我会提供建设性、可行动的细节。
+        - label: I will share constructive, actionable suggestions. / 我会提供建设性、可行动的建议。
           required: true
         - label: I have read the Code of Conduct. / 我已阅读行为准则。
           required: true
+    validations:
+      required: true
 
   - type: textarea
     id: description
@@ -48,7 +42,7 @@ body:
       render: typescript
       placeholder: Minimal reproduction code
     validations:
-      required: true
+      required: false
 
   - type: input
     id: browser
@@ -56,7 +50,7 @@ body:
       label: Browser
       placeholder: 'Chrome 120, Firefox 119, etc.'
     validations:
-      required: true
+      required: false
 
   - type: input
     id: version
@@ -64,4 +58,4 @@ body:
       label: version
       placeholder: '0.0.0'
     validations:
-      required: true
+      required: false

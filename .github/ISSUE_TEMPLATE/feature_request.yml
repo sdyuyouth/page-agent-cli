@@ -6,19 +6,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        Please follow our community communication guidelines when proposing features.
-        - Be polite and respectful.
-        - Explain the problem first, then propose solutions.
-        - Prefer constructive, actionable suggestions.
-        - Contributions are encouraged — consider opening a PR.
+        Thanks for your interest in improving the project! Before submitting, please read our guidelines.
+        感谢您对改进项目的兴趣！提交前请阅读我们的指南。
 
-        提交功能建议时请遵守社区沟通规范：
-        - 保持礼貌与尊重。
-        - 先阐述问题，再提出解决方案。
-        - 提供建设性、可行动的建议。
-        - 鼓励代码贡献，欢迎直接提交 PR。
-
-        See: CODE_OF_CONDUCT.md / CODE_OF_CONDUCT_zh.md, CONTRIBUTING.md
+        - [Code of Conduct](https://github.com/alibaba/page-agent/blob/main/CODE_OF_CONDUCT.md)
+        - [Contributing Guide](https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md)
 
   - type: checkboxes
     id: community
@@ -32,27 +24,24 @@ body:
           required: true
         - label: I have read the CODE_OF_CONDUCT.md and CONTRIBUTING.md. / 我已阅读行为准则。
           required: true
-
-  - type: textarea
-    id: problem
-    attributes:
-      label: Problem
-      placeholder: What problem does this solve?
     validations:
       required: true
 
   - type: textarea
-    id: solution
+    id: description
     attributes:
-      label: Solution
-      placeholder: How should this work?
+      label: Feature Description / 功能描述
+      description: Describe the problem, solution, and any API changes. / 描述问题、解决方案以及 API 变更。
+      placeholder: |
+        **Problem**:
+        What problem does this solve?
+
+        **Solution**:
+        How should this work?
+
+        **Proposed API**:
+        ```typescript
+        // code here
+        ```
     validations:
       required: true
-
-  - type: textarea
-    id: api
-    attributes:
-      label: Proposed API
-      render: typescript
-    validations:
-      required: false

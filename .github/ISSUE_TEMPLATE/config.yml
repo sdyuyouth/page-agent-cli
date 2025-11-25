@@ -12,6 +12,3 @@ contact_links:
   - name: Code of Conduct / 行为准则
     url: https://github.com/alibaba/page-agent/blob/main/CODE_OF_CONDUCT.md
     about: Community expectations and standards. 社区行为期望与标准。
-  - name: 行为准则（中文）
-    url: https://github.com/alibaba/page-agent/blob/main/CODE_OF_CONDUCT_zh.md
-    about: 中文版社区行为准则。
