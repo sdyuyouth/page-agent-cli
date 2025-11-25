@@ -25,11 +25,11 @@ export default function Header() {
 							aria-label={t('header.logo_alt')}
 							onClick={() => setMobileMenuOpen(false)}
 						>
-							<div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-								<span className="text-white font-bold text-2xl lg:text-2xl" aria-hidden="true">
-									P
-								</span>
-							</div>
+							<img
+								src="https://img.alicdn.com/imgextra/i2/O1CN01HB8ylu1uozANEMZw2_!!6000000006085-49-tps-128-128.webp"
+								alt="PageAgent Logo"
+								className="w-10 h-10 rounded-xl group-hover:scale-110 transition-transform duration-200"
+							/>
 							<div>
 								<span className="text-base sm:text-xl font-bold text-gray-900 dark:text-white block leading-tight">
 									page-agent
