@@ -48,25 +48,25 @@ const pageAgentTool = {
 
 			<h2 className="text-2xl font-bold mb-4">应用场景</h2>
 			<div className="grid md:grid-cols-2 gap-4 mb-6">
-				<div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
+				<div className="bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
 					<h4 className="font-semibold mb-2 text-gray-900 dark:text-white">🤖 智能客服系统</h4>
 					<p className="text-sm text-gray-600 dark:text-gray-300">
 						客服机器人帮用户直接操作系统，如"帮我提交工单"
 					</p>
 				</div>
-				<div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
+				<div className="bg-linear-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
 					<h4 className="font-semibold mb-2 text-gray-900 dark:text-white">📋 业务流程助手</h4>
 					<p className="text-sm text-gray-600 dark:text-gray-300">
 						引导新员工完成复杂流程，如"完成客户入职"
 					</p>
 				</div>
-				<div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
+				<div className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
 					<h4 className="font-semibold mb-2 text-gray-900 dark:text-white">🎯 个人效率助手</h4>
 					<p className="text-sm text-gray-600 dark:text-gray-300">
 						跨网站帮你完成任务，如"预订会议室"
 					</p>
 				</div>
-				<div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
+				<div className="bg-linear-to-br from-orange-50 to-red-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
 					<h4 className="font-semibold mb-2 text-gray-900 dark:text-white">🔧 运维自动化</h4>
 					<p className="text-sm text-gray-600 dark:text-gray-300">
 						通过自然语言操作管理后台，如"重启服务器"

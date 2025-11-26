@@ -28,7 +28,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
 	// 使用 Tailwind 的 dark: 前缀实现自动主题切换
 	const containerClasses =
-		'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-300 dark:border-gray-700'
+		'bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-300 dark:border-gray-700'
 	const headerClasses = 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700'
 	const headerTextClasses = 'text-gray-700 dark:text-gray-300'
 	const languageTextClasses = 'text-gray-600 dark:text-gray-400'

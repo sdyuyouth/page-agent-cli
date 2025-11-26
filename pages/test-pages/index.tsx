@@ -2,7 +2,7 @@ import { Link } from 'wouter'
 
 export default function IndexPage() {
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-8">
+		<div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-8">
 			<div className="max-w-4xl mx-auto">
 				<div className="text-center mb-12">
 					<h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -59,7 +59,10 @@ export default function IndexPage() {
 				</div>
 
 				<div className="text-center">
-					<Link href="/" className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+					<Link
+						href="/"
+						className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+					>
 						← 回到 Page Use 首页
 					</Link>
 				</div>
@@ -78,28 +81,24 @@ interface TestPageCardProps {
 
 function TestPageCard({ title, description, path, icon, difficulty }: TestPageCardProps) {
 	const difficultyColors = {
-		'简单': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-		'中等': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-		'困难': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+		简单: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+		中等: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+		困难: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
 	}
 
 	return (
 		<Link href={path}>
 			<div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer border border-gray-200 dark:border-gray-700">
 				<div className="text-4xl mb-4">{icon}</div>
-				<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-					{title}
-				</h3>
-				<p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-					{description}
-				</p>
+				<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
+				<p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">{description}</p>
 				<div className="flex justify-between items-center">
-					<span className={`px-2 py-1 rounded-full text-xs font-medium ${difficultyColors[difficulty as keyof typeof difficultyColors]}`}>
+					<span
+						className={`px-2 py-1 rounded-full text-xs font-medium ${difficultyColors[difficulty as keyof typeof difficultyColors]}`}
+					>
 						{difficulty}
 					</span>
-					<span className="text-blue-600 dark:text-blue-400 text-sm font-medium">
-						开始测试 →
-					</span>
+					<span className="text-blue-600 dark:text-blue-400 text-sm font-medium">开始测试 →</span>
 				</div>
 			</div>
 		</Link>

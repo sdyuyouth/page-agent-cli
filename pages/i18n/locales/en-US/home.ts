@@ -39,9 +39,9 @@ export default {
 	},
 	features: {
 		section_title: 'Why PageAgent',
-		dom_understanding: {
-			title: 'Smart DOM Analysis',
-			desc: 'Analyzes page structure without screenshots or vision models. Pure text understanding for fast, accurate automation.',
+		in_page: {
+			title: 'In-page Solution',
+			desc: 'Runs entirely within your page. No browser extensions, no headless browsers, and no backend required.',
 		},
 		secure_integration: {
 			title: 'Secure by Design',
@@ -49,7 +49,7 @@ export default {
 		},
 		zero_backend: {
 			title: 'Zero Backend Setup',
-			desc: 'Just drop in a script tag. Works with any LLM provider—OpenAI, Anthropic, or your own models.',
+			desc: 'Just drop in a script. Works with any LLM provider—OpenAI, Anthropic, or your own models.',
 		},
 		accessible: {
 			title: 'Natural Language UI',

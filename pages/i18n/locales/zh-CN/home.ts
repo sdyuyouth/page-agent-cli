@@ -38,9 +38,9 @@ export default {
 	},
 	features: {
 		section_title: '核心特性',
-		dom_understanding: {
-			title: '智能 DOM 理解',
-			desc: '基于 DOM 分析，高强度脱水。无需视觉识别，纯文本实现精准操作。',
+		in_page: {
+			title: '纯页面内方案',
+			desc: '完全运行在你的页面内。不需要浏览器插件、不需要无头浏览器，不需要后端。',
 		},
 		secure_integration: {
 			title: '安全可控集成',
@@ -48,7 +48,7 @@ export default {
 		},
 		zero_backend: {
 			title: '零后端部署',
-			desc: 'CDN 直接引入，自定义 LLM 接入点。从 OpenAI 到 qwen3，完全由你掌控。',
+			desc: '前端脚本引入，自定义 LLM 接入点。从 OpenAI 到 qwen3，完全由你掌控。',
 		},
 		accessible: {
 			title: '普惠智能交互',

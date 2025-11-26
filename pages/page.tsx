@@ -70,7 +70,7 @@ export default function HomePage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+		<div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
 			<Header />
 
 			{/* Hero Section */}
@@ -302,49 +302,30 @@ export default function HomePage() {
 						<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8" role="list">
 							{/* Feature 1 */}
 							<article
-								className="group p-8 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+								className="group p-8 bg-linear-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
 								role="listitem"
 							>
 								<div
-									className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
 									aria-hidden="true"
 								>
-									<span className="text-white text-xl">🧠</span>
+									<span className="text-white text-xl">📦</span>
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-									{t('home:features.dom_understanding.title')}
+									{t('home:features.in_page.title')}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-									{t('home:features.dom_understanding.desc')}
+									{t('home:features.in_page.desc')}
 								</p>
 							</article>
 
 							{/* Feature 2 */}
 							<article
-								className="group p-8 bg-gradient-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+								className="group p-8 bg-linear-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
 								role="listitem"
 							>
 								<div
-									className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
-									aria-hidden="true"
-								>
-									<span className="text-white text-xl">🔒</span>
-								</div>
-								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-									{t('home:features.secure_integration.title')}
-								</h3>
-								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-									{t('home:features.secure_integration.desc')}
-								</p>
-							</article>
-
-							{/* Feature 3 */}
-							<article
-								className="group p-8 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
-								role="listitem"
-							>
-								<div
-									className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									className="w-12 h-12 bg-linear-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
 									aria-hidden="true"
 								>
 									<span className="text-white text-xl">⚡</span>
@@ -357,22 +338,41 @@ export default function HomePage() {
 								</p>
 							</article>
 
-							{/* Feature 4 */}
+							{/* Feature 3 */}
 							<article
-								className="group p-8 bg-gradient-to-br from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+								className="group p-8 bg-linear-to-br from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
 								role="listitem"
 							>
 								<div
-									className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
 									aria-hidden="true"
 								>
-									<span className="text-white text-xl">♿</span>
+									<span className="text-white text-xl">🌈</span>
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
 									{t('home:features.accessible.title')}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
 									{t('home:features.accessible.desc')}
+								</p>
+							</article>
+
+							{/* Feature 4 */}
+							<article
+								className="group p-8 bg-linear-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+								role="listitem"
+							>
+								<div
+									className="w-12 h-12 bg-linear-to-br from-orange-500 to-orange-600  rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									aria-hidden="true"
+								>
+									<span className="text-white text-xl">🔒</span>
+								</div>
+								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+									{t('home:features.secure_integration.title')}
+								</h3>
+								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+									{t('home:features.secure_integration.desc')}
 								</p>
 							</article>
 						</div>
@@ -396,7 +396,7 @@ export default function HomePage() {
 
 						<div className="grid lg:grid-cols-2 gap-12" role="list">
 							{/* Use Case 1 */}
-							<div className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="bg-linear-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
 									<div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
 										<span className="text-white font-bold">1</span>
@@ -414,7 +414,7 @@ export default function HomePage() {
 							</div>
 
 							{/* Use Case 2 */}
-							<div className="bg-gradient-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="bg-linear-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
 									<div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
 										<span className="text-white font-bold">2</span>
@@ -431,7 +431,7 @@ export default function HomePage() {
 							</div>
 
 							{/* Use Case 3 */}
-							<div className="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="bg-linear-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
 									<div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
 										<span className="text-white font-bold">3</span>
@@ -448,7 +448,7 @@ export default function HomePage() {
 							</div>
 
 							{/* Use Case 4 */}
-							<div className="bg-gradient-to-br from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="bg-linear-to-br from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
 									<div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
 										<span className="text-white font-bold">4</span>
