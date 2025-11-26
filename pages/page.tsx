@@ -79,8 +79,8 @@ export default function HomePage() {
 					<div className="max-w-7xl mx-auto text-center">
 						{/* Background Pattern */}
 						<div className="absolute inset-0 opacity-30" aria-hidden="true">
-							<div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl transform rotate-1"></div>
-							<div className="absolute inset-0 bg-gradient-to-l from-purple-400/20 to-blue-400/20 rounded-3xl transform -rotate-1"></div>
+							<div className="absolute inset-0 bg-linear-to-r from-blue-400/20 to-purple-400/20 rounded-3xl transform rotate-1"></div>
+							<div className="absolute inset-0 bg-linear-to-l from-purple-400/20 to-blue-400/20 rounded-3xl transform -rotate-1"></div>
 						</div>
 
 						<div className="relative z-10">
@@ -94,7 +94,7 @@ export default function HomePage() {
 
 							<h1
 								id="hero-heading"
-								className="text-5xl lg:text-7xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent pb-1"
+								className="text-5xl lg:text-7xl font-bold mb-8 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent pb-1"
 							>
 								{t('home:hero.title_line1')}
 								<br />
@@ -102,7 +102,7 @@ export default function HomePage() {
 							</h1>
 
 							<p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-								<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">
+								<span className="bg-linear-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">
 									{t('home:hero.subtitle_emoji')}
 								</span>
 								{t('home:hero.subtitle_main')}
@@ -120,7 +120,7 @@ export default function HomePage() {
 												onClick={() => setActiveTab('try')}
 												className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 ${
 													activeTab === 'try'
-														? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-700 dark:text-blue-300 border-b-2 border-blue-500'
+														? 'bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-700 dark:text-blue-300 border-b-2 border-blue-500'
 														: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
 												}`}
 											>
@@ -130,7 +130,7 @@ export default function HomePage() {
 												onClick={() => setActiveTab('other')}
 												className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 ${
 													activeTab === 'other'
-														? 'bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/30 dark:to-blue-900/30 text-green-700 dark:text-green-300 border-b-2 border-green-500'
+														? 'bg-linear-to-r from-green-50 to-blue-50 dark:from-green-900/30 dark:to-blue-900/30 text-green-700 dark:text-green-300 border-b-2 border-green-500'
 														: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
 												}`}
 											>
@@ -154,7 +154,7 @@ export default function HomePage() {
 															onClick={handleExecute}
 															// disabled
 															// disabled={!task.trim()}
-															className="absolute right-2 top-2 px-5 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-md hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
+															className="absolute right-2 top-2 px-5 py-1.5 bg-linear-to-r from-blue-600 to-purple-600 text-white font-medium rounded-md hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
 															data-page-agent-not-interactive
 														>
 															{t('home:hero.execute_button')}
@@ -218,27 +218,27 @@ export default function HomePage() {
 														</h4>
 														<ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
 															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 																{t('home:try_other.notice_items.item1')}
 															</li>
 															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 																{t('home:try_other.notice_items.item2')}
 															</li>
 															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 																{t('home:try_other.notice_items.item3')}
 															</li>
 															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 																{t('home:try_other.notice_items.item4')}
 															</li>
 															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 																{t('home:try_other.notice_items.item5')}
 															</li>
 															<li className="flex items-start text-left">
-																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 flex-shrink-0 "></span>
+																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 																{t('home:try_other.notice_items.item6_prefix')}{' '}
 																<Link
 																	href="/docs/introduction/limitations"
@@ -385,7 +385,7 @@ export default function HomePage() {
 						<div className="text-center mb-16">
 							<h2
 								id="use-cases-heading"
-								className="text-4xl lg:text-5xl mb-6 text-gray-900 dark:text-white"
+								className="text-4xl lg:text-5xl font-bold mb-6 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
 							>
 								{t('home:use_cases.section_title')}
 							</h2>
@@ -398,7 +398,7 @@ export default function HomePage() {
 							{/* Use Case 1 */}
 							<div className="bg-linear-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+									<div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
 										<span className="text-white font-bold">1</span>
 									</div>
 
@@ -416,7 +416,7 @@ export default function HomePage() {
 							{/* Use Case 2 */}
 							<div className="bg-linear-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+									<div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
 										<span className="text-white font-bold">2</span>
 									</div>
 									<div>
@@ -433,7 +433,7 @@ export default function HomePage() {
 							{/* Use Case 3 */}
 							<div className="bg-linear-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+									<div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
 										<span className="text-white font-bold">3</span>
 									</div>
 									<div>
@@ -450,7 +450,7 @@ export default function HomePage() {
 							{/* Use Case 4 */}
 							<div className="bg-linear-to-br from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+									<div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
 										<span className="text-white font-bold">4</span>
 									</div>
 									<div>
