@@ -21,7 +21,7 @@ export default function Header() {
 						{/* Logo */}
 						<Link
 							href="/"
-							className="flex items-center gap-2 sm:gap-3 group flex-shrink-0"
+							className="flex items-center gap-2 sm:gap-3 group shrink-0"
 							aria-label={t('header.logo_alt')}
 							onClick={() => setMobileMenuOpen(false)}
 						>
@@ -48,7 +48,7 @@ export default function Header() {
 						>
 							<Link
 								href="/docs/introduction/overview"
-								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex-shrink-0"
+								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
 								aria-label={t('header.nav_docs')}
 							>
 								<BookIcon className="w-5 h-5" />
@@ -57,7 +57,7 @@ export default function Header() {
 								href="https://github.com/alibaba/page-agent"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 flex-shrink-0"
+								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
 								aria-label={t('header.nav_source')}
 							>
 								<GithubIcon className="w-5 h-5" />
@@ -94,7 +94,7 @@ export default function Header() {
 						{/* Mobile menu button */}
 						<button
 							type="button"
-							className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 flex-shrink-0"
+							className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 shrink-0"
 							aria-label={t('header.mobile_menu')}
 							aria-expanded={mobileMenuOpen}
 							aria-controls="mobile-menu"

@@ -72,7 +72,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 				<div className="flex">
 					{/* 行号 */}
 					{showLineNumbers && (
-						<div className={`flex-shrink-0 px-4 py-4 ${lineNumbersClasses} border-r select-none`}>
+						<div className={`shrink-0 px-4 py-4 ${lineNumbersClasses} border-r select-none`}>
 							<div className="text-xs font-mono leading-6">
 								{lines.map((line, lineIdx) => {
 									const lineNum = lineIdx + 1

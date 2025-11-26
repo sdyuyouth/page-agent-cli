@@ -96,7 +96,7 @@ const ProductListItem = ({ product }: { product: Product }) => (
 		<img
 			src={product.image}
 			alt={product.name}
-			className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+			className="w-20 h-20 object-cover rounded-lg shrink-0"
 			loading="lazy"
 		/>
 		<div className="flex-1 min-w-0">

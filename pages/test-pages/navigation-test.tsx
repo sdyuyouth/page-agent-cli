@@ -373,7 +373,7 @@ export default function NavigationTestPage() {
 									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
 										销售趋势
 									</h3>
-									<div className="h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-white">
+									<div className="h-32 bg-linear-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-white">
 										📈 图表占位符
 									</div>
 								</div>
@@ -381,7 +381,7 @@ export default function NavigationTestPage() {
 									<h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
 										用户分布
 									</h3>
-									<div className="h-32 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center text-white">
+									<div className="h-32 bg-linear-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center text-white">
 										🗺️ 地图占位符
 									</div>
 								</div>

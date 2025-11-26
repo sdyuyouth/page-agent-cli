@@ -174,7 +174,7 @@ export default function Overview() {
 
 				<ul className="space-y-4 mb-8">
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 min-w-6 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
+						<span className="w-6 h-6 min-w-6 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 shrink-0">
 							1
 						</span>
 						<div className="text-gray-700 dark:text-gray-300">
@@ -182,7 +182,7 @@ export default function Overview() {
 						</div>
 					</li>
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 min-w-6 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
+						<span className="w-6 h-6 min-w-6 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 shrink-0">
 							2
 						</span>
 						<div className="text-gray-700 dark:text-gray-300">
@@ -190,7 +190,7 @@ export default function Overview() {
 						</div>
 					</li>
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 min-w-6 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
+						<span className="w-6 h-6 min-w-6 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 shrink-0">
 							3
 						</span>
 						<div className="text-gray-700 dark:text-gray-300">
@@ -198,7 +198,7 @@ export default function Overview() {
 						</div>
 					</li>
 					<li className="flex items-start space-x-3">
-						<span className="w-6 h-6 min-w-6 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 flex-shrink-0">
+						<span className="w-6 h-6 min-w-6 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm mt-0.5 shrink-0">
 							4
 						</span>
 						<div className="text-gray-700 dark:text-gray-300">

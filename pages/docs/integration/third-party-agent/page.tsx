@@ -98,7 +98,7 @@ const pageAgentTool = {
 				</ul>
 			</div>
 
-			<div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg">
+			<div className="bg-linear-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg">
 				<h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">🎉 开始集成</h3>
 				<p className="mb-3 text-gray-700 dark:text-gray-300">
 					通过这种方式，你的 Agent 系统就能真正成为用户的智能助手。

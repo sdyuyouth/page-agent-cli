@@ -54,7 +54,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 		<div className="max-w-7xl mx-auto px-6 py-8 overflow-x-auto">
 			<div className="flex gap-8 min-w-[900px]">
 				{/* Sidebar */}
-				<aside className="w-64 flex-shrink-0" role="complementary" aria-label="文档导航">
+				<aside className="w-64 shrink-0" role="complementary" aria-label="文档导航">
 					<div className="sticky top-8">
 						<nav className="space-y-8" role="navigation" aria-label="文档章节">
 							{navigationSections.map((section) => (
