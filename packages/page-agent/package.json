@@ -14,7 +14,10 @@
 		}
 	},
 	"files": [
-		"dist/"
+		"dist/",
+		"README.md",
+		"README-zh.md",
+		"LICENSE"
 	],
 	"description": "AI-powered UI agent for web applications - add intelligent automation to any webpage with a single script tag",
 	"keywords": [
@@ -39,7 +42,9 @@
 		"build": "MODE=lib vite build && MODE=umd vite build",
 		"build:lib": "MODE=lib vite build",
 		"build:umd": "MODE=umd vite build",
-		"build:watch": "MODE=lib vite build --watch"
+		"build:watch": "MODE=lib vite build --watch",
+		"prepublishOnly": "node -e \"const fs=require('fs');['README.md','README-zh.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
+		"postpublish": "node -e \"['README.md','README-zh.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
 	},
 	"dependencies": {
 		"ai-motion": "^0.4.7",
