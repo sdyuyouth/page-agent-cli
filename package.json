@@ -23,6 +23,7 @@
 		"start": "npm run dev --workspace=@page-agent/website",
 		"build": "npm run build --workspaces --if-present",
 		"build:lib": "npm run build --workspace=page-agent",
+		"version": "node scripts/sync-version.js",
 		"lint": "eslint .",
 		"prepare": "husky"
 	},
