@@ -1,7 +1,7 @@
 {
 	"name": "page-agent",
 	"private": false,
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"type": "module",
 	"main": "./dist/lib/page-agent.js",
 	"module": "./dist/lib/page-agent.js",
@@ -16,26 +16,26 @@
 	"files": [
 		"dist/",
 		"README.md",
-		"README-zh.md",
 		"LICENSE"
 	],
-	"description": "AI-powered UI agent for web applications - add intelligent automation to any webpage with a single script tag",
+	"description": "GUI agent for web applications - add intelligent automation to any webpage with a single script",
 	"keywords": [
 		"ai",
 		"automation",
 		"ui-agent",
+		"GUI-agent",
 		"browser-automation",
 		"web-agent",
 		"llm",
 		"dom-interaction",
-		"intelligent-ui"
+		"web-automation",
+		"GUI-simulation"
 	],
 	"author": "Simon<gaomeng1900>",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/alibaba/page-agent.git",
-		"directory": "packages/page-agent"
+		"url": "https://github.com/alibaba/page-agent.git"
 	},
 	"homepage": "https://alibaba.github.io/page-agent/",
 	"scripts": {
@@ -43,8 +43,8 @@
 		"build:lib": "MODE=lib vite build",
 		"build:umd": "MODE=umd vite build",
 		"build:watch": "MODE=lib vite build --watch",
-		"prepublishOnly": "node -e \"const fs=require('fs');['README.md','README-zh.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
-		"postpublish": "node -e \"['README.md','README-zh.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
+		"prepublishOnly": "node -e \"const fs=require('fs');['README.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
+		"postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
 	},
 	"dependencies": {
 		"ai-motion": "^0.4.7",
