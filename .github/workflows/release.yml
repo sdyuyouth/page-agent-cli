@@ -32,4 +32,4 @@ jobs:
         run: npm run build:lib
 
       - name: Publish to npm
-        run: npm publish
+        run: npm publish --workspace=page-agent
