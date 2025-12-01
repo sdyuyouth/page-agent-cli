@@ -12,21 +12,6 @@ body:
         - [Code of Conduct](https://github.com/alibaba/page-agent/blob/main/CODE_OF_CONDUCT.md)
         - [Contributing Guide](https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md)
 
-  - type: checkboxes
-    id: community
-    attributes:
-      label: Community Communication / 社区沟通
-      description: Confirm you will communicate respectfully and constructively / 确认将以礼貌、建设性的方式沟通
-      options:
-        - label: I will be polite and respectful. / 我会保持礼貌与尊重。
-          required: true
-        - label: I will share constructive, actionable suggestions. / 我会提供建设性、可行动的建议。
-          required: true
-        - label: I have read the Code of Conduct. / 我已阅读行为准则。
-          required: true
-    validations:
-      required: true
-
   - type: textarea
     id: description
     attributes:
@@ -59,3 +44,18 @@ body:
       placeholder: '0.0.0'
     validations:
       required: false
+
+  - type: checkboxes
+    id: community
+    attributes:
+      label: Community Communication / 社区沟通
+      description: Confirm you will communicate respectfully and constructively / 确认将以礼貌、建设性的方式沟通
+      options:
+        - label: I will be polite and respectful. / 我会保持礼貌与尊重。
+          required: true
+        - label: I will share constructive, actionable suggestions. / 我会提供建设性、可行动的建议。
+          required: true
+        - label: I have read the Code of Conduct. / 我已阅读行为准则。
+          required: true
+    validations:
+      required: true
