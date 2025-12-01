@@ -14,10 +14,7 @@
 		}
 	},
 	"files": [
-		"dist/",
-		"README.md",
-		"LICENSE",
-		"NOTICE"
+		"dist/"
 	],
 	"description": "AI-powered UI agent for web applications - add intelligent automation to any webpage with a single script tag",
 	"keywords": [
