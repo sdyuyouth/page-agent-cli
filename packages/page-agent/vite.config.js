@@ -65,7 +65,7 @@ const umdConfig = {
 	},
 	build: {
 		lib: {
-			entry: resolve(__dirname, 'src/entry.ts'),
+			entry: resolve(__dirname, 'src/umd.ts'),
 			name: 'PageAgent',
 			fileName: 'page-agent',
 			formats: ['umd'],
