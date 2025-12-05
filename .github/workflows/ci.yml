@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20, 22]
+        node-version: [20, 24, 25]
 
     steps:
       - uses: actions/checkout@v6
@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+
+      # test on default version of npm
+      # - 9.6~10.8 on node@20
+      # - 11.3~11.6 on node@24
 
       - name: Install dependencies
         run: npm install
