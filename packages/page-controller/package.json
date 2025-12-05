@@ -1,7 +1,6 @@
 {
 	"name": "@page-agent/page-controller",
-	"private": false,
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"type": "module",
 	"main": "./dist/lib/page-controller.js",
 	"module": "./dist/lib/page-controller.js",
@@ -35,7 +34,7 @@
 	"scripts": {
 		"build": "vite build",
 		"build:watch": "vite build --watch",
-		"prepublishOnly": "node -e \"const fs=require('fs');['README.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
-		"postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
+		"prepublishOnly": "node -e \"const fs=require('fs');['LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
+		"postpublish": "node -e \"['LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
 	}
 }
