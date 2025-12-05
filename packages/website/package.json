@@ -1,7 +1,7 @@
 {
 	"name": "@page-agent/website",
 	"private": true,
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -9,10 +9,8 @@
 		"preview": "vite preview",
 		"typecheck": "tsc --noEmit"
 	},
-	"dependencies": {
-		"page-agent": "*"
-	},
 	"devDependencies": {
+		"page-agent": "*",
 		"@tailwindcss/vite": "^4.1.14",
 		"@types/react": "^19.2.2",
 		"@types/react-dom": "^19.2.1",

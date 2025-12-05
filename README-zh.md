@@ -67,16 +67,17 @@ await agent.execute('点击登录按钮')
 
 ## 🏗️ 架构设计
 
-PageAgent 采用清晰的模块化架构：
+PageAgent adopts a simplified monorepo structure:
 
 ```
-src/
-├── PageAgent.ts          # Agent 主流程
-├── dom/                  # DOM 理解
-├── tools/                # 代理交互工具
-├── ui/                   # UI 组件和面板
-├── llms/                 # LLM 集成层
-└── utils/                # 事件总线和工具
+packages/
+├── page-agent/          # AI agent (npm: page-agent)
+│   ├── PageAgent        # Agent main loop
+│   ├── tools/           # LLM tool definitions
+│   ├── ui/              # UI components & panels
+│   └── llms/            # LLM integration layer
+├── page-controller/     # DOM operations (npm: @page-agent/page-controller)
+└── website/             # Documentation site
 ```
 
 ## 🤝 贡献

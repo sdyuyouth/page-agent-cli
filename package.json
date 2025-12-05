@@ -1,10 +1,12 @@
 {
 	"name": "root",
 	"private": true,
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"type": "module",
 	"workspaces": [
-		"packages/*"
+		"packages/page-controller",
+		"packages/page-agent",
+		"packages/website"
 	],
 	"description": "AI-powered UI agent for web applications",
 	"author": "Simon<gaomeng1900>",
@@ -30,10 +32,10 @@
 	"devDependencies": {
 		"@commitlint/cli": "^20.1.0",
 		"@commitlint/config-conventional": "^20.0.0",
-		"@eslint/js": "^9.37.0",
+		"@eslint/js": "^9.39.1",
 		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
 		"dotenv": "^17.2.3",
-		"eslint": "^9.37.0",
+		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-react-dom": "^2.3.9",
 		"eslint-plugin-react-hooks": "^7.0.1",
@@ -44,8 +46,11 @@
 		"lint-staged": "^16.2.4",
 		"prettier": "^3.6.2",
 		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.46.0",
-		"vite": "^7.2.6"
+		"typescript-eslint": "^8.48.1",
+		"vite": "^7.2.6",
+		"@microsoft/api-extractor": "^7.55.1",
+		"unplugin-dts": "^1.0.0-beta.6",
+		"vite-plugin-css-injected-by-js": "^3.5.2"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,cts,mjs,mts}": [

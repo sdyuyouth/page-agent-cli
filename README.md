@@ -67,16 +67,17 @@ await agent.execute('Click the login button')
 
 ## 🏗️ Structure
 
-PageAgent follows a clean, modular architecture:
+PageAgent adopts a simplified monorepo structure:
 
 ```
-src/
-├── PageAgent.ts          # Agent main loop
-├── dom/                  # DOM processing
-├── tools/                # Agent tools
-├── ui/                   # UI components & panels
-├── llms/                 # LLM integration layer
-└── utils/                # Event bus & utilities
+packages/
+├── page-agent/          # AI agent (npm: page-agent)
+│   ├── PageAgent        # Agent main loop
+│   ├── tools/           # LLM tool definitions
+│   ├── ui/              # UI components & panels
+│   └── llms/            # LLM integration layer
+├── page-controller/     # DOM operations (npm: @page-agent/page-controller)
+└── website/             # Demo & Documentation site
 ```
 
 ## 🤝 Contributing

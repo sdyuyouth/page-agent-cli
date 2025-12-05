@@ -1,4 +1,4 @@
-import type { PageAgent } from '../PageAgent'
+import type { PageController } from '../PageController'
 
 const clearFunctions = [] as (() => void)[]
 
@@ -11,9 +11,9 @@ function fixAntdSelect() {
 	// for (const select of selects) {}
 }
 
-export function patchAntd(pageAgent: PageAgent) {
-	pageAgent.addEventListener('beforeUpdate', fixAntdSelect)
-	pageAgent.addEventListener('afterUpdate', () => {
+export function patchAntd(pageController: PageController) {
+	pageController.addEventListener('beforeUpdate', fixAntdSelect)
+	pageController.addEventListener('afterUpdate', () => {
 		for (const fn of clearFunctions) fn()
 		clearFunctions.length = 0
 	})

@@ -5,21 +5,7 @@
 import zod, { type z } from 'zod'
 
 import type { PageAgent } from '../PageAgent'
-import {
-	clickElement,
-	getElementByIndex,
-	getSystemInfo,
-	inputTextElement,
-	scrollHorizontally,
-	scrollVertically,
-	selectOptionElement,
-	waitFor,
-} from './actions'
-// debug
-import * as utils from './actions'
-
-// @ts-expect-error debug only
-window.utils = utils
+import { waitFor } from '../utils'
 
 /**
  * Internal tool definition that has access to PageAgent `this` context
@@ -40,18 +26,6 @@ export function tool<TParams>(options: PageAgentTool<TParams>): PageAgentTool<TP
  * Note: Using any to allow different parameter types for each tool
  */
 export const tools = new Map<string, PageAgentTool>()
-
-// tools.set(
-// 	'get_current_html',
-// 	tool({
-// 		description: 'Get the current (updated) simplified HTML of the page',
-// 		inputSchema: zod.object({}),
-// 		execute: function (this: PageAgent) {
-// 			this.updateTree()
-// 			return this.simplifiedHTML
-// 		},
-// 	})
-// )
 
 tools.set(
 	'done',
@@ -79,11 +53,11 @@ tools.set(
 			seconds: zod.number().min(1).max(10).default(1),
 		}),
 		execute: async function (this: PageAgent, input) {
-			const lastTimeUpdate = this.lastTimeUpdate
+			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
 			const actualWaitTime = Math.max(0, input.seconds - (Date.now() - lastTimeUpdate) / 1000)
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
 			await waitFor(actualWaitTime)
-			return `✅ Waited for ${input.seconds} seconds.` + (await getSystemInfo())
+			return `✅ Waited for ${input.seconds} seconds.`
 		},
 	})
 )
@@ -98,7 +72,7 @@ tools.set(
 		}),
 		execute: async function (this: PageAgent, input) {
 			const answer = await this.panel.askUser(input.question)
-			return `✅ Received user answer: ${answer}` + (await getSystemInfo())
+			return `✅ Received user answer: ${answer}`
 		},
 	})
 )
@@ -111,16 +85,8 @@ tools.set(
 			index: zod.int().min(0),
 		}),
 		execute: async function (this: PageAgent, input) {
-			const element = getElementByIndex(this, input.index)
-			const elemText = this.elementTextMap.get(input.index)
-			await clickElement(element)
-
-			// @workaround: Handle links that open in new tabs
-			if (element instanceof HTMLAnchorElement && element.target === '_blank') {
-				return `⚠️ Clicked link that opens in a new tab (${elemText ? elemText : input.index}). You are not capable of reading new tabs.`
-			}
-
-			return `✅ Clicked element (${elemText ? elemText : input.index}).` + (await getSystemInfo())
+			const result = await this.pageController.clickElement(input.index)
+			return result.message
 		},
 	})
 )
@@ -134,13 +100,8 @@ tools.set(
 			text: zod.string(),
 		}),
 		execute: async function (this: PageAgent, input) {
-			const element = getElementByIndex(this, input.index)
-			const elemText = this.elementTextMap.get(input.index)
-			await inputTextElement(element, input.text)
-			return (
-				`✅ Input text (${input.text}) into element (${elemText ? elemText : input.index}).` +
-				(await getSystemInfo())
-			)
+			const result = await this.pageController.inputText(input.index, input.text)
+			return result.message
 		},
 	})
 )
@@ -155,13 +116,8 @@ tools.set(
 			text: zod.string(),
 		}),
 		execute: async function (this: PageAgent, input) {
-			const element = getElementByIndex(this, input.index)
-			const elemText = this.elementTextMap.get(input.index)
-			await selectOptionElement(element as HTMLSelectElement, input.text)
-			return (
-				`✅ Selected option (${input.text}) in element (${elemText ? elemText : input.index}).` +
-				(await getSystemInfo())
-			)
+			const result = await this.pageController.selectOption(input.index, input.text)
+			return result.message
 		},
 	})
 )
@@ -181,13 +137,11 @@ tools.set(
 			index: zod.number().int().min(0).optional(),
 		}),
 		execute: async function (this: PageAgent, input) {
-			const { down, num_pages, index, pixels } = input
-
-			const scroll_amount = pixels ? pixels : num_pages * (down ? 1 : -1) * window.innerHeight
-
-			const element = index !== undefined ? getElementByIndex(this, index) : null
-
-			return (await scrollVertically(down, scroll_amount, element)) + (await getSystemInfo())
+			const result = await this.pageController.scroll({
+				...input,
+				numPages: input.num_pages,
+			})
+			return result.message
 		},
 	})
 )
@@ -203,13 +157,8 @@ tools.set(
 			index: zod.number().int().min(0).optional(),
 		}),
 		execute: async function (this: PageAgent, input) {
-			const { right, pixels, index } = input
-
-			const scroll_amount = pixels * (right ? 1 : -1)
-
-			const element = index !== undefined ? getElementByIndex(this, index) : null
-
-			return (await scrollHorizontally(right, scroll_amount, element)) + (await getSystemInfo())
+			const result = await this.pageController.scrollHorizontally(input)
+			return result.message
 		},
 	})
 )
@@ -223,14 +172,8 @@ tools.set(
 			script: zod.string(),
 		}),
 		execute: async function (this: PageAgent, input) {
-			try {
-				// Wrap script in async function to support await
-				const asyncFunction = eval(`(async () => { ${input.script} })`)
-				const result = await asyncFunction()
-				return `✅ Executed JavaScript. Result: ${result}` + (await getSystemInfo())
-			} catch (error) {
-				return `❌ Error executing JavaScript: ${error}` + (await getSystemInfo())
-			}
+			const result = await this.pageController.executeJavascript(input.script)
+			return result.message
 		},
 	})
 )

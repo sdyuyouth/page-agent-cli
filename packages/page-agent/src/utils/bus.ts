@@ -23,8 +23,6 @@ export interface PageAgentEventMap {
 	'panel:collapse': { params: undefined }
 
 	// PageAgent status events
-	// 'agent:beforeUpdate': { params: undefined }
-	// 'agent:afterUpdate': { params: undefined }
 	// 'agent:execute': { params: { task: string } }
 	// 'agent:done': { params: { text: string; success: boolean } }
 	// 'agent:paused': { params: undefined }

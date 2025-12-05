@@ -2,24 +2,12 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
-import type { PageAgent } from '../PageAgent'
+import type { InteractiveElementDomNode } from './dom/dom_tree/type'
 
 // ======= general utils =======
 
-export async function waitFor(seconds: number): Promise<void> {
+async function waitFor(seconds: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
-}
-
-let currentUrl = window.location.href
-export async function getSystemInfo() {
-	// If current URL is already up to date, no need to add message
-	if (currentUrl === window.location.href) return ''
-
-	await waitFor(0.3) // Wait a bit longer for page to load
-
-	currentUrl = window.location.href
-
-	return `\n<sys> Current URL changed to: ${currentUrl} </sys>`
 }
 
 // ======= dom utils =======
@@ -35,10 +23,13 @@ export async function movePointerToElement(element: HTMLElement) {
 }
 
 /**
- * Get the HTMLElement by index from the selectorMap in PageAgent.
+ * Get the HTMLElement by index from a selectorMap.
  */
-export function getElementByIndex(pageAgent: PageAgent, index: number): HTMLElement {
-	const interactiveNode = pageAgent.selectorMap.get(index)
+export function getElementByIndex(
+	selectorMap: Map<number, InteractiveElementDomNode>,
+	index: number
+): HTMLElement {
+	const interactiveNode = selectorMap.get(index)
 	if (!interactiveNode) {
 		throw new Error(`No interactive element found at index ${index}`)
 	}
@@ -170,7 +161,6 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 	await waitFor(0.1) // Wait to ensure change event processing completes
 }
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export async function scrollIntoViewIfNeeded(element: HTMLElement) {
 	const el = element as any
 	if (el.scrollIntoViewIfNeeded) {

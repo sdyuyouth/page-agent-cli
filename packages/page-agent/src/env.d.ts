@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import type { PageAgent } from './src/PageAgent'
+import type { PageAgent } from './PageAgent'
 
 declare module '*.module.css' {
 	const classes: Record<string, string>

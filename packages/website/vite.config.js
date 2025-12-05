@@ -18,7 +18,8 @@ export default defineConfig({
 			// Self root
 			'@': resolve(__dirname, 'src'),
 
-			// Simplified monorepo solution (raw npm workspace with hoisting)
+			// Monorepo packages (always bundle local code instead of npm versions)
+			'@page-agent/page-controller': resolve(__dirname, '../page-controller/src/PageController.ts'),
 			'page-agent': resolve(__dirname, '../page-agent/src/PageAgent.ts'),
 		},
 	},
