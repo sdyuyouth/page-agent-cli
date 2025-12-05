@@ -13,7 +13,7 @@ console.log(chalk.cyan(`📦 Building @page-agent/page-controller`))
 export default defineConfig({
 	clearScreen: false,
 	plugins: [
-		dts({ tsconfigPath: './tsconfig.json', bundleTypes: true }),
+		dts({ tsconfigPath: './tsconfig.dts.json', bundleTypes: true }),
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
 	],
 	publicDir: false,
@@ -29,7 +29,7 @@ export default defineConfig({
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
-			external: [],
+			external: ['@page-agent/*'],
 		},
 		minify: false,
 		sourcemap: true,

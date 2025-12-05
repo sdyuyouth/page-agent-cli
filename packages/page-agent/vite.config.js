@@ -47,6 +47,9 @@ const libConfig = {
 
 // ============================================================================
 // UMD Config (Browser Bundle for CDN)
+// - alias all local packages so that they can be build in
+// - no external
+// - no d.ts. dts does not work with monorepo aliasing
 // ============================================================================
 /** @type {import('vite').UserConfig} */
 const umdConfig = {

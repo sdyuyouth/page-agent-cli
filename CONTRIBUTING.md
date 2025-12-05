@@ -27,7 +27,11 @@ This is a **monorepo** with npm workspaces containing **two main packages**:
 1. **Core Library** (`packages/page-agent/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation, published as `page-agent` on npm
 2. **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
-We use a simplified monorepo solution with native npm-workspace. No fancy tooling. Hoisting is required.
+We use a simplified monorepo solution with native npm-workspace + ts reference + vite alias. No fancy tooling. Hoisting is required. 
+
+- When developing. Use alias so that we don't have to pre-build.
+- When bundling. Use external and disable ts `paths` alias to leave deps out.
+- When bundling `UMD` or `Website`. Bundle everything including local packages.
 
 ## 🤝 How to Contribute
 
