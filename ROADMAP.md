@@ -25,19 +25,22 @@ The development progress and future plans for PageAgent.
   - [x] **lifecycle hooks**
   - [ ] **lifecycle events**
 - [ ] **User takeover** 
+  - [#64](https://github.com/alibaba/page-agent/issues/64)
 - [ ] **❗Hijack `page_open/page_change/page_unload` behavior**
 - [ ] **Custom knowledge base and instructions**
+  - [#45](https://github.com/alibaba/page-agent/issues/45)
 - [ ] **Black/white-list safeguard**
 - [ ] **Data-masking**
+  - [#44](https://github.com/alibaba/page-agent/issues/44)
 - [ ] **Improve Memory**
-  - Current phrasing can cause logic-loop for some models.
-  - Test adding `Action` to memory.
+  - [#66](https://github.com/alibaba/page-agent/issues/66)
+  - [#65](https://github.com/alibaba/page-agent/issues/65)
 - [ ] **Optimize for popular UI frameworks**
 - [x] **i18n of the website**
   - [x] Chinese version
   - [x] English version
 - [x] **Refactor: Separate `Agent` and `PageController`** 
-- [ ] **Chrome-ext wrapper**
+- [ ] **Chrome-ext wrapper for multi-page tasks**
 
 ♻️ Following browser-use's update and contribute back.
 
