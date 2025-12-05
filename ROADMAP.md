@@ -24,8 +24,7 @@ The development progress and future plans for PageAgent.
 - [ ] **Hooks and Events**
   - [x] **lifecycle hooks**
   - [ ] **lifecycle events**
-- [ ] **❗Pause and intervene** 
-  - Current pause does not allow user intervention.
+- [ ] **User takeover** 
 - [ ] **❗Hijack `page_open/page_change/page_unload` behavior**
 - [ ] **Custom knowledge base and instructions**
 - [ ] **Black/white-list safeguard**
@@ -33,24 +32,22 @@ The development progress and future plans for PageAgent.
 - [ ] **Improve Memory**
   - Current phrasing can cause logic-loop for some models.
   - Test adding `Action` to memory.
-- [ ] **Tools for more complex tasks**
-  - todo list
-  - file sys
 - [ ] **Optimize for popular UI frameworks**
 - [x] **i18n of the website**
   - [x] Chinese version
   - [x] English version
-- [ ] **Testing suits**
-- [ ] **Support custom llm fetch**
-- [ ] **Refactor: Separate `Agent` and `Page-Controller`** 
-  - Agent should be able to run w/o dom. 
-  - Actions should be able to be injected through iframe.
+- [x] **Refactor: Separate `Agent` and `PageController`** 
+- [ ] **Chrome-ext wrapper**
 
 ♻️ Following browser-use's update and contribute back.
 
 ## 📋 Pending Features
 
-- [ ] **Chrome-ext wrapper**
+- [ ] **Tools for more complex tasks**
+  - todo list
+  - file sys
+- [ ] **Support custom llm fetch**
+- [ ] **Testing suits**
 - [ ] **Same-origin multi-page-app rally**
 - [ ] **Local MCP proxy**
 
