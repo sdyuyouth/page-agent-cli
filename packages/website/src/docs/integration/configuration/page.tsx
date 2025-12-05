@@ -9,7 +9,7 @@ export default function Configuration() {
 				className="mb-8"
 				language="typescript"
 				code={`// config
-type PageAgentConfig = LLMConfig & AgentConfig & DomConfig
+type PageAgentConfig = LLMConfig & AgentConfig & PageControllerConfig
 
 interface LLMConfig {
 	baseURL?: string
@@ -93,12 +93,13 @@ interface AgentConfig {
 	experimentalPreventNewPage?: boolean
 }
 
-interface DomConfig {
+interface PageControllerConfig {
 	interactiveBlacklist?: (Element | (() => Element))[]
 	interactiveWhitelist?: (Element | (() => Element))[]
 	include_attributes?: string[]
 	highlightOpacity?: number
 	highlightLabelOpacity?: number
+	viewportExpansion?: number
 }
 
 `}

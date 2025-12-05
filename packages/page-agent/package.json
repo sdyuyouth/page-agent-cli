@@ -39,10 +39,10 @@
 	},
 	"homepage": "https://alibaba.github.io/page-agent/",
 	"scripts": {
-		"build": "MODE=lib vite build && MODE=umd vite build",
+		"build": "npm run build:lib && npm run build:umd",
 		"build:lib": "MODE=lib vite build",
 		"build:umd": "MODE=umd vite build",
-		"build:watch": "MODE=lib vite build --watch",
+		"build:watch": "MODE=umd vite build --watch",
 		"prepublishOnly": "node -e \"const fs=require('fs');['README.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
 		"postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
 	},
@@ -52,8 +52,6 @@
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {
-		"@microsoft/api-extractor": "^7.55.1",
-		"unplugin-dts": "^1.0.0-beta.6",
-		"vite-plugin-css-injected-by-js": "^3.5.2"
+		"@page-agent/page-controller": "*"
 	}
 }

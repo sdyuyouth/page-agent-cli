@@ -17,7 +17,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const libConfig = {
 	clearScreen: false,
 	plugins: [
-		dts({ tsconfigPath: './tsconfig.json', bundleTypes: true }),
+		dts({ tsconfigPath: './tsconfig.dts.json', bundleTypes: true }),
+		// dts({ tsconfigPath: './tsconfig.json', bundleTypes: true, compilerOptions: { paths: {} } }),
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
 	],
 	publicDir: false,
@@ -33,7 +34,7 @@ const libConfig = {
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
-			external: ['ai', 'ai-motion', 'chalk', 'zod'],
+			external: ['ai', 'ai-motion', 'chalk', 'zod', '@page-agent/*'],
 		},
 		minify: false,
 		sourcemap: true,
@@ -53,6 +54,11 @@ const umdConfig = {
 	publicDir: false,
 	esbuild: {
 		keepNames: true,
+	},
+	resolve: {
+		alias: {
+			'@page-agent/page-controller': resolve(__dirname, '../page-controller/src/PageController.ts'),
+		},
 	},
 	build: {
 		lib: {

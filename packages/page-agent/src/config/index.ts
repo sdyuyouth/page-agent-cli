@@ -1,5 +1,6 @@
+import type { PageControllerConfig } from '@page-agent/page-controller'
+
 import type { AgentHistory, ExecutionResult, PageAgent } from '../PageAgent'
-import type { DomConfig } from '../dom'
 import type { SupportedLanguage } from '../i18n'
 import type { PageAgentTool } from '../tools'
 import {
@@ -94,7 +95,7 @@ export interface AgentConfig {
 	experimentalPreventNewPage?: boolean
 }
 
-export type PageAgentConfig = LLMConfig & AgentConfig & DomConfig
+export type PageAgentConfig = LLMConfig & AgentConfig & PageControllerConfig
 
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 	return {

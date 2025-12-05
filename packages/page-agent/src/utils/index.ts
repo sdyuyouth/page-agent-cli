@@ -20,6 +20,10 @@ export async function waitUntil(check: () => boolean, timeout = 60 * 60_1000): P
 	})
 }
 
+export async function waitFor(seconds: number): Promise<void> {
+	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
+}
+
 //
 
 export function truncate(text: string, maxLength: number): string {

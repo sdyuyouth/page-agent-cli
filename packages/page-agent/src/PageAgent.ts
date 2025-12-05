@@ -2,17 +2,14 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
+import { PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import zod from 'zod'
 
 import type { PageAgentConfig } from './config'
-import { MAX_STEPS, VIEWPORT_EXPANSION } from './config/constants'
-import * as dom from './dom'
-import { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
-import { getPageInfo } from './dom/getPageInfo'
+import { MAX_STEPS } from './config/constants'
 import { I18n } from './i18n'
 import { LLM, type Tool } from './llms'
-import { patchReact } from './patches/react'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
 import { Panel, getToolCompletedText, getToolExecutingText } from './ui/Panel'
@@ -87,19 +84,8 @@ export class PageAgent extends EventTarget {
 	#totalWaitTime = 0
 	#abortController = new AbortController()
 
-	/** Corresponds to eval_page in browser-use */
-	flatTree: FlatDomTree | null = null
-	/**
-	 * All highlighted index-mapped interactive elements
-	 * Corresponds to DOMState.selector_map in browser-use
-	 */
-	selectorMap = new Map<number, InteractiveElementDomNode>()
-	/** highlight index -> element text */
-	elementTextMap = new Map<number, string>()
-	/** Corresponds to clickable_elements_to_string in browser-use */
-	simplifiedHTML = '<EMPTY>'
-	/** last time the tree was updated */
-	lastTimeUpdate = 0
+	/** PageController for DOM operations */
+	pageController: PageController
 
 	/** Fullscreen mask */
 	mask = new SimulatorMask()
@@ -115,6 +101,9 @@ export class PageAgent extends EventTarget {
 		this.panel = new Panel(this)
 		this.tools = new Map(tools)
 
+		// Initialize PageController with config
+		this.pageController = new PageController(this.config)
+
 		if (this.config.customTools) {
 			for (const [name, tool] of Object.entries(this.config.customTools)) {
 				if (tool === null) {
@@ -128,8 +117,6 @@ export class PageAgent extends EventTarget {
 		if (!this.config.experimentalScriptExecutionTool) {
 			this.tools.delete('execute_javascript')
 		}
-
-		patchReact(this)
 
 		window.addEventListener('beforeunload', (e) => {
 			if (!this.disposed) this.dispose('PAGE_UNLOADING')
@@ -175,7 +162,7 @@ export class PageAgent extends EventTarget {
 			while (true) {
 				await onBeforeStep.call(this, step)
 
-				console.group(`step: ${step + 1}`)
+				console.group(`step: ${step}`)
 
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
@@ -197,7 +184,7 @@ export class PageAgent extends EventTarget {
 						},
 						{
 							role: 'user',
-							content: this.#assembleUserPrompt(),
+							content: await this.#assembleUserPrompt(),
 						},
 					],
 					{ AgentOutput: this.#packMacroTool() },
@@ -392,7 +379,7 @@ export class PageAgent extends EventTarget {
 		return systemPrompt
 	}
 
-	#assembleUserPrompt(): string {
+	async #assembleUserPrompt(): Promise<string> {
 		let prompt = ''
 
 		// <agent_history>
@@ -430,13 +417,13 @@ export class PageAgent extends EventTarget {
 
 		// <browser_state>
 
-		prompt += this.#getBrowserState()
+		prompt += await this.#getBrowserState()
 
 		return trimLines(prompt)
 	}
 
 	#onDone(text: string, success = true) {
-		dom.cleanUpHighlights()
+		this.pageController.cleanUpHighlights()
 
 		// Update panel status
 		this.bus.emit('panel:update', {
@@ -455,37 +442,42 @@ export class PageAgent extends EventTarget {
 		this.#abortController.abort()
 	}
 
-	#getBrowserState(): string {
-		const pageUrl = window.location.href
-		const pageTitle = document.title
-		const pi = getPageInfo()
+	async #getBrowserState(): Promise<string> {
+		const pageUrl = await this.pageController.getCurrentUrl()
+		const pageTitle = await this.pageController.getPageTitle()
+		const pi = await this.pageController.getPageInfo()
+		const viewportExpansion = await this.pageController.getViewportExpansion()
 
-		this.#updateTree()
+		this.mask.wrapper.style.pointerEvents = 'none'
+		await this.pageController.updateTree()
+		this.mask.wrapper.style.pointerEvents = 'auto'
+
+		const simplifiedHTML = await this.pageController.getSimplifiedHTML()
 
 		let prompt = trimLines(`<browser_state>
 			Current Page: [${pageTitle}](${pageUrl})
 
 			Page info: ${pi.viewport_width}x${pi.viewport_height}px viewport, ${pi.page_width}x${pi.page_height}px total page size, ${pi.pages_above.toFixed(1)} pages above, ${pi.pages_below.toFixed(1)} pages below, ${pi.total_pages.toFixed(1)} total pages, at ${(pi.current_page_position * 100).toFixed(0)}% of page
 
-			${VIEWPORT_EXPANSION === -1 ? 'Interactive elements from top layer of the current page (full page):' : 'Interactive elements from top layer of the current page inside the viewport:'}
+			${viewportExpansion === -1 ? 'Interactive elements from top layer of the current page (full page):' : 'Interactive elements from top layer of the current page inside the viewport:'}
 
 		`)
 
 		// Page header info
 		const has_content_above = pi.pixels_above > 4
-		if (has_content_above && VIEWPORT_EXPANSION !== -1) {
+		if (has_content_above && viewportExpansion !== -1) {
 			prompt += `... ${pi.pixels_above} pixels above (${pi.pages_above.toFixed(1)} pages) - scroll to see more ...\n`
 		} else {
 			prompt += `[Start of page]\n`
 		}
 
 		// Current viewport info
-		prompt += this.simplifiedHTML
+		prompt += simplifiedHTML
 		prompt += `\n`
 
 		// Page footer info
 		const has_content_below = pi.pixels_below > 4
-		if (has_content_below && VIEWPORT_EXPANSION !== -1) {
+		if (has_content_below && viewportExpansion !== -1) {
 			prompt += `... ${pi.pixels_below} pixels below (${pi.pages_below.toFixed(1)} pages) - scroll to see more ...\n`
 		} else {
 			prompt += `[End of page]\n`
@@ -496,37 +488,10 @@ export class PageAgent extends EventTarget {
 		return prompt
 	}
 
-	/**
-	 * Update document tree
-	 */
-	#updateTree() {
-		this.dispatchEvent(new Event('beforeUpdate'))
-		this.lastTimeUpdate = Date.now()
-		dom.cleanUpHighlights()
-		this.mask.wrapper.style.pointerEvents = 'none'
-		this.flatTree = dom.getFlatTree({
-			...this.config,
-			interactiveBlacklist: [
-				...(this.config.interactiveBlacklist || []),
-				...document.querySelectorAll('[data-page-agent-not-interactive]').values(),
-			],
-		})
-		this.mask.wrapper.style.pointerEvents = 'auto'
-		this.simplifiedHTML = dom.flatTreeToString(this.flatTree, this.config.include_attributes)
-		this.selectorMap.clear()
-		this.selectorMap = dom.getSelectorMap(this.flatTree)
-		this.elementTextMap.clear()
-		this.elementTextMap = dom.getElementTextMap(this.simplifiedHTML)
-		this.dispatchEvent(new Event('afterUpdate'))
-	}
-
 	dispose(reason?: string) {
 		console.log('Disposing PageAgent...')
 		this.disposed = true
-		dom.cleanUpHighlights()
-		this.flatTree = null
-		this.selectorMap.clear()
-		this.elementTextMap.clear()
+		this.pageController.dispose()
 		this.panel.dispose()
 		this.mask.dispose()
 		this.history = []

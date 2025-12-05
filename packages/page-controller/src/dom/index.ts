@@ -1,5 +1,5 @@
-import { VIEWPORT_EXPANSION } from '../config/constants'
-import domTree from './dom_tree/index'
+import { VIEWPORT_EXPANSION } from '../constants'
+import domTree from './dom_tree/index.js'
 import {
 	ElementDomNode,
 	FlatDomTree,

@@ -37,8 +37,10 @@ export default defineConfig([
 		],
 		languageOptions: {
 			parserOptions: {
-				project: ['./packages/*/tsconfig.json'],
-				tsconfigRootDir: import.meta.dirname,
+				// project: ['./tsconfig.json'],
+				// project: ['./packages/*/tsconfig.json'],
+				// tsconfigRootDir: import.meta.dirname,
+				projectService: true,
 			},
 			ecmaVersion: 2020,
 			globals: globals.browser,
@@ -67,6 +69,9 @@ export default defineConfig([
 			'react-dom/no-missing-button-type': 'off',
 			'react-x/no-nested-component-definitions': 'off',
 			'@typescript-eslint/prefer-optional-chain': 'off',
+
+			// 'require-await': 'off',
+			'@typescript-eslint/require-await': 'off',
 		},
 	},
 ])
