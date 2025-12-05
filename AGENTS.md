@@ -41,10 +41,7 @@ npm run build --workspace=@page-agent/website
 
 We adopt a very simple monorepo solution: ts reference + vite alias. 
 
-We use the same vite config for dev and bundling. Local packages (even when they are published to npm) will be bundled into artifacts instead of installed from npm. 
-That is why we put local packages in devDependencies (with version "*") rather than dependencies.
-
-You must update relative tsconfig and vite config if you add/remove/rename a package.
+You must update tsconfig and vite config if you add/remove/rename a package.
 
 ```bash
 packages/
@@ -67,6 +64,17 @@ packages/
         ├── PageController.ts  # Main controller class
         ├── actions.ts         # Element interaction actions
         └── dom/               # DOM tree extraction
+```
+
+`workspaces` must be written in topological order to guarantee build order.
+
+```json
+"workspaces": [
+    // internal deps ...
+    "packages/page-controller",
+    "packages/page-agent",
+    "packages/website"
+],
 ```
 
 ### Module Boundaries (Critical)
@@ -143,7 +151,6 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 | `src/utils/bus.ts` | Type-safe event bus for decoupled communication |
 | `src/ui/` | UI components (Panel, SimulatorMask) with CSS modules |
 | `src/llms/` | LLM integration and communication layer |
-| `src/patches/` | Framework-specific optimizations (React, Antd) |
 | `vite.config.js` | Library build configuration (ES + UMD) |
 
 ### Page Controller (`packages/page-controller/`)
@@ -154,6 +161,7 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 | `src/actions.ts` | Element interaction implementations (click, input, scroll) |
 | `src/dom/dom_tree/index.js` | Core DOM extraction engine (ported from browser-use) |
 | `src/dom/getPageInfo.ts` | Page scroll/size information |
+| `src/patches/` | Framework-specific optimizations (React, Antd) |
 | `src/types.ts` | TypeScript interfaces for controller |
 
 ### Website (`packages/website/`)

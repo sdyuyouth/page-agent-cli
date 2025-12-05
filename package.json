@@ -4,7 +4,9 @@
 	"version": "0.0.6",
 	"type": "module",
 	"workspaces": [
-		"packages/*"
+		"packages/page-controller",
+		"packages/page-agent",
+		"packages/website"
 	],
 	"description": "AI-powered UI agent for web applications",
 	"author": "Simon<gaomeng1900>",

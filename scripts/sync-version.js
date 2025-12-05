@@ -41,19 +41,53 @@ const packages = readdirSync(packagesDir, { withFileTypes: true })
 
 let hasChanges = !!versionArg
 
+/**
+ * Check if a dependency name is a page-agent internal package
+ */
+function isInternalPackage(name) {
+	return name === 'page-agent' || name.startsWith('@page-agent/')
+}
+
+/**
+ * Update internal package versions in dependencies object
+ * @returns {boolean} Whether any changes were made
+ */
+function updateInternalDeps(deps, newVersion) {
+	if (!deps) return false
+	let changed = false
+	for (const [name, version] of Object.entries(deps)) {
+		if (isInternalPackage(name) && version !== newVersion) {
+			deps[name] = newVersion
+			changed = true
+		}
+	}
+	return changed
+}
+
 for (const pkg of packages) {
 	const pkgPath = join(packagesDir, pkg, 'package.json')
 	if (!existsSync(pkgPath)) continue
 
 	const pkgJson = JSON.parse(readFileSync(pkgPath, 'utf-8'))
 	const oldVersion = pkgJson.version
+	let pkgChanged = false
 
-	if (oldVersion === newVersion) {
+	// Update package version
+	if (oldVersion !== newVersion) {
+		pkgJson.version = newVersion
+		pkgChanged = true
+	}
+
+	// Update internal dependencies (dependencies only, devDeps keep "*")
+	if (updateInternalDeps(pkgJson.dependencies, newVersion)) {
+		pkgChanged = true
+	}
+
+	if (!pkgChanged) {
 		console.log(chalk.dim(`  ${pkgJson.name}: ${newVersion} (unchanged)`))
 		continue
 	}
 
-	pkgJson.version = newVersion
 	writeFileSync(pkgPath, JSON.stringify(pkgJson, null, '\t') + '\n')
 	console.log(
 		chalk.green('✓') +
