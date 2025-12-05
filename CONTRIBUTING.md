@@ -7,11 +7,9 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 ### Development Setup
 
 1. **Prerequisites**
-   - Node.js 20+
-   - npm 10+
-   - typescript as required in package.json
-   - vscode or other editors that support ts/eslint/prettier
-   - make sure `eslint`, `auto-format` and `commit-lint` all work
+   - `node.js >= 20` with `npm >= 10`
+   - An editor that supports `ts/eslint/prettier`
+   - Make sure `eslint`, `prettier` and `commitlint` work well
 
 2. **Setup**
 
@@ -27,11 +25,11 @@ This is a **monorepo** with npm workspaces containing **two main packages**:
 1. **Core Library** (`packages/page-agent/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation, published as `page-agent` on npm
 2. **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
-We use a simplified monorepo solution with native npm-workspace + ts reference + vite alias. No fancy tooling. Hoisting is required. 
+We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required. 
 
 - When developing. Use alias so that we don't have to pre-build.
 - When bundling. Use external and disable ts `paths` alias to leave deps out.
-- When bundling `UMD` or `Website`. Bundle everything including local packages.
+- When bundling `UMD` and `Website`. Bundle everything including local packages.
 
 ## 🤝 How to Contribute
 
@@ -101,19 +99,6 @@ We use a simplified monorepo solution with native npm-workspace + ts reference +
    - Github Copilot: `./.github/copilot-instructions.md`
    - Claude Code: `./CLAUDE.md`
 
-### Core Library (`src/`)
-
-- **No React dependencies** - Pure JavaScript/TypeScript only
-- Use event bus for component communication
-- Follow browser-use patterns for DOM operations
-
-### Doc&demo Site (`pages/`)
-
-- Use React 19 + TypeScript
-- Follow hash routing patterns (`useHashLocation`)
-- Use Tailwind CSS for styling
-- Add new docs pages to both router and sidebar
-
 ## 🔧 Development Workflows
 
 ### Website Development
@@ -124,11 +109,13 @@ npm start                # React development server
 
 ### Core Lib Development and Testing
 
+> @TODO this part is outdated. Update this.
+
 - Config your LLM API
 - Start a local script
 
    ```bash
-   npm run build:lib:watch    # Auto-rebuild on changes
+   npm run build:watch --workspace=page-agent   # UMD with auto rebuild
    ```
 
 - Add a new bookmark enable it on other website
@@ -139,9 +126,9 @@ npm start                # React development server
 
 ### Adding Documentation
 
-1. Create `pages/docs/section/page-name/page.tsx`
-2. Add route to `pages/router.tsx`
-3. Add navigation link to `pages/components/DocsLayout.tsx`
+1. Create `website/src/docs/section/page-name/page.tsx`
+2. Add route to `website/src/router.tsx`
+3. Add navigation link to `website/src/components/DocsLayout.tsx`
 
 ## 🎯 Contribution Areas
 
