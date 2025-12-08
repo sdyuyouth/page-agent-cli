@@ -21,10 +21,9 @@
 		"npm": ">=10.0.0"
 	},
 	"scripts": {
-		"dev": "npm run dev --workspace=@page-agent/website",
 		"start": "npm run dev --workspace=@page-agent/website",
 		"build": "npm run build --workspaces --if-present",
-		"build:lib": "npm run build --workspace=page-agent",
+		"build:lib": "npm run build:lib --workspace=page-agent",
 		"version": "node scripts/sync-version.js",
 		"lint": "eslint .",
 		"prepare": "husky"
