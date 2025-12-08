@@ -28,6 +28,9 @@ jobs:
       # - 9.6~10.8 on node@20
       # - 11.3~11.6 on node@24
 
+      - name: Node and NPM version
+        run: node --version && npm --version
+
       - name: Install dependencies
         run: npm install
 
