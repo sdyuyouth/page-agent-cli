@@ -87,7 +87,7 @@ export class LLM {
 						displayText: `retry-ing (${retries} / ${this.config.maxRetries})`,
 					})
 				},
-				onError: (error: Error, withRetry: boolean) => {
+				onError: (error: Error) => {
 					this.#bus.emit('panel:update', {
 						type: 'error',
 						displayText: `step failed: ${(error as Error).message}`,
@@ -103,7 +103,7 @@ async function withRetry<T>(
 	settings: {
 		maxRetries: number
 		onRetry: (retries: number) => void
-		onError: (error: Error, withRetry: boolean) => void
+		onError: (error: Error) => void
 	}
 ): Promise<T> {
 	let retries = 0
@@ -118,7 +118,7 @@ async function withRetry<T>(
 			return await fn()
 		} catch (error: unknown) {
 			console.error(error)
-			settings.onError(error as Error, retries < settings.maxRetries)
+			settings.onError(error as Error)
 
 			// do not retry if aborted by user
 			if ((error as { name?: string })?.name === 'AbortError') throw error
