@@ -1,6 +1,6 @@
 {
 	"name": "@page-agent/ui",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"type": "module",
 	"main": "./dist/lib/page-agent-ui.js",
 	"module": "./dist/lib/page-agent-ui.js",
@@ -40,4 +40,3 @@
 		"ai-motion": "^0.4.7"
 	}
 }
-
