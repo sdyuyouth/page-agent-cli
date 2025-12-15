@@ -7,10 +7,16 @@
 		"baseUrl": ".",
 		"outDir": "dist",
 		"paths": {
-			"@page-agent/page-controller": ["../page-controller/src/PageController.ts"]
+			//
+			"@page-agent/page-controller": ["../page-controller/src/PageController.ts"],
+			"@page-agent/ui": ["../ui/src/index.ts"]
 		}
 	},
 	"include": ["**/*.ts"],
 	"exclude": ["dist", "node_modules"],
-	"references": [{ "path": "../page-controller" }]
+	"references": [
+		//
+		{ "path": "../page-controller" },
+		{ "path": "../ui" }
+	]
 }

@@ -4,8 +4,8 @@ import { useHashLocation } from 'wouter/use-hash-location'
 
 import './i18n/config'
 import './i18n/types'
-import { default as PagesRouter } from './router.tsx'
-import { default as TestPagesRouter } from './test-pages/router.tsx'
+import { default as PagesRouter } from './router'
+import { default as TestPagesRouter } from './test-pages/router'
 
 import './index.css'
 

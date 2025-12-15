@@ -11,11 +11,17 @@
 			"@/*": ["src/*"],
 
 			// Simplified monorepo solution (raw npm workspace with hoisting)
+			"page-agent": ["../page-agent/src/PageAgent.ts"],
 			"@page-agent/page-controller": ["../page-controller/src/PageController.ts"],
-			"page-agent": ["../page-agent/src/PageAgent.ts"]
+			"@page-agent/ui": ["../ui/src/index.ts"]
 		}
 	},
 	"include": ["**/*.ts", "**/*.tsx"],
 	"exclude": ["dist", "node_modules"],
-	"references": [{ "path": "../page-controller" }, { "path": "../page-agent" }]
+	"references": [
+		//
+		{ "path": "../page-agent" },
+		{ "path": "../page-controller" },
+		{ "path": "../ui" }
+	]
 }
