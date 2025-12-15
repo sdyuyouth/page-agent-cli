@@ -19,7 +19,6 @@ And other internal packages:
 ```bash
 npm start                    # Start website dev server
 npm run build                # Build all packages
-npm run build:lib            # Build page-agent library only
 npm run lint                 # ESLint with TypeScript strict rules
 ```
 
@@ -28,7 +27,6 @@ npm run lint                 # ESLint with TypeScript strict rules
 ```bash
 # Core library
 npm run build --workspace=page-agent
-npm run build:watch --workspace=page-agent
 
 # Website
 npm run dev --workspace=@page-agent/website

@@ -34,7 +34,13 @@ const libConfig = {
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
-			external: ['ai', 'ai-motion', 'chalk', 'zod', '@page-agent/*'],
+			external: [
+				'ai-motion',
+				'chalk',
+				'zod',
+				// all the internal packages
+				/^@page-agent\//,
+			],
 		},
 		minify: false,
 		sourcemap: true,
