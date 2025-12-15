@@ -1,26 +1,8 @@
 /**
- * Type-safe event bus for decoupling PageAgent and Panel
- */
-
-/**
  * Event mapping definitions
  * @note Event bus callbacks must be repeatable without errors
  */
 export interface PageAgentEventMap {
-	// Panel control events
-	// call panel.show()
-	'panel:show': { params: undefined }
-	// call panel.hide()
-	// 'panel:hide': { params: undefined }
-	// call panel.reset()
-	// 'panel:reset': { params: undefined }
-	// call panel.update()
-	// 'panel:update': { params: Omit<Step, 'id' | 'stepNumber' | 'timestamp'> }
-	// call panel.expand()
-	// 'panel:expand': { params: undefined }
-	// call panel.collapse()
-	// 'panel:collapse': { params: undefined }
-
 	// PageAgent status events
 	// 'agent:execute': { params: { task: string } }
 	// 'agent:done': { params: { text: string; success: boolean } }
@@ -30,8 +12,7 @@ export interface PageAgentEventMap {
 	// 'agent:error': { params: { error: string | Error } }
 
 	// Task status change events
-	// 'task:start': { params: { task: string } }
-	// 'task:step': { params: Omit<AgentStep, 'id' | 'stepNumber' | 'timestamp'> }
+	'task:start': { params: { task: string } }
 	// 'task:complete': { params: { text: string; success: boolean } }
 	// 'task:error': { params: { error: string | Error } }
 
