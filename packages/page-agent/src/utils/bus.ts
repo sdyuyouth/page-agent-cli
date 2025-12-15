@@ -1,7 +1,6 @@
 /**
  * Type-safe event bus for decoupling PageAgent and Panel
  */
-import type { Step } from '../ui/UIState'
 
 /**
  * Event mapping definitions
@@ -12,15 +11,15 @@ export interface PageAgentEventMap {
 	// call panel.show()
 	'panel:show': { params: undefined }
 	// call panel.hide()
-	'panel:hide': { params: undefined }
+	// 'panel:hide': { params: undefined }
 	// call panel.reset()
-	'panel:reset': { params: undefined }
+	// 'panel:reset': { params: undefined }
 	// call panel.update()
-	'panel:update': { params: Omit<Step, 'id' | 'stepNumber' | 'timestamp'> }
+	// 'panel:update': { params: Omit<Step, 'id' | 'stepNumber' | 'timestamp'> }
 	// call panel.expand()
-	'panel:expand': { params: undefined }
+	// 'panel:expand': { params: undefined }
 	// call panel.collapse()
-	'panel:collapse': { params: undefined }
+	// 'panel:collapse': { params: undefined }
 
 	// PageAgent status events
 	// 'agent:execute': { params: { task: string } }

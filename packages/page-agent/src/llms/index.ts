@@ -33,24 +33,19 @@
  */
 import type { LLMConfig } from '../config'
 import { parseLLMConfig } from '../config'
-import { EventBus, getEventBus } from '../utils/bus'
 import { OpenAIClient } from './OpenAILenientClient'
 import { InvokeError } from './errors'
 import type { InvokeResult, LLMClient, Message, Tool } from './types'
 
 export type { Message, Tool, InvokeResult, LLMClient }
 
-export class LLM {
+export class LLM extends EventTarget {
 	config: Required<LLMConfig>
-	id: string
 	client: LLMClient
-	#bus: EventBus
 
-	constructor(config: LLMConfig, id: string) {
+	constructor(config: LLMConfig) {
+		super()
 		this.config = parseLLMConfig(config)
-		this.id = id
-
-		this.#bus = getEventBus(id)
 
 		// Default to OpenAI client
 		this.client = new OpenAIClient({
@@ -81,17 +76,13 @@ export class LLM {
 			// retry settings
 			{
 				maxRetries: this.config.maxRetries,
-				onRetry: (retries: number) => {
-					this.#bus.emit('panel:update', {
-						type: 'retry',
-						displayText: `retry-ing (${retries} / ${this.config.maxRetries})`,
-					})
+				onRetry: (current: number) => {
+					this.dispatchEvent(
+						new CustomEvent('retry', { detail: { current, max: this.config.maxRetries } })
+					)
 				},
 				onError: (error: Error) => {
-					this.#bus.emit('panel:update', {
-						type: 'error',
-						displayText: `step failed: ${(error as Error).message}`,
-					})
+					this.dispatchEvent(new CustomEvent('error', { detail: { error } }))
 				},
 			}
 		)
