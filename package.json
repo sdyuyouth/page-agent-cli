@@ -5,6 +5,7 @@
 	"type": "module",
 	"workspaces": [
 		"packages/page-controller",
+		"packages/ui",
 		"packages/page-agent",
 		"packages/website"
 	],

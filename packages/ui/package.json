@@ -1,33 +1,33 @@
 {
-	"name": "@page-agent/page-controller",
+	"name": "@page-agent/ui",
 	"version": "0.0.7",
 	"type": "module",
-	"main": "./dist/lib/page-controller.js",
-	"module": "./dist/lib/page-controller.js",
-	"types": "./dist/lib/PageController.d.ts",
+	"main": "./dist/lib/page-agent-ui.js",
+	"module": "./dist/lib/page-agent-ui.js",
+	"types": "./dist/lib/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./dist/lib/PageController.d.ts",
-			"import": "./dist/lib/page-controller.js",
-			"default": "./dist/lib/page-controller.js"
+			"types": "./dist/lib/index.d.ts",
+			"import": "./dist/lib/page-agent-ui.js",
+			"default": "./dist/lib/page-agent-ui.js"
 		}
 	},
 	"files": [
 		"dist/"
 	],
-	"description": "Page controller for page-agent - DOM operations and element interactions",
+	"description": "UI components for page-agent - Panel, SimulatorMask, and i18n",
 	"keywords": [
 		"page-agent",
-		"dom",
-		"browser-automation",
-		"web-automation"
+		"ui",
+		"panel",
+		"i18n"
 	],
 	"author": "Simon<gaomeng1900>",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/alibaba/page-agent.git",
-		"directory": "packages/page-controller"
+		"directory": "packages/ui"
 	},
 	"homepage": "https://alibaba.github.io/page-agent/",
 	"scripts": {
@@ -35,5 +35,9 @@
 		"build:watch": "vite build --watch",
 		"prepublishOnly": "node -e \"const fs=require('fs');['LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
 		"postpublish": "node -e \"['LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
+	},
+	"dependencies": {
+		"ai-motion": "^0.4.7"
 	}
 }
+

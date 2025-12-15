@@ -3,6 +3,7 @@
  * All rights reserved.
  */
 import { PageController } from '@page-agent/page-controller'
+import { Panel, SimulatorMask } from '@page-agent/ui'
 import chalk from 'chalk'
 import zod from 'zod'
 
@@ -11,8 +12,6 @@ import { MAX_STEPS } from './config/constants'
 import { LLM, type Tool } from './llms'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
-import { Panel } from './ui/Panel'
-import { SimulatorMask } from './ui/SimulatorMask'
 import { trimLines, uid, waitUntil } from './utils'
 import { assert } from './utils/assert'
 

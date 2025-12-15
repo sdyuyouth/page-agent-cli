@@ -61,6 +61,7 @@ const umdConfig = {
 	resolve: {
 		alias: {
 			'@page-agent/page-controller': resolve(__dirname, '../page-controller/src/PageController.ts'),
+			'@page-agent/ui': resolve(__dirname, '../ui/src/index.ts'),
 		},
 	},
 	build: {

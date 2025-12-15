@@ -1,6 +1,6 @@
 import { Motion } from 'ai-motion'
 
-import { isPageDark } from '../utils/checkDarkMode'
+import { isPageDark } from './checkDarkMode'
 
 import styles from './SimulatorMask.module.css'
 import cursorStyles from './cursor.module.css'

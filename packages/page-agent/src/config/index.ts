@@ -1,7 +1,7 @@
 import type { PageControllerConfig } from '@page-agent/page-controller'
+import type { SupportedLanguage } from '@page-agent/ui'
 
 import type { AgentHistory, ExecutionResult, PageAgent } from '../PageAgent'
-import type { SupportedLanguage } from '../i18n'
 import type { PageAgentTool } from '../tools'
 import {
 	DEFAULT_API_KEY,

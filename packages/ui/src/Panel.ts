@@ -1,6 +1,6 @@
-import { I18n, type SupportedLanguage } from '../i18n'
-import { truncate } from '../utils'
 import { type Step, UIState } from './UIState'
+import { I18n, type SupportedLanguage } from './i18n'
+import { truncate } from './utils'
 
 import styles from './Panel.module.css'
 

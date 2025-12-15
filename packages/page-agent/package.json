@@ -14,9 +14,7 @@
 		}
 	},
 	"files": [
-		"dist/",
-		"README.md",
-		"LICENSE"
+		"dist/"
 	],
 	"description": "GUI agent for web applications - add intelligent automation to any webpage with a single script",
 	"keywords": [
@@ -47,9 +45,9 @@
 		"postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
 	},
 	"dependencies": {
-		"ai-motion": "^0.4.7",
 		"chalk": "^5.6.2",
 		"zod": "^4.1.12",
-		"@page-agent/page-controller": "0.0.7"
+		"@page-agent/page-controller": "0.0.7",
+		"@page-agent/ui": "0.0.7"
 	}
 }

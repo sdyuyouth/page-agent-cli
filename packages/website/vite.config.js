@@ -20,6 +20,7 @@ export default defineConfig({
 
 			// Monorepo packages (always bundle local code instead of npm versions)
 			'@page-agent/page-controller': resolve(__dirname, '../page-controller/src/PageController.ts'),
+			'@page-agent/ui': resolve(__dirname, '../ui/src/index.ts'),
 			'page-agent': resolve(__dirname, '../page-agent/src/PageAgent.ts'),
 		},
 	},
