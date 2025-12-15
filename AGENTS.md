@@ -22,17 +22,6 @@ npm run build                # Build all packages
 npm run lint                 # ESLint with TypeScript strict rules
 ```
 
-### Package-specific Commands
-
-```bash
-# Core library
-npm run build --workspace=page-agent
-
-# Website
-npm run dev --workspace=@page-agent/website
-npm run build --workspace=@page-agent/website
-```
-
 ## Architecture & Critical Patterns
 
 ### Monorepo Structure

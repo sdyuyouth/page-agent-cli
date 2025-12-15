@@ -112,16 +112,16 @@ npm start                # React development server
 > @TODO this part is outdated. Update this.
 
 - Config your LLM API
-- Start a local script
+- Start and serve a local umd script
 
    ```bash
-   npm run build:watch --workspace=page-agent   # UMD with auto rebuild
+   npm run dev:umd # Serving UMD with auto rebuild at http://localhost:5173/page-agent.umd.cjs
    ```
 
 - Add a new bookmark enable it on other website
 
    ```
-   javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5173/dist/lib/page-agent.umd.cjs?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
+   javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5173/page-agent.umd.cjs?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
    ```
 
 ### Adding Documentation
