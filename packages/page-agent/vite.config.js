@@ -35,7 +35,6 @@ const libConfig = {
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
 			external: [
-				'ai-motion',
 				'chalk',
 				'zod',
 				// all the internal packages
