@@ -80,6 +80,7 @@ export class PageAgent extends EventTarget {
 	#abortController = new AbortController()
 	#llmRetryListener: ((e: Event) => void) | null = null
 	#llmErrorListener: ((e: Event) => void) | null = null
+	#beforeUnloadListener: ((e: Event) => void) | null = null
 
 	/** PageController for DOM operations */
 	pageController: PageController
@@ -135,9 +136,10 @@ export class PageAgent extends EventTarget {
 			this.tools.delete('execute_javascript')
 		}
 
-		window.addEventListener('beforeunload', (e) => {
+		this.#beforeUnloadListener = (e) => {
 			if (!this.disposed) this.dispose('PAGE_UNLOADING')
-		})
+		}
+		window.addEventListener('beforeunload', this.#beforeUnloadListener)
 	}
 
 	/**
@@ -503,6 +505,12 @@ export class PageAgent extends EventTarget {
 		if (this.#llmErrorListener) {
 			this.#llm.removeEventListener('error', this.#llmErrorListener)
 			this.#llmErrorListener = null
+		}
+
+		// Clean up window event listeners
+		if (this.#beforeUnloadListener) {
+			window.removeEventListener('beforeunload', this.#beforeUnloadListener)
+			this.#beforeUnloadListener = null
 		}
 
 		this.config.onDispose?.call(this, reason)
