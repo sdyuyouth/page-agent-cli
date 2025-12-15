@@ -78,6 +78,9 @@ export class PageAgent extends EventTarget {
 	#llm: LLM
 	#totalWaitTime = 0
 	#abortController = new AbortController()
+	#llmRetryListener: ((e: Event) => void) | null = null
+	#llmErrorListener: ((e: Event) => void) | null = null
+	#beforeUnloadListener: ((e: Event) => void) | null = null
 
 	/** PageController for DOM operations */
 	pageController: PageController
@@ -108,14 +111,16 @@ export class PageAgent extends EventTarget {
 		this.pageController = new PageController(this.config)
 
 		// Listen to LLM events
-		this.#llm.addEventListener('retry', (e) => {
+		this.#llmRetryListener = (e) => {
 			const { current, max } = (e as CustomEvent).detail
 			this.panel.update({ type: 'retry', current, max })
-		})
-		this.#llm.addEventListener('error', (e) => {
+		}
+		this.#llmErrorListener = (e) => {
 			const { error } = (e as CustomEvent).detail
 			this.panel.update({ type: 'error', message: `step failed: ${error.message}` })
-		})
+		}
+		this.#llm.addEventListener('retry', this.#llmRetryListener)
+		this.#llm.addEventListener('error', this.#llmErrorListener)
 
 		if (this.config.customTools) {
 			for (const [name, tool] of Object.entries(this.config.customTools)) {
@@ -131,9 +136,10 @@ export class PageAgent extends EventTarget {
 			this.tools.delete('execute_javascript')
 		}
 
-		window.addEventListener('beforeunload', (e) => {
+		this.#beforeUnloadListener = (e) => {
 			if (!this.disposed) this.dispose('PAGE_UNLOADING')
-		})
+		}
+		window.addEventListener('beforeunload', this.#beforeUnloadListener)
 	}
 
 	/**
@@ -490,6 +496,22 @@ export class PageAgent extends EventTarget {
 		this.mask.dispose()
 		this.history = []
 		this.#abortController.abort(reason ?? 'PageAgent disposed')
+
+		// Clean up LLM event listeners
+		if (this.#llmRetryListener) {
+			this.#llm.removeEventListener('retry', this.#llmRetryListener)
+			this.#llmRetryListener = null
+		}
+		if (this.#llmErrorListener) {
+			this.#llm.removeEventListener('error', this.#llmErrorListener)
+			this.#llmErrorListener = null
+		}
+
+		// Clean up window event listeners
+		if (this.#beforeUnloadListener) {
+			window.removeEventListener('beforeunload', this.#beforeUnloadListener)
+			this.#beforeUnloadListener = null
+		}
 
 		this.config.onDispose?.call(this, reason)
 	}
