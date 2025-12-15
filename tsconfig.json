@@ -2,6 +2,7 @@
 	"extends": "./tsconfig.base.json",
 	"references": [
 		{ "path": "./packages/page-controller" },
+		{ "path": "./packages/ui" },
 		{ "path": "./packages/page-agent" },
 		{ "path": "./packages/website" }
 	],

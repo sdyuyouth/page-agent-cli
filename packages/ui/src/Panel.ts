@@ -1,10 +1,34 @@
-import type { PageAgent } from '../PageAgent'
-import type { I18n } from '../i18n'
-import { truncate } from '../utils'
-import type { EventBus } from '../utils/bus'
 import { type Step, UIState } from './UIState'
+import { I18n, type SupportedLanguage } from './i18n'
+import { truncate } from './utils'
 
 import styles from './Panel.module.css'
+
+/**
+ * Panel configuration
+ */
+export interface PanelConfig {
+	language?: SupportedLanguage
+	onExecuteTask: (task: string) => void
+	onStop: () => void
+	onPauseToggle: () => boolean // returns new paused state
+	getPaused: () => boolean
+}
+
+/**
+ * Semantic update types - Panel handles i18n internally
+ */
+export type PanelUpdate =
+	| { type: 'thinking'; text?: string } // text is optional, defaults to i18n thinking text
+	| { type: 'input'; task: string }
+	| { type: 'question'; question: string }
+	| { type: 'userAnswer'; input: string }
+	| { type: 'retry'; current: number; max: number }
+	| { type: 'error'; message: string }
+	| { type: 'output'; text: string }
+	| { type: 'completed' }
+	| { type: 'toolExecuting'; toolName: string; args: any }
+	| { type: 'toolCompleted'; toolName: string; args: any; result?: string; duration?: number }
 
 /**
  * Agent control panel
@@ -19,11 +43,11 @@ export class Panel {
 	#stopButton: HTMLElement
 	#inputSection: HTMLElement
 	#taskInput: HTMLInputElement
-	#bus: EventBus
 
 	#state = new UIState()
 	#isExpanded = false
-	#pageAgent: PageAgent
+	#config: PanelConfig
+	#i18n: I18n
 	#userAnswerResolver: ((input: string) => void) | null = null
 	#isWaitingForUserAnswer: boolean = false
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
@@ -34,9 +58,9 @@ export class Panel {
 		return this.#wrapper
 	}
 
-	constructor(pageAgent: PageAgent) {
-		this.#pageAgent = pageAgent
-		this.#bus = pageAgent.bus
+	constructor(config: PanelConfig) {
+		this.#config = config
+		this.#i18n = new I18n(config.language ?? 'en-US')
 		this.#wrapper = this.#createWrapper()
 		this.#indicator = this.#wrapper.querySelector(`.${styles.indicator}`)!
 		this.#statusText = this.#wrapper.querySelector(`.${styles.statusText}`)!
@@ -49,16 +73,8 @@ export class Panel {
 
 		this.#setupEventListeners()
 		this.#startHeaderUpdateLoop()
-		// this.#expand() // debug
 
 		this.#showInputArea()
-
-		this.#bus.on('panel:show', () => this.#show())
-		this.#bus.on('panel:hide', () => this.#hide())
-		this.#bus.on('panel:reset', () => this.#reset())
-		this.#bus.on('panel:update', (stepData) => this.#update(stepData))
-		this.#bus.on('panel:expand', () => this.#expand())
-		this.#bus.on('panel:collapse', () => this.#collapse())
 	}
 
 	/**
@@ -71,16 +87,65 @@ export class Panel {
 			this.#userAnswerResolver = resolve
 
 			// Update state to `running`
-			this.#update({
+			this.#updateInternal({
 				type: 'output',
-				displayText: this.#pageAgent.i18n.t('ui.panel.question', { question }),
+				displayText: this.#i18n.t('ui.panel.question', { question }),
 			}) // Expand history panel
 			if (!this.#isExpanded) {
 				this.#expand()
 			}
 
-			this.#showInputArea(this.#pageAgent.i18n.t('ui.panel.userAnswerPrompt'))
+			this.#showInputArea(this.#i18n.t('ui.panel.userAnswerPrompt'))
 		})
+	}
+
+	// ========== Public control methods ==========
+
+	show(): void {
+		this.wrapper.style.display = 'block'
+		void this.wrapper.offsetHeight
+		this.wrapper.style.opacity = '1'
+		this.wrapper.style.transform = 'translateX(-50%) translateY(0)'
+	}
+
+	hide(): void {
+		this.wrapper.style.opacity = '0'
+		this.wrapper.style.transform = 'translateX(-50%) translateY(20px)'
+		this.wrapper.style.display = 'none'
+	}
+
+	reset(): void {
+		this.#state.reset()
+		this.#statusText.textContent = this.#i18n.t('ui.panel.ready')
+		this.#updateStatusIndicator('thinking')
+		this.#updateHistory()
+		this.#collapse()
+		// Reset pause state via callback
+		if (this.#config.getPaused()) {
+			this.#config.onPauseToggle()
+		}
+		this.#updatePauseButton()
+		// Reset user input state
+		this.#isWaitingForUserAnswer = false
+		this.#userAnswerResolver = null
+		// Show input area
+		this.#showInputArea()
+	}
+
+	expand(): void {
+		this.#expand()
+	}
+
+	collapse(): void {
+		this.#collapse()
+	}
+
+	/**
+	 * Update panel with semantic data - i18n handled internally
+	 */
+	update(data: PanelUpdate): void {
+		const stepData = this.#toStepData(data)
+		this.#updateInternal(stepData)
 	}
 
 	/**
@@ -92,10 +157,102 @@ export class Panel {
 		this.wrapper.remove()
 	}
 
+	// ========== Private methods ==========
+
 	/**
-	 * Update status
+	 * Convert semantic update to step data with i18n
 	 */
-	#update(stepData: Omit<Step, 'id' | 'stepNumber' | 'timestamp'>): void {
+	#toStepData(data: PanelUpdate): Omit<Step, 'id' | 'stepNumber' | 'timestamp'> {
+		switch (data.type) {
+			case 'thinking':
+				return { type: 'thinking', displayText: data.text ?? this.#i18n.t('ui.panel.thinking') }
+			case 'input':
+				return { type: 'input', displayText: data.task }
+			case 'question':
+				return {
+					type: 'output',
+					displayText: this.#i18n.t('ui.panel.question', { question: data.question }),
+				}
+			case 'userAnswer':
+				return {
+					type: 'input',
+					displayText: this.#i18n.t('ui.panel.userAnswer', { input: data.input }),
+				}
+			case 'retry':
+				return { type: 'retry', displayText: `retry-ing (${data.current} / ${data.max})` }
+			case 'error':
+				return { type: 'error', displayText: data.message }
+			case 'output':
+				return { type: 'output', displayText: data.text }
+			case 'completed':
+				return { type: 'completed', displayText: this.#i18n.t('ui.panel.taskCompleted') }
+			case 'toolExecuting':
+				return {
+					type: 'tool_executing',
+					toolName: data.toolName,
+					toolArgs: data.args,
+					displayText: this.#getToolExecutingText(data.toolName, data.args),
+				}
+			case 'toolCompleted': {
+				const displayText = this.#getToolCompletedText(data.toolName, data.args)
+				if (!displayText) return { type: 'tool_executing', displayText: '' } // will be filtered
+				return {
+					type: 'tool_executing',
+					toolName: data.toolName,
+					toolArgs: data.args,
+					toolResult: data.result,
+					displayText,
+					duration: data.duration,
+				}
+			}
+		}
+	}
+
+	#getToolExecutingText(toolName: string, args: any): string {
+		switch (toolName) {
+			case 'click_element_by_index':
+				return this.#i18n.t('ui.tools.clicking', { index: args.index })
+			case 'input_text':
+				return this.#i18n.t('ui.tools.inputting', { index: args.index })
+			case 'select_dropdown_option':
+				return this.#i18n.t('ui.tools.selecting', { text: args.text })
+			case 'scroll':
+				return this.#i18n.t('ui.tools.scrolling')
+			case 'wait':
+				return this.#i18n.t('ui.tools.waiting', { seconds: args.seconds })
+			case 'done':
+				return this.#i18n.t('ui.tools.done')
+			default:
+				return this.#i18n.t('ui.tools.executing', { toolName })
+		}
+	}
+
+	#getToolCompletedText(toolName: string, args: any): string | null {
+		switch (toolName) {
+			case 'click_element_by_index':
+				return this.#i18n.t('ui.tools.clicked', { index: args.index })
+			case 'input_text':
+				return this.#i18n.t('ui.tools.inputted', { text: args.text })
+			case 'select_dropdown_option':
+				return this.#i18n.t('ui.tools.selected', { text: args.text })
+			case 'scroll':
+				return this.#i18n.t('ui.tools.scrolled')
+			case 'wait':
+				return this.#i18n.t('ui.tools.waited')
+			case 'done':
+				return null
+			default:
+				return null
+		}
+	}
+
+	/**
+	 * Update status (internal)
+	 */
+	#updateInternal(stepData: Omit<Step, 'id' | 'stepNumber' | 'timestamp'>): void {
+		// Skip empty displayText (filtered toolCompleted for 'done')
+		if (!stepData.displayText) return
+
 		const step = this.#state.addStep(stepData)
 
 		// Queue header text update (will be processed by periodic check)
@@ -121,58 +278,19 @@ export class Panel {
 	}
 
 	/**
-	 * Show panel
-	 */
-	#show(): void {
-		this.wrapper.style.display = 'block'
-		// Force reflow to trigger animation
-		void this.wrapper.offsetHeight
-		this.wrapper.style.opacity = '1'
-		this.wrapper.style.transform = 'translateX(-50%) translateY(0)'
-	}
-
-	/**
-	 * Hide panel
-	 */
-	#hide(): void {
-		this.wrapper.style.opacity = '0'
-		this.wrapper.style.transform = 'translateX(-50%) translateY(20px)'
-		this.wrapper.style.display = 'none'
-	}
-
-	/**
-	 * Reset state
-	 */
-	#reset(): void {
-		this.#state.reset()
-		this.#statusText.textContent = this.#pageAgent.i18n.t('ui.panel.ready')
-		this.#updateStatusIndicator('thinking')
-		this.#updateHistory()
-		this.#collapse()
-		// Reset pause state
-		this.#pageAgent.paused = false
-		this.#updatePauseButton()
-		// Reset user input state
-		this.#isWaitingForUserAnswer = false
-		this.#userAnswerResolver = null
-		// Show input area
-		this.#showInputArea()
-	}
-
-	/**
 	 * Toggle pause state
 	 */
 	#togglePause(): void {
-		this.#pageAgent.paused = !this.#pageAgent.paused
+		const paused = this.#config.onPauseToggle()
 		this.#updatePauseButton()
 
 		// Update status display
-		if (this.#pageAgent.paused) {
-			this.#statusText.textContent = this.#pageAgent.i18n.t('ui.panel.paused')
-			this.#updateStatusIndicator('thinking') // Use existing thinking state
+		if (paused) {
+			this.#statusText.textContent = this.#i18n.t('ui.panel.paused')
+			this.#updateStatusIndicator('thinking')
 		} else {
-			this.#statusText.textContent = this.#pageAgent.i18n.t('ui.panel.continueExecution')
-			this.#updateStatusIndicator('tool_executing') // Restore to execution state
+			this.#statusText.textContent = this.#i18n.t('ui.panel.continueExecution')
+			this.#updateStatusIndicator('tool_executing')
 		}
 	}
 
@@ -180,13 +298,14 @@ export class Panel {
 	 * Update pause button state
 	 */
 	#updatePauseButton(): void {
-		if (this.#pageAgent.paused) {
+		const paused = this.#config.getPaused()
+		if (paused) {
 			this.#pauseButton.textContent = '▶'
-			this.#pauseButton.title = this.#pageAgent.i18n.t('ui.panel.continue')
+			this.#pauseButton.title = this.#i18n.t('ui.panel.continue')
 			this.#pauseButton.classList.add(styles.paused)
 		} else {
 			this.#pauseButton.textContent = '⏸︎'
-			this.#pauseButton.title = this.#pageAgent.i18n.t('ui.panel.pause')
+			this.#pauseButton.title = this.#i18n.t('ui.panel.pause')
 			this.#pauseButton.classList.remove(styles.paused)
 		}
 	}
@@ -196,12 +315,12 @@ export class Panel {
 	 */
 	#stopAgent(): void {
 		// Update status display
-		this.#update({
+		this.#updateInternal({
 			type: 'error',
-			displayText: this.#pageAgent.i18n.t('ui.panel.taskTerminated'),
+			displayText: this.#i18n.t('ui.panel.taskTerminated'),
 		})
 
-		this.#pageAgent.dispose()
+		this.#config.onStop()
 	}
 
 	/**
@@ -218,7 +337,7 @@ export class Panel {
 			// Handle user input mode
 			this.#handleUserAnswer(input)
 		} else {
-			this.#pageAgent.execute(input)
+			this.#config.onExecuteTask(input)
 		}
 	}
 
@@ -227,9 +346,9 @@ export class Panel {
 	 */
 	#handleUserAnswer(input: string): void {
 		// Add user input to history
-		this.#update({
+		this.#updateInternal({
 			type: 'input',
-			displayText: this.#pageAgent.i18n.t('ui.panel.userAnswer', { input }),
+			displayText: this.#i18n.t('ui.panel.userAnswer', { input }),
 		})
 
 		// Reset state
@@ -248,7 +367,7 @@ export class Panel {
 	#showInputArea(placeholder?: string): void {
 		// Clear input field
 		this.#taskInput.value = ''
-		this.#taskInput.placeholder = placeholder || this.#pageAgent.i18n.t('ui.panel.taskInput')
+		this.#taskInput.placeholder = placeholder || this.#i18n.t('ui.panel.taskInput')
 		this.#inputSection.classList.remove(styles.hidden)
 		// Focus on input field
 		setTimeout(() => {
@@ -294,23 +413,23 @@ export class Panel {
 						stepNumber: 0,
 						timestamp: new Date(),
 						type: 'thinking',
-						displayText: this.#pageAgent.i18n.t('ui.panel.waitingPlaceholder'),
+						displayText: this.#i18n.t('ui.panel.waitingPlaceholder'),
 					})}
 				</div>
 			</div>
 			<div class="${styles.header}">
 				<div class="${styles.statusSection}">
 					<div class="${styles.indicator} ${styles.thinking}"></div>
-					<div class="${styles.statusText}">${this.#pageAgent.i18n.t('ui.panel.ready')}</div>
+					<div class="${styles.statusText}">${this.#i18n.t('ui.panel.ready')}</div>
 				</div>
 				<div class="${styles.controls}">
-					<button class="${styles.controlButton} ${styles.expandButton}" title="${this.#pageAgent.i18n.t('ui.panel.expand')}">
+					<button class="${styles.controlButton} ${styles.expandButton}" title="${this.#i18n.t('ui.panel.expand')}">
 						▼
 					</button>
-					<button class="${styles.controlButton} ${styles.pauseButton}" title="${this.#pageAgent.i18n.t('ui.panel.pause')}">
+					<button class="${styles.controlButton} ${styles.pauseButton}" title="${this.#i18n.t('ui.panel.pause')}">
 						⏸︎
 					</button>
-					<button class="${styles.controlButton} ${styles.stopButton}" title="${this.#pageAgent.i18n.t('ui.panel.stop')}">
+					<button class="${styles.controlButton} ${styles.stopButton}" title="${this.#i18n.t('ui.panel.stop')}">
 						X
 					</button>
 				</div>
@@ -501,8 +620,8 @@ export class Panel {
 			// Check if this is a result from done tool
 			if (step.toolName === 'done') {
 				// Judge success or failure based on result
-				const failureKeyword = this.#pageAgent.i18n.t('ui.tools.resultFailure')
-				const errorKeyword = this.#pageAgent.i18n.t('ui.tools.resultError')
+				const failureKeyword = this.#i18n.t('ui.tools.resultFailure')
+				const errorKeyword = this.#i18n.t('ui.tools.resultError')
 				const isSuccess =
 					!step.toolResult ||
 					(!step.toolResult.includes(failureKeyword) && !step.toolResult.includes(errorKeyword))
@@ -531,7 +650,7 @@ export class Panel {
 		}
 
 		const durationText = step.duration ? ` · ${step.duration}ms` : ''
-		const stepLabel = this.#pageAgent.i18n.t('ui.panel.step', {
+		const stepLabel = this.#i18n.t('ui.panel.step', {
 			number: step.stepNumber.toString(),
 			time,
 			duration: durationText || '', // Explicitly pass empty string to replace template
@@ -548,49 +667,5 @@ export class Panel {
 				</div>
 			</div>
 		`
-	}
-}
-
-/**
- * Get display text for tool execution
- */
-export function getToolExecutingText(toolName: string, args: any, i18n: I18n): string {
-	switch (toolName) {
-		case 'click_element_by_index':
-			return i18n.t('ui.tools.clicking', { index: args.index })
-		case 'input_text':
-			return i18n.t('ui.tools.inputting', { index: args.index })
-		case 'select_dropdown_option':
-			return i18n.t('ui.tools.selecting', { text: args.text })
-		case 'scroll':
-			return i18n.t('ui.tools.scrolling')
-		case 'wait':
-			return i18n.t('ui.tools.waiting', { seconds: args.seconds })
-		case 'done':
-			return i18n.t('ui.tools.done')
-		default:
-			return i18n.t('ui.tools.executing', { toolName })
-	}
-}
-
-/**
- * Get display text for tool completion
- */
-export function getToolCompletedText(toolName: string, args: any, i18n: I18n): string | null {
-	switch (toolName) {
-		case 'click_element_by_index':
-			return i18n.t('ui.tools.clicked', { index: args.index })
-		case 'input_text':
-			return i18n.t('ui.tools.inputted', { text: args.text })
-		case 'select_dropdown_option':
-			return i18n.t('ui.tools.selected', { text: args.text })
-		case 'scroll':
-			return i18n.t('ui.tools.scrolled')
-		case 'wait':
-			return i18n.t('ui.tools.waited')
-		case 'done':
-			return null
-		default:
-			return null
 	}
 }

@@ -107,19 +107,6 @@ DOM element references and internal state (selectorMap, elementTextMap) are enca
 3. **LLM Processing**: AI model returns action plans (in page-agent)
 4. **Indexed Operations**: PageAgent calls PageController methods by element index
 
-### Event Bus Communication
-
-Use `src/utils/bus.ts` for decoupled PageAgent ↔ UI communication:
-
-```typescript
-// Emit from PageAgent
-getEventBus().emit('panel:show')
-getEventBus().emit('panel:update', { status: 'thinking' })
-
-// Listen in UI components
-getEventBus().on('panel:show', () => panel.show())
-```
-
 ### Hash Routing Requirement
 
 Uses wouter with `useHashLocation` for static hosting:
@@ -147,7 +134,6 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 | `src/PageAgent.ts` | ⭐ Main AI agent class orchestrating tools and LLM |
 | `src/entry.ts` | CDN/UMD entry point with auto-initialization |
 | `src/tools/` | Tool definitions that call PageController methods |
-| `src/utils/bus.ts` | Type-safe event bus for decoupled communication |
 | `src/ui/` | UI components (Panel, SimulatorMask) with CSS modules |
 | `src/llms/` | LLM integration and communication layer |
 | `vite.config.js` | Library build configuration (ES + UMD) |
@@ -194,11 +180,6 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 2. Expose via async method in `PageController.ts`
 3. Export from `packages/page-controller/src/index.ts`
 
-### New UI Component
-
-1. Create in `packages/page-agent/src/ui/` with colocated CSS modules
-2. Use event bus for PageAgent communication
-
 ## Code Standards
 
 ### TypeScript
@@ -233,5 +214,4 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 
 1. Check `packages/page-agent/dist/lib/page-agent.umd.js` builds correctly
 2. Test CDN injection with query params
-3. Verify event bus communications are properly typed
 4. Use `packages/website/src/test-pages/` for isolated testing

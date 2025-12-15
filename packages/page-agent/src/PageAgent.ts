@@ -3,20 +3,17 @@
  * All rights reserved.
  */
 import { PageController } from '@page-agent/page-controller'
+import { Panel, SimulatorMask } from '@page-agent/ui'
 import chalk from 'chalk'
 import zod from 'zod'
 
 import type { PageAgentConfig } from './config'
 import { MAX_STEPS } from './config/constants'
-import { I18n } from './i18n'
 import { LLM, type Tool } from './llms'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
-import { Panel, getToolCompletedText, getToolExecutingText } from './ui/Panel'
-import { SimulatorMask } from './ui/SimulatorMask'
 import { trimLines, uid, waitUntil } from './utils'
 import { assert } from './utils/assert'
-import { getEventBus } from './utils/bus'
 
 export type { PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
@@ -71,8 +68,6 @@ export interface ExecutionResult {
 export class PageAgent extends EventTarget {
 	config: PageAgentConfig
 	id = uid()
-	bus = getEventBus(this.id)
-	i18n: I18n
 	panel: Panel
 	tools: typeof tools
 	paused = false
@@ -83,6 +78,9 @@ export class PageAgent extends EventTarget {
 	#llm: LLM
 	#totalWaitTime = 0
 	#abortController = new AbortController()
+	#llmRetryListener: ((e: Event) => void) | null = null
+	#llmErrorListener: ((e: Event) => void) | null = null
+	#beforeUnloadListener: ((e: Event) => void) | null = null
 
 	/** PageController for DOM operations */
 	pageController: PageController
@@ -96,13 +94,33 @@ export class PageAgent extends EventTarget {
 		super()
 
 		this.config = config
-		this.#llm = new LLM(this.config, this.id)
-		this.i18n = new I18n(this.config.language)
-		this.panel = new Panel(this)
+		this.#llm = new LLM(this.config)
+		this.panel = new Panel({
+			language: this.config.language,
+			onExecuteTask: (task) => this.execute(task),
+			onStop: () => this.dispose(),
+			onPauseToggle: () => {
+				this.paused = !this.paused
+				return this.paused
+			},
+			getPaused: () => this.paused,
+		})
 		this.tools = new Map(tools)
 
 		// Initialize PageController with config
 		this.pageController = new PageController(this.config)
+
+		// Listen to LLM events
+		this.#llmRetryListener = (e) => {
+			const { current, max } = (e as CustomEvent).detail
+			this.panel.update({ type: 'retry', current, max })
+		}
+		this.#llmErrorListener = (e) => {
+			const { error } = (e as CustomEvent).detail
+			this.panel.update({ type: 'error', message: `step failed: ${error.message}` })
+		}
+		this.#llm.addEventListener('retry', this.#llmRetryListener)
+		this.#llm.addEventListener('error', this.#llmErrorListener)
 
 		if (this.config.customTools) {
 			for (const [name, tool] of Object.entries(this.config.customTools)) {
@@ -118,9 +136,10 @@ export class PageAgent extends EventTarget {
 			this.tools.delete('execute_javascript')
 		}
 
-		window.addEventListener('beforeunload', (e) => {
+		this.#beforeUnloadListener = (e) => {
 			if (!this.disposed) this.dispose('PAGE_UNLOADING')
-		})
+		}
+		window.addEventListener('beforeunload', this.#beforeUnloadListener)
 	}
 
 	/**
@@ -141,13 +160,10 @@ export class PageAgent extends EventTarget {
 		// Show mask and panel
 		this.mask.show()
 
-		this.bus.emit('panel:show')
-		this.bus.emit('panel:reset')
+		this.panel.show()
+		this.panel.reset()
 
-		this.bus.emit('panel:update', {
-			type: 'input',
-			displayText: this.task,
-		})
+		this.panel.update({ type: 'input', task: this.task })
 
 		if (this.#abortController) {
 			this.#abortController.abort()
@@ -171,10 +187,7 @@ export class PageAgent extends EventTarget {
 
 				// Update status to thinking
 				console.log(chalk.blue('Thinking...'))
-				this.bus.emit('panel:update', {
-					type: 'thinking',
-					displayText: this.i18n.t('ui.panel.thinking'),
-				})
+				this.panel.update({ type: 'thinking' })
 
 				const result = await this.#llm.invoke(
 					[
@@ -304,22 +317,14 @@ export class PageAgent extends EventTarget {
 					`)
 
 				console.log(brain)
-				this.bus.emit('panel:update', {
-					type: 'thinking',
-					displayText: brain,
-				})
+				this.panel.update({ type: 'thinking', text: brain })
 
 				// Find the corresponding tool
 				const tool = tools.get(toolName)
 				assert(tool, `Tool ${toolName} not found. (@note should have been caught before this!!!)`)
 
 				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
-				this.bus.emit('panel:update', {
-					type: 'tool_executing',
-					toolName,
-					toolArgs: toolInput,
-					displayText: getToolExecutingText(toolName, toolInput, this.i18n),
-				})
+				this.panel.update({ type: 'toolExecuting', toolName, args: toolInput })
 
 				const startTime = Date.now()
 
@@ -341,16 +346,13 @@ export class PageAgent extends EventTarget {
 				}
 
 				// Briefly display execution result
-				const displayResult = getToolCompletedText(toolName, toolInput, this.i18n)
-				if (displayResult)
-					this.bus.emit('panel:update', {
-						type: 'tool_executing',
-						toolName,
-						toolArgs: toolInput,
-						toolResult: result,
-						displayText: displayResult,
-						duration,
-					})
+				this.panel.update({
+					type: 'toolCompleted',
+					toolName,
+					args: toolInput,
+					result,
+					duration,
+				})
 
 				// Wait a moment to let user see the result
 				await new Promise((resolve) => setTimeout(resolve, 100))
@@ -426,16 +428,14 @@ export class PageAgent extends EventTarget {
 		this.pageController.cleanUpHighlights()
 
 		// Update panel status
-		this.bus.emit('panel:update', {
-			type: success ? 'output' : 'error',
-			displayText: text,
-		})
+		if (success) {
+			this.panel.update({ type: 'output', text })
+		} else {
+			this.panel.update({ type: 'error', message: text })
+		}
 
 		// Task completed
-		this.bus.emit('panel:update', {
-			type: 'completed',
-			displayText: this.i18n.t('ui.panel.taskCompleted'),
-		})
+		this.panel.update({ type: 'completed' })
 
 		this.mask.hide()
 
@@ -496,6 +496,22 @@ export class PageAgent extends EventTarget {
 		this.mask.dispose()
 		this.history = []
 		this.#abortController.abort(reason ?? 'PageAgent disposed')
+
+		// Clean up LLM event listeners
+		if (this.#llmRetryListener) {
+			this.#llm.removeEventListener('retry', this.#llmRetryListener)
+			this.#llmRetryListener = null
+		}
+		if (this.#llmErrorListener) {
+			this.#llm.removeEventListener('error', this.#llmErrorListener)
+			this.#llmErrorListener = null
+		}
+
+		// Clean up window event listeners
+		if (this.#beforeUnloadListener) {
+			window.removeEventListener('beforeunload', this.#beforeUnloadListener)
+			this.#beforeUnloadListener = null
+		}
 
 		this.config.onDispose?.call(this, reason)
 	}
