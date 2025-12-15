@@ -72,11 +72,8 @@ PageAgent adopts a simplified monorepo structure:
 ```
 packages/
 ├── page-agent/          # AI agent (npm: page-agent)
-│   ├── PageAgent        # Agent main loop
-│   ├── tools/           # LLM tool definitions
-│   ├── ui/              # UI components & panels
-│   └── llms/            # LLM integration layer
 ├── page-controller/     # DOM operations (npm: @page-agent/page-controller)
+├── ui/                  # Panel & Mask & Mouse Animation (npm: @page-agent/ui)
 └── website/             # Demo & Documentation site
 ```
 

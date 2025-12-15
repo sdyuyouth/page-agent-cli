@@ -7,9 +7,10 @@ This is a **monorepo** with npm workspaces containing **two main packages**:
 1. **Core Library** (`packages/page-agent/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation, published as `page-agent` on npm
 2. **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
-And other internal packages. Such as:
+And other internal packages:
 
-- **Page Controller** (`packages/page-controller/`) - DOM operations and element interactions module. Independent of LLM, can be tested in unit tests.
+- **Page Controller** (`packages/page-controller/`) - DOM operations and element interactions. Independent of LLM.
+- **UI** (`packages/ui/`) - Panel, SimulatorMask, and i18n. Decoupled from PageAgent.
 
 ## Development Commands
 
@@ -45,11 +46,10 @@ You must update tsconfig and vite config if you add/remove/rename a package.
 ```bash
 packages/
 ├── page-agent/              # npm: "page-agent" ⭐ MAIN
-│   ├── src/                 # AI agent source
+│   ├── src/
 │   │   ├── PageAgent.ts     # Main AI agent class
 │   │   ├── tools/           # LLM tool definitions
-│   │   ├── llms/            # LLM integration
-│   │   └── ui/              # UI components
+│   │   └── llms/            # LLM integration
 │   ├── vite.config.js       # Library build (ES + UMD)
 │   └── package.json
 ├── website/                 # npm: "@page-agent/website" (private) ⭐ MAIN
@@ -58,19 +58,25 @@ packages/
 │
 │   # ...internal packages below...
 │
-└── page-controller/         # npm: "@page-agent/page-controller"
-    └── src/                 # DOM operations source
-        ├── PageController.ts  # Main controller class
-        ├── actions.ts         # Element interaction actions
-        └── dom/               # DOM tree extraction
+├── page-controller/         # npm: "@page-agent/page-controller"
+│   └── src/                 # DOM operations
+│       ├── PageController.ts
+│       ├── actions.ts
+│       └── dom/
+└── ui/                      # npm: "@page-agent/ui"
+    └── src/                 # Panel and Mask Effects
+        ├── Panel.ts
+        ├── SimulatorMask.ts
+        └── i18n/
 ```
 
 `workspaces` must be written in topological order to guarantee build order.
 
 ```json
 "workspaces": [
-    // internal deps ...
+    // internal deps (topological order)
     "packages/page-controller",
+    "packages/ui",
     "packages/page-agent",
     "packages/website"
 ],
@@ -79,8 +85,9 @@ packages/
 ### Module Boundaries (Critical)
 
 - **Website** (`packages/website/`): CAN import from `page-agent` for demos. Alias `@/` → `website/src/`
-- **Page Agent** (`packages/page-agent/`): The core lib. Imports from all internal packages. Never import from website.
-- **Page Controller** (`packages/page-controller/`): Internal lib. Pure DOM operations, NO LLM dependency. Never import from page-agent.
+- **Page Agent** (`packages/page-agent/`): The core lib. Imports from `@page-agent/page-controller` and `@page-agent/ui`.
+- **UI** (`packages/ui/`): Panel, Mask, i18n. No dependency on page-agent.
+- **Page Controller** (`packages/page-controller/`): Pure DOM operations. No LLM or UI dependency.
 
 ### PageController ↔ PageAgent Communication
 
@@ -132,9 +139,8 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 | File | Description |
 |------|-------------|
 | `src/PageAgent.ts` | ⭐ Main AI agent class orchestrating tools and LLM |
-| `src/entry.ts` | CDN/UMD entry point with auto-initialization |
+| `src/umd.ts` | CDN/UMD entry point with auto-initialization |
 | `src/tools/` | Tool definitions that call PageController methods |
-| `src/ui/` | UI components (Panel, SimulatorMask) with CSS modules |
 | `src/llms/` | LLM integration and communication layer |
 | `vite.config.js` | Library build configuration (ES + UMD) |
 
