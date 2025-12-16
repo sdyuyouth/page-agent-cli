@@ -31,10 +31,11 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 ### CDN Integration
 
 ```html
-<!-- temporary CDN URL. May change in the future -->
-<script
-	src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.4/page-agent.js"
-	crossorigin="true"
+// CDN          - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
+// China Mirror - https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
+<script 
+	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js" 
+	crossorigin="true" 
 	type="text/javascript"
 ></script>
 ```

@@ -31,10 +31,11 @@
 ### CDN 集成
 
 ```html
-<!-- 临时 CDN URL. 未来会变更 -->
-<script
-	src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.4/page-agent.js"
-	crossorigin="true"
+// CDN          - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
+// China Mirror - https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
+<script 
+	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js" 
+	crossorigin="true" 
 	type="text/javascript"
 ></script>
 ```
