@@ -6,23 +6,27 @@ import { Link, useSearchParams } from 'wouter'
 
 import Footer from './components/Footer'
 import Header from './components/Header'
+import { CDN_CN_URL, CDN_URL } from './constants'
 
-const injection = encodeURI(
-	"javascript:(function(){var s=document.createElement('script');s.src=`https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.4/page-agent.js?t=${Math.random()}`;s.setAttribute('crossorigin', true);s.type=`text/javascript`;s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();"
-)
+function getInjection(useCN?: boolean) {
+	const cdn = useCN ? CDN_CN_URL : CDN_URL
 
-const injectionA = `
-<a
-	href=${injection}
-	class="inline-flex items-center text-xs px-3 py-2 bg-blue-500 text-white font-medium rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-move border-2 border-dashed border-green-300"
-	draggable="true"
-	onclick="return false;"
-	title="Drag me to your bookmarks bar!"
->
-	✨PageAgent
-</a>
+	const injection = encodeURI(
+		`javascript:(function(){var s=document.createElement('script');s.src=\`${cdn}?t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();`
+	)
 
-`
+	return `
+	<a
+		href=${injection}
+		class="inline-flex items-center text-xs px-3 py-2 bg-blue-500 text-white font-medium rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-move border-2 border-dashed border-green-300"
+		draggable="true"
+		onclick="return false;"
+		title="Drag me to your bookmarks bar!"
+	>
+		✨PageAgent
+	</a>
+	`
+}
 
 export default function HomePage() {
 	const { t, i18n } = useTranslation(['home', 'common'])
@@ -38,6 +42,7 @@ export default function HomePage() {
 	const isOther = params.has('try_other')
 
 	const [activeTab, setActiveTab] = useState<'try' | 'other'>(isOther ? 'other' : 'try')
+	const [cdnSource, setCdnSource] = useState<'international' | 'china'>('international')
 
 	const handleExecute = async () => {
 		if (!task.trim()) return
@@ -194,10 +199,25 @@ export default function HomePage() {
 																</span>{' '}
 																{t('home:try_other.step2_content')}
 															</p>
-															<div
-																className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400"
-																dangerouslySetInnerHTML={{ __html: injectionA }}
-															></div>
+															<div className="flex items-center justify-center gap-3">
+																<select
+																	value={cdnSource}
+																	onChange={(e) =>
+																		setCdnSource(e.target.value as 'international' | 'china')
+																	}
+																	className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200"
+																>
+																	<option value="international">
+																		{t('home:try_other.cdn_international')}
+																	</option>
+																	<option value="china">{t('home:try_other.cdn_china')}</option>
+																</select>
+																<div
+																	dangerouslySetInnerHTML={{
+																		__html: getInjection(cdnSource === 'china'),
+																	}}
+																></div>
+															</div>
 														</div>
 
 														{/* Usage Instructions */}

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
+import { CDN_CN_URL, CDN_URL } from '@/constants'
 
 export default function QuickStart() {
 	const { t } = useTranslation('docs')
@@ -23,8 +24,9 @@ export default function QuickStart() {
 						<div>
 							<p className="text-sm font-medium mb-2">{t('quick_start.step1_cdn')}</p>
 							<CodeEditor
-								code={`// 仅供测试使用
-<script src="https://hwcxiuzfylggtcktqgij.supabase.co/storage/v1/object/public/demo-public/v0.0.4/page-agent.js" crossorigin="true" type="text/javascript"></script>`}
+								code={`// CDN: \t${CDN_URL}
+// Mirror: \t${CDN_CN_URL}
+<script src="${CDN_URL}" crossorigin="true" type="text/javascript"></script>`}
 								language="html"
 							/>
 						</div>
