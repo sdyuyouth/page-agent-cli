@@ -19,6 +19,8 @@ And other internal packages:
 ```bash
 npm start                    # Start website dev server
 npm run build                # Build all packages
+npm run build:libs           # Build all libraries
+npm run build:website        # Build the website
 npm run lint                 # ESLint with TypeScript strict rules
 ```
 

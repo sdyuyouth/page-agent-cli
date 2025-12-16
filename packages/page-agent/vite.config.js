@@ -11,14 +11,13 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // ============================================================================
-// Library Config (ES Module for NPM Package)
+// ES Module for NPM Package
 // ============================================================================
 /** @type {import('vite').UserConfig} */
-const libConfig = {
+const esmConfig = {
 	clearScreen: false,
 	plugins: [
 		dts({ tsconfigPath: './tsconfig.dts.json', bundleTypes: true }),
-		// dts({ tsconfigPath: './tsconfig.json', bundleTypes: true, compilerOptions: { paths: {} } }),
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
 	],
 	publicDir: false,
@@ -32,7 +31,7 @@ const libConfig = {
 			fileName: 'page-agent',
 			formats: ['es'],
 		},
-		outDir: resolve(__dirname, 'dist', 'lib'),
+		outDir: resolve(__dirname, 'dist', 'esm'),
 		rollupOptions: {
 			external: [
 				'chalk',
@@ -51,7 +50,7 @@ const libConfig = {
 }
 
 // ============================================================================
-// UMD Config (Browser Bundle for CDN)
+// UMD Bundle for CDN
 // - alias all local packages so that they can be build in
 // - no external
 // - no d.ts. dts does not work with monorepo aliasing
@@ -77,6 +76,11 @@ const umdConfig = {
 			formats: ['umd'],
 		},
 		outDir: resolve(__dirname, 'dist', 'umd'),
+		rollupOptions: {
+			output: {
+				entryFileNames: 'page-agent.js', // 强制指定完整文件名
+			},
+		},
 		cssCodeSplit: true,
 	},
 	define: {
@@ -88,13 +92,13 @@ const umdConfig = {
 
 const MODE = process.env.MODE
 
-console.log(chalk.cyan(`📦 Build mode: ${chalk.bold(MODE || 'lib')}`))
+console.log(chalk.cyan(`📦 Build mode: ${chalk.bold(MODE || 'esm')}`))
 
 let config
 if (MODE === 'umd') {
 	config = umdConfig
 } else {
-	config = libConfig
+	config = esmConfig
 }
 
 export default defineConfig(config)

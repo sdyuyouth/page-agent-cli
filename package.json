@@ -1,7 +1,7 @@
 {
 	"name": "root",
 	"private": true,
-	"version": "0.0.10",
+	"version": "0.0.11",
 	"type": "module",
 	"workspaces": [
 		"packages/page-controller",
@@ -23,7 +23,9 @@
 	},
 	"scripts": {
 		"start": "npm run dev --workspace=@page-agent/website",
-		"build": "npm run build --workspaces --if-present",
+		"build:website": "npm run build:website --workspace=@page-agent/website",
+		"build:libs": "npm run build --workspaces --if-present",
+		"build": "npm run build:libs && npm run build:website",
 		"dev:umd": "npm run dev:umd --workspace=page-agent",
 		"version": "node scripts/sync-version.js",
 		"lint": "eslint .",
