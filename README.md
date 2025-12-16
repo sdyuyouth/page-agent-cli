@@ -31,8 +31,8 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 ### CDN Integration
 
 ```html
-// CDN          - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
-// China Mirror - https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
+// CDN        - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
+// Mirror(CN) - https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
 <script 
 	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js" 
 	crossorigin="true" 
