@@ -1,12 +1,15 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
-import 'dotenv/config'
+import { config as dotenvConfig } from 'dotenv'
 import process from 'node:process'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+
+// Load .env from repo root
+dotenvConfig({ path: resolve(__dirname, '../../.env') })
 
 // Website Config (React Documentation Site)
 export default defineConfig({
