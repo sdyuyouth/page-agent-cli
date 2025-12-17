@@ -3,14 +3,14 @@
  * @returns {boolean} - True if a common dark mode class is found.
  */
 function hasDarkModeClass() {
-	const DFEAULT_DARK_MODE_CLASSES = ['dark', 'dark-mode', 'theme-dark', 'night', 'night-mode']
+	const DEFAULT_DARK_MODE_CLASSES = ['dark', 'dark-mode', 'theme-dark', 'night', 'night-mode']
 
 	const htmlElement = document.documentElement
-	const bodyElement = document.body
+	const bodyElement = document.body || document.documentElement // can be null in some cases
 
 	// Check class names on <html> and <body>
-	for (const className of DFEAULT_DARK_MODE_CLASSES) {
-		if (htmlElement.classList.contains(className) || bodyElement.classList.contains(className)) {
+	for (const className of DEFAULT_DARK_MODE_CLASSES) {
+		if (htmlElement.classList.contains(className) || bodyElement?.classList.contains(className)) {
 			return true
 		}
 	}
@@ -70,7 +70,7 @@ function isColorDark(colorString: string, threshold = 128) {
 function isBackgroundDark() {
 	// We check both <html> and <body> because some pages set the color on <html>
 	const htmlStyle = window.getComputedStyle(document.documentElement)
-	const bodyStyle = window.getComputedStyle(document.body)
+	const bodyStyle = window.getComputedStyle(document.body || document.documentElement)
 
 	// Get background colors
 	const htmlBgColor = htmlStyle.backgroundColor
@@ -93,18 +93,23 @@ function isBackgroundDark() {
  * @returns {boolean} - True if the page is likely dark.
  */
 export function isPageDark() {
-	// Strategy 1: Check for common dark mode classes
-	if (hasDarkModeClass()) {
-		return true
+	try {
+		// Strategy 1: Check for common dark mode classes
+		if (hasDarkModeClass()) {
+			return true
+		}
+
+		// Strategy 2: Analyze the computed background color
+		if (isBackgroundDark()) {
+			return true
+		}
+
+		// @TODO add more checks here, e.g., analyzing text color,
+		// or checking the background of major layout elements like <main> or #app.
+
+		return false
+	} catch (error) {
+		console.warn('Error determining if page is dark:', error)
+		return false
 	}
-
-	// Strategy 2: Analyze the computed background color
-	if (isBackgroundDark()) {
-		return true
-	}
-
-	// @TODO add more checks here, e.g., analyzing text color,
-	// or checking the background of major layout elements like <main> or #app.
-
-	return false
 }
