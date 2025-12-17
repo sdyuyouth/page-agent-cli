@@ -3,13 +3,13 @@
  * @returns {boolean} - True if a common dark mode class is found.
  */
 function hasDarkModeClass() {
-	const DFEAULT_DARK_MODE_CLASSES = ['dark', 'dark-mode', 'theme-dark', 'night', 'night-mode']
+	const DEFAULT_DARK_MODE_CLASSES = ['dark', 'dark-mode', 'theme-dark', 'night', 'night-mode']
 
 	const htmlElement = document.documentElement
 	const bodyElement = document.body
 
 	// Check class names on <html> and <body>
-	for (const className of DFEAULT_DARK_MODE_CLASSES) {
+	for (const className of DEFAULT_DARK_MODE_CLASSES) {
 		if (htmlElement.classList.contains(className) || bodyElement.classList.contains(className)) {
 			return true
 		}
@@ -93,18 +93,23 @@ function isBackgroundDark() {
  * @returns {boolean} - True if the page is likely dark.
  */
 export function isPageDark() {
-	// Strategy 1: Check for common dark mode classes
-	if (hasDarkModeClass()) {
-		return true
+	try {
+		// Strategy 1: Check for common dark mode classes
+		if (hasDarkModeClass()) {
+			return true
+		}
+
+		// Strategy 2: Analyze the computed background color
+		if (isBackgroundDark()) {
+			return true
+		}
+
+		// @TODO add more checks here, e.g., analyzing text color,
+		// or checking the background of major layout elements like <main> or #app.
+
+		return false
+	} catch (error) {
+		console.warn('Error determining if page is dark:', error)
+		return false
 	}
-
-	// Strategy 2: Analyze the computed background color
-	if (isBackgroundDark()) {
-		return true
-	}
-
-	// @TODO add more checks here, e.g., analyzing text color,
-	// or checking the background of major layout elements like <main> or #app.
-
-	return false
 }
