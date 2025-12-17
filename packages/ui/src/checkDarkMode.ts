@@ -6,11 +6,11 @@ function hasDarkModeClass() {
 	const DEFAULT_DARK_MODE_CLASSES = ['dark', 'dark-mode', 'theme-dark', 'night', 'night-mode']
 
 	const htmlElement = document.documentElement
-	const bodyElement = document.body
+	const bodyElement = document.body || document.documentElement // can be null in some cases
 
 	// Check class names on <html> and <body>
 	for (const className of DEFAULT_DARK_MODE_CLASSES) {
-		if (htmlElement.classList.contains(className) || bodyElement.classList.contains(className)) {
+		if (htmlElement.classList.contains(className) || bodyElement?.classList.contains(className)) {
 			return true
 		}
 	}
@@ -70,7 +70,7 @@ function isColorDark(colorString: string, threshold = 128) {
 function isBackgroundDark() {
 	// We check both <html> and <body> because some pages set the color on <html>
 	const htmlStyle = window.getComputedStyle(document.documentElement)
-	const bodyStyle = window.getComputedStyle(document.body)
+	const bodyStyle = window.getComputedStyle(document.body || document.documentElement)
 
 	// Get background colors
 	const htmlBgColor = htmlStyle.backgroundColor
