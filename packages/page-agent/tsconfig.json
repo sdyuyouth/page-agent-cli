@@ -8,6 +8,7 @@
 		"outDir": "dist",
 		"paths": {
 			//
+			"@page-agent/llms": ["../llms/src/index.ts"],
 			"@page-agent/page-controller": ["../page-controller/src/PageController.ts"],
 			"@page-agent/ui": ["../ui/src/index.ts"]
 		}
@@ -16,6 +17,7 @@
 	"exclude": ["dist", "node_modules"],
 	"references": [
 		//
+		{ "path": "../llms" },
 		{ "path": "../page-controller" },
 		{ "path": "../ui" }
 	]

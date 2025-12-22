@@ -6,6 +6,7 @@
 	"workspaces": [
 		"packages/page-controller",
 		"packages/ui",
+		"packages/llms",
 		"packages/page-agent",
 		"packages/website"
 	],

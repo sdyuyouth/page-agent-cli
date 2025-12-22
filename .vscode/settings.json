@@ -1,6 +1,13 @@
 {
 	"editor.fontLigatures": true,
-	"cSpell.words": ["HITL", "innerhtml", "opensource", "retryable", "wouter"],
+	"cSpell.words": [
+		"HITL",
+		"innerhtml",
+		"llms",
+		"opensource",
+		"retryable",
+		"wouter"
+	],
 	"markdownlint.config": {
 		// "comment": "Relaxed rules",
 		"default": true,
