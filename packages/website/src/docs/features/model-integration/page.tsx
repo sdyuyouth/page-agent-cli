@@ -13,7 +13,6 @@ const MODELS = {
 		'gpt-5.1',
 		'grok-4',
 		'grok-code-fast',
-		'deepseek-v3.2',
 		'claude-sonnet-3.5',
 		'claude-sonnet-4.5',
 		'claude-opus-4.5',
