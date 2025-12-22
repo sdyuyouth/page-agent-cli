@@ -46,11 +46,6 @@ export class OpenAIClient implements LLMClient {
 						tools: openaiTools,
 						// tool_choice: 'required',
 						tool_choice: { type: 'function', function: { name: 'AgentOutput' } },
-
-						// model specific params
-
-						// reasoning_effort: 'minimal',
-						// verbosity: 'low',
 						parallel_tool_calls: false,
 					})
 				),

@@ -1,10 +1,15 @@
 /**
  * OpenAI Client implementation
+ * @note This client is only for demonstrating how to implement a LLM client.
+ * @note Use OpenAILenientClient instead.
  */
 import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeResult, LLMClient, Message, OpenAIClientConfig, Tool } from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
 
+/**
+ * @deprecated Use OpenAILenientClient instead.
+ */
 export class OpenAIClient implements LLMClient {
 	config: OpenAIClientConfig
 

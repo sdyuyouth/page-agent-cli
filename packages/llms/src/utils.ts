@@ -7,6 +7,10 @@ import { z } from 'zod'
 import { InvokeError, InvokeErrorType } from './errors'
 import type { MacroToolInput, Tool } from './types'
 
+function debug(message: string) {
+	console.debug(chalk.gray('[LLM]'), message)
+}
+
 /**
  * Convert Zod schema to OpenAI tool format
  * Uses Zod 4 native z.toJSONSchema()
@@ -192,22 +196,82 @@ export function lenientParseMacroToolCall(
 	}
 }
 
+/**
+ * Patch model specific parameters
+ */
 export function modelPatch(body: Record<string, any>) {
 	const model: string = body.model || ''
+	if (!model) return body
 
-	if (model.toLowerCase().startsWith('claude')) {
+	const modelName = normalizeModelName(model)
+
+	if (modelName.startsWith('claude')) {
+		debug('Applying Claude patch: change tool_choice and disable thinking')
 		body.tool_choice = { type: 'tool', name: 'AgentOutput' }
 		body.thinking = { type: 'disabled' }
 		// body.reasoning = { enabled: 'disabled' }
 	}
 
-	if (model.toLowerCase().includes('grok')) {
-		console.log('Applying Grok patch: removing tool_choice')
+	if (modelName.startsWith('grok')) {
+		debug('Applying Grok patch: removing tool_choice')
 		delete body.tool_choice
-		console.log('Applying Grok patch: disable reasoning and thinking')
+		debug('Applying Grok patch: disable reasoning and thinking')
 		body.thinking = { type: 'disabled', effort: 'minimal' }
 		body.reasoning = { enabled: false, effort: 'low' }
 	}
 
+	if (modelName.startsWith('gpt')) {
+		debug('Applying GPT patch: set verbosity to low')
+		body.verbosity = 'low'
+
+		if (modelName.startsWith('gpt-52')) {
+			debug('Applying GPT-52 patch: disable reasoning')
+			body.reasoning_effort = 'none'
+		} else if (modelName.startsWith('gpt-51')) {
+			debug('Applying GPT-51 patch: disable reasoning')
+			body.reasoning_effort = 'none'
+		} else if (modelName.startsWith('gpt-5')) {
+			debug('Applying GPT-5 patch: set reasoning effort to low')
+			body.reasoning_effort = 'low'
+		}
+	}
+
+	if (modelName.startsWith('gemini')) {
+		debug('Applying Gemini patch: set reasoning effort to minimal')
+		body.reasoning_effort = 'minimal'
+	}
+
 	return body
+}
+
+/**
+ * check if a given model ID fits a specific model name
+ *
+ * @note
+ * Different model providers may use different model IDs for the same model.
+ * For example, openai's `gpt-5.2` may called:
+ *
+ * - `gpt-5.2-version`
+ * - `gpt-5_2-date`
+ * - `GPT-52-version-date`
+ * - `openai/gpt-5.2-chat`
+ *
+ * They should be treated as the same model.
+ * Normalize them to `gpt-52`
+ */
+function normalizeModelName(modelName: string): string {
+	let normalizedName = modelName.toLowerCase()
+
+	// remove prefix before '/'
+	if (normalizedName.includes('/')) {
+		normalizedName = normalizedName.split('/')[1]
+	}
+
+	// remove '_'
+	normalizedName = normalizedName.replace(/_/g, '')
+
+	// remove '.'
+	normalizedName = normalizedName.replace(/\./g, '')
+
+	return normalizedName
 }
