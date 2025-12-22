@@ -31,13 +31,48 @@
  * - 永远使用 tool call 来返回结构化数据，禁止模型直接返回（视为出错）
  * - 不能假设 tool 参数合法，必须有修复机制，而且修复也应该使用 tool call 返回
  */
-import type { LLMConfig } from '../config'
-import { parseLLMConfig } from '../config'
 import { OpenAIClient } from './OpenAILenientClient'
+import {
+	DEFAULT_API_KEY,
+	DEFAULT_BASE_URL,
+	DEFAULT_MAX_TOKENS,
+	DEFAULT_MODEL_NAME,
+	DEFAULT_TEMPERATURE,
+	LLM_MAX_RETRIES,
+} from './constants'
 import { InvokeError } from './errors'
-import type { InvokeResult, LLMClient, Message, Tool } from './types'
+import type {
+	AgentBrain,
+	InvokeResult,
+	LLMClient,
+	LLMConfig,
+	MacroToolInput,
+	MacroToolResult,
+	Message,
+	Tool,
+} from './types'
 
-export type { Message, Tool, InvokeResult, LLMClient }
+export type {
+	AgentBrain,
+	InvokeResult,
+	LLMClient,
+	LLMConfig,
+	MacroToolInput,
+	MacroToolResult,
+	Message,
+	Tool,
+}
+
+export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
+	return {
+		baseURL: config.baseURL ?? DEFAULT_BASE_URL,
+		apiKey: config.apiKey ?? DEFAULT_API_KEY,
+		model: config.model ?? DEFAULT_MODEL_NAME,
+		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
+		maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
+		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
+	}
+}
 
 export class LLM extends EventTarget {
 	config: Required<LLMConfig>

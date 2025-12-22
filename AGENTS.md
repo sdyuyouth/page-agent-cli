@@ -9,6 +9,7 @@ This is a **monorepo** with npm workspaces containing **two main packages**:
 
 And other internal packages:
 
+- **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model.
 - **Page Controller** (`packages/page-controller/`) - DOM operations and element interactions. Independent of LLM.
 - **UI** (`packages/ui/`) - Panel, SimulatorMask, and i18n. Decoupled from PageAgent.
 
@@ -37,8 +38,7 @@ packages/
 ├── page-agent/              # npm: "page-agent" ⭐ MAIN
 │   ├── src/
 │   │   ├── PageAgent.ts     # Main AI agent class
-│   │   ├── tools/           # LLM tool definitions
-│   │   └── llms/            # LLM integration
+│   │   └── tools/           # LLM tool definitions
 │   ├── vite.config.js       # Library build (ES + UMD)
 │   └── package.json
 ├── website/                 # npm: "@page-agent/website" (private) ⭐ MAIN
@@ -47,6 +47,11 @@ packages/
 │
 │   # ...internal packages below...
 │
+├── llms/                    # npm: "@page-agent/llms"
+│   └── src/                 # LLM client (reflection-before-action model)
+│       ├── index.ts
+│       ├── types.ts         # MacroToolInput, AgentBrain, LLMConfig
+│       └── OpenAI*.ts       # OpenAI-compatible clients
 ├── page-controller/         # npm: "@page-agent/page-controller"
 │   └── src/                 # DOM operations
 │       ├── PageController.ts
@@ -66,6 +71,7 @@ packages/
     // internal deps (topological order)
     "packages/page-controller",
     "packages/ui",
+    "packages/llms",
     "packages/page-agent",
     "packages/website"
 ],
@@ -74,7 +80,8 @@ packages/
 ### Module Boundaries (Critical)
 
 - **Website** (`packages/website/`): CAN import from `page-agent` for demos. Alias `@/` → `website/src/`
-- **Page Agent** (`packages/page-agent/`): The core lib. Imports from `@page-agent/page-controller` and `@page-agent/ui`.
+- **Page Agent** (`packages/page-agent/`): The core lib. Imports from `@page-agent/llms`, `@page-agent/page-controller` and `@page-agent/ui`.
+- **LLMs** (`packages/llms/`): LLM client with MacroToolInput contract. No dependency on page-agent.
 - **UI** (`packages/ui/`): Panel, Mask, i18n. No dependency on page-agent.
 - **Page Controller** (`packages/page-controller/`): Pure DOM operations. No LLM or UI dependency.
 
@@ -130,8 +137,16 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 | `src/PageAgent.ts` | ⭐ Main AI agent class orchestrating tools and LLM |
 | `src/umd.ts` | CDN/UMD entry point with auto-initialization |
 | `src/tools/` | Tool definitions that call PageController methods |
-| `src/llms/` | LLM integration and communication layer |
 | `vite.config.js` | Library build configuration (ES + UMD) |
+
+### LLMs (`packages/llms/`)
+
+| File | Description |
+|------|-------------|
+| `src/index.ts` | ⭐ LLM class with retry logic |
+| `src/types.ts` | MacroToolInput, AgentBrain, LLMConfig definitions |
+| `src/OpenAILenientClient.ts` | OpenAI-compatible client with lenient parsing |
+| `src/utils.ts` | Zod-to-OpenAI conversion, model patches |
 
 ### Page Controller (`packages/page-controller/`)
 

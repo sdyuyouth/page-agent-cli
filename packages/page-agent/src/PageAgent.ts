@@ -2,6 +2,13 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
+import {
+	type AgentBrain,
+	LLM,
+	type MacroToolInput,
+	type MacroToolResult,
+	type Tool,
+} from '@page-agent/llms'
 import { PageController } from '@page-agent/page-controller'
 import { Panel, SimulatorMask } from '@page-agent/ui'
 import chalk from 'chalk'
@@ -9,7 +16,6 @@ import zod from 'zod'
 
 import type { PageAgentConfig } from './config'
 import { MAX_STEPS } from './config/constants'
-import { LLM, type Tool } from './llms'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
 import { trimLines, uid, waitUntil } from './utils'
@@ -17,31 +23,7 @@ import { assert } from './utils/assert'
 
 export type { PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
-
-export interface AgentBrain {
-	// thinking?: string
-	evaluation_previous_goal: string
-	memory: string
-	next_goal: string
-}
-
-/**
- * MacroTool input structure
- */
-export interface MacroToolInput {
-	evaluation_previous_goal?: string
-	memory?: string
-	next_goal?: string
-	action: Record<string, any>
-}
-
-/**
- * MacroTool output structure
- */
-export interface MacroToolResult {
-	input: MacroToolInput
-	output: string
-}
+export type { AgentBrain, MacroToolInput, MacroToolResult }
 
 export interface AgentHistory {
 	brain: AgentBrain

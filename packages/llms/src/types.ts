@@ -75,3 +75,48 @@ export interface OpenAIClientConfig {
 	maxTokens?: number
 	maxRetries?: number
 }
+
+/**
+ * LLM configuration for PageAgent
+ */
+export interface LLMConfig {
+	baseURL?: string
+	apiKey?: string
+	model?: string
+	temperature?: number
+	maxTokens?: number
+	maxRetries?: number
+}
+
+/**
+ * Agent brain state - the reflection-before-action model
+ *
+ * Every tool call must first reflect on:
+ * - evaluation_previous_goal: How well did the previous action achieve its goal?
+ * - memory: Key information to remember for future steps
+ * - next_goal: What should be accomplished in the next action?
+ */
+export interface AgentBrain {
+	// thinking?: string
+	evaluation_previous_goal: string
+	memory: string
+	next_goal: string
+}
+
+/**
+ * MacroTool input structure
+ *
+ * This is the core abstraction that enforces the "reflection-before-action" mental model.
+ * Before executing any action, the LLM must output its reasoning state.
+ */
+export interface MacroToolInput extends AgentBrain {
+	action: Record<string, any>
+}
+
+/**
+ * MacroTool output structure
+ */
+export interface MacroToolResult {
+	input: MacroToolInput
+	output: string
+}

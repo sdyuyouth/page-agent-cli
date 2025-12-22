@@ -1,9 +1,15 @@
 /**
  * OpenAI Client implementation
  */
-import type { MacroToolInput } from '../PageAgent'
 import { InvokeError, InvokeErrorType } from './errors'
-import type { InvokeResult, LLMClient, Message, OpenAIClientConfig, Tool } from './types'
+import type {
+	InvokeResult,
+	LLMClient,
+	MacroToolInput,
+	Message,
+	OpenAIClientConfig,
+	Tool,
+} from './types'
 import { lenientParseMacroToolCall, modelPatch, zodToOpenAITool } from './utils'
 
 export class OpenAIClient implements LLMClient {

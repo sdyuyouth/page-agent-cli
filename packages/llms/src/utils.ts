@@ -4,9 +4,8 @@
 import chalk from 'chalk'
 import { z } from 'zod'
 
-import type { MacroToolInput } from '../PageAgent'
 import { InvokeError, InvokeErrorType } from './errors'
-import type { Tool } from './types'
+import type { MacroToolInput, Tool } from './types'
 
 /**
  * Convert Zod schema to OpenAI tool format

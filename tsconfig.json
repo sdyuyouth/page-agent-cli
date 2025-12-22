@@ -3,6 +3,7 @@
 	"references": [
 		{ "path": "./packages/page-controller" },
 		{ "path": "./packages/ui" },
+		{ "path": "./packages/llms" },
 		{ "path": "./packages/page-agent" },
 		{ "path": "./packages/website" }
 	],
