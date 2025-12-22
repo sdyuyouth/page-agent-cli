@@ -23,6 +23,7 @@
 		"npm": ">=10.0.0"
 	},
 	"scripts": {
+		"cleanup": "rm -rf packages/*/dist",
 		"start": "npm run dev --workspace=@page-agent/website",
 		"build:website": "npm run build:website --workspace=@page-agent/website",
 		"build:libs": "npm run build --workspaces --if-present",
