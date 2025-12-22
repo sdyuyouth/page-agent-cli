@@ -45,7 +45,7 @@
 	},
 	"dependencies": {
 		"chalk": "^5.6.2",
-		"zod": "^4.2.0",
+		"zod": "^4.2.1",
 		"@page-agent/llms": "0.0.15",
 		"@page-agent/page-controller": "0.0.15",
 		"@page-agent/ui": "0.0.15"
