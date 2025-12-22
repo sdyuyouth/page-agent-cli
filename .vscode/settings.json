@@ -8,6 +8,7 @@
 		"opensource",
 		"qwen",
 		"retryable",
+		"shadcn",
 		"wouter"
 	],
 	"markdownlint.config": {
