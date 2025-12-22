@@ -30,26 +30,6 @@ This design ensures that:
 2. **Working memory is explicitly maintained** across conversation turns
 3. **Goals are clearly stated**, making the agent's reasoning transparent and debuggable
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────┐
-│                    PageAgent                        │
-│  - Maintains agent state and history                │
-│  - Orchestrates tool execution                      │
-│  - Assembles prompts with browser state             │
-└─────────────────────┬───────────────────────────────┘
-                      │ uses
-                      ▼
-┌─────────────────────────────────────────────────────┐
-│                 @page-agent/llms                    │
-│  - Defines MacroToolInput contract                  │
-│  - Handles LLM API calls                            │
-│  - Parses and validates structured output           │
-│  - Executes tool calls                              │
-└─────────────────────────────────────────────────────┘
-```
-
 ## Key Components
 
 | Export | Description |
@@ -59,24 +39,3 @@ This design ensures that:
 | `AgentBrain` | Agent's thinking state (eval, memory, goal) |
 | `LLMConfig` | Configuration for LLM connection |
 | `parseLLMConfig` | Parse and apply defaults to config |
-
-## Usage
-
-This package is used internally by `page-agent`. Direct usage:
-
-```typescript
-import { LLM, type MacroToolInput } from '@page-agent/llms'
-
-const llm = new LLM({
-  model: 'gpt-4o',
-  apiKey: 'your-api-key',
-  baseURL: 'https://api.openai.com/v1',
-})
-
-const result = await llm.invoke(messages, tools, abortSignal)
-```
-
-## License
-
-MIT
-

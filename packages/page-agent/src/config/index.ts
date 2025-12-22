@@ -1,25 +1,11 @@
+import type { LLMConfig } from '@page-agent/llms'
 import type { PageControllerConfig } from '@page-agent/page-controller'
 import type { SupportedLanguage } from '@page-agent/ui'
 
 import type { AgentHistory, ExecutionResult, PageAgent } from '../PageAgent'
 import type { PageAgentTool } from '../tools'
-import {
-	DEFAULT_API_KEY,
-	DEFAULT_BASE_URL,
-	DEFAULT_MAX_TOKENS,
-	DEFAULT_MODEL_NAME,
-	DEFAULT_TEMPERATURE,
-	LLM_MAX_RETRIES,
-} from './constants'
 
-export interface LLMConfig {
-	baseURL?: string
-	apiKey?: string
-	model?: string
-	temperature?: number
-	maxTokens?: number
-	maxRetries?: number
-}
+export type { LLMConfig }
 
 export interface AgentConfig {
 	// theme?: 'light' | 'dark'
@@ -96,14 +82,3 @@ export interface AgentConfig {
 }
 
 export type PageAgentConfig = LLMConfig & AgentConfig & PageControllerConfig
-
-export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
-	return {
-		baseURL: config.baseURL ?? DEFAULT_BASE_URL,
-		apiKey: config.apiKey ?? DEFAULT_API_KEY,
-		model: config.model ?? DEFAULT_MODEL_NAME,
-		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
-		maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
-		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
-	}
-}
