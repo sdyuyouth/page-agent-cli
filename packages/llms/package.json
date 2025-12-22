@@ -1,6 +1,6 @@
 {
 	"name": "@page-agent/llms",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"type": "module",
 	"main": "./dist/lib/page-agent-llms.js",
 	"module": "./dist/lib/page-agent-llms.js",
@@ -41,4 +41,3 @@
 		"zod": "^4.2.0"
 	}
 }
-
