@@ -4,25 +4,19 @@ import CodeEditor from '@/components/CodeEditor'
 
 // Recommended models: lightweight with excellent tool call capabilities
 const MODELS = {
-	recommended: [
-		'gpt-4.1-mini',
-		'claude-haiku-4.5',
-		'gemini-3-flash',
-		'deepseek-3.2',
-		'qwen-3-max',
-		'gpt-5.2',
-	],
+	recommended: ['gpt-4.1-mini', 'claude-haiku-4.5', 'gemini-3-flash', 'deepseek-3.2', 'gpt-5.2'],
 	verified: [
+		'qwen-3-max',
 		'gpt-4.1',
 		'gpt-5',
 		'gpt-5-mini',
 		'gpt-5.1',
 		'grok-4',
 		'grok-code-fast',
-		'qwen3-max',
 		'deepseek-v3.2',
 		'claude-sonnet-3.5',
 		'claude-sonnet-4.5',
+		'claude-opus-4.5',
 		'gemini-2.5',
 		'gemini-3-pro',
 	],
@@ -52,10 +46,10 @@ export default function ModelIntegration() {
 							return (
 								<div
 									key={model}
-									className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+									className={`px-3 py-1.5 rounded-md text-sm font-medium font-mono transition-colors ${
 										isRecommended
 											? 'bg-emerald-500 text-white shadow-sm'
-											: 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-300'
+											: 'bg-white/80 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600'
 									}`}
 								>
 									{model}
@@ -64,6 +58,7 @@ export default function ModelIntegration() {
 							)
 						})}
 					</div>
+					<p className="text-xs text-gray-600 dark:text-gray-400 mt-5">⭐ baseline models</p>
 				</div>
 			</section>
 

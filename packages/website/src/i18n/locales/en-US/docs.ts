@@ -116,9 +116,9 @@ export default {
 		title: 'Model Integration',
 		subtitle:
 			'Supports models that comply with OpenAI API specification and support tool calls, including public cloud services and private deployments.',
-		recommendation_logic: 'Recommended: Lightweight models with strong ToolCall capabilities',
+		recommendation_logic: 'Recommended: Lightweight models with strong ToolCall capabilities.',
 		recommended: 'Recommended Models',
-		available: 'Available Models',
+		available: 'Tested Models',
 		available_verified: 'Verified Working Models',
 		tips: 'Tips',
 		tip_1: 'Reasoning models (like GPT-5) are slower with no advantage',
@@ -127,7 +127,7 @@ export default {
 		tip_3:
 			'Small models or those unable to handle complex tool definitions typically perform poorly',
 		security: '🔐 Production Authentication',
-		security_warning: '⚠️ Never commit real LLM API Keys to your frontend codebase',
+		security_warning: '⚠️ Never commit real LLM API Keys to your frontend code',
 		security_desc:
 			'In production environments, to hide the real LLM API Keys, we recommend the following architecture:',
 		security_backend_proxy: 'Backend Proxy Pattern',

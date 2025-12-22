@@ -114,9 +114,9 @@ export default {
 	model_integration: {
 		title: '模型接入',
 		subtitle: '当前支持符合 OpenAI 接口规范且支持 tool call 的模型,包括公有云服务和私有部署方案。',
-		recommendation_logic: '推荐使用 ToolCall 能力强的轻量级模型',
+		recommendation_logic: '推荐使用 ToolCall 能力强的轻量级模型。',
 		recommended: '推荐模型',
-		available: '可用模型',
+		available: '已测试模型',
 		available_verified: '已验证可用模型',
 		tips: '提示',
 		tip_1: 'reasoning 模型(如 GPT-5),速度偏慢,没有必要',
@@ -124,7 +124,7 @@ export default {
 			'ToolCall 能力较弱的模型可能返回错误的格式，常见错误能够自动恢复，建议设置较高的 temperature',
 		tip_3: '小模型或者无法适应复杂 Tool 定义的模型，通常效果不佳',
 		security: '🔐 生产环境鉴权建议',
-		security_warning: '⚠️ 永远不要把真实的 LLM API Key 发布到前端代码库',
+		security_warning: '⚠️ 永远不要把真实的 LLM API Key 发布到前端代码',
 		security_desc: '在实际应用中,为了隐藏真实的 LLM API Key，建议采用以下架构:',
 		security_backend_proxy: '后端代理转发',
 		security_backend_desc:
