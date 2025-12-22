@@ -1,10 +1,12 @@
 {
 	"editor.fontLigatures": true,
 	"cSpell.words": [
+		"deepseek",
 		"HITL",
 		"innerhtml",
 		"llms",
 		"opensource",
+		"qwen",
 		"retryable",
 		"wouter"
 	],
