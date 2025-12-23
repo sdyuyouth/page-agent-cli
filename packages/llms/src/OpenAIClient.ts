@@ -4,16 +4,16 @@
  * @note Use OpenAILenientClient instead.
  */
 import { InvokeError, InvokeErrorType } from './errors'
-import type { InvokeResult, LLMClient, Message, OpenAIClientConfig, Tool } from './types'
+import type { InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
 
 /**
  * @deprecated Use OpenAILenientClient instead.
  */
 export class OpenAIClient implements LLMClient {
-	config: OpenAIClientConfig
+	config: LLMConfig
 
-	constructor(config: OpenAIClientConfig) {
+	constructor(config: LLMConfig) {
 		this.config = config
 	}
 

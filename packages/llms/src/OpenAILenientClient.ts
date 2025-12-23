@@ -2,20 +2,13 @@
  * OpenAI Client implementation
  */
 import { InvokeError, InvokeErrorType } from './errors'
-import type {
-	InvokeResult,
-	LLMClient,
-	MacroToolInput,
-	Message,
-	OpenAIClientConfig,
-	Tool,
-} from './types'
+import type { InvokeResult, LLMClient, LLMConfig, MacroToolInput, Message, Tool } from './types'
 import { lenientParseMacroToolCall, modelPatch, zodToOpenAITool } from './utils'
 
 export class OpenAIClient implements LLMClient {
-	config: OpenAIClientConfig
+	config: LLMConfig
 
-	constructor(config: OpenAIClientConfig) {
+	constructor(config: LLMConfig) {
 		this.config = config
 	}
 

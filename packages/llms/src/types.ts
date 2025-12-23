@@ -65,19 +65,7 @@ export interface InvokeResult<TResult = unknown> {
 }
 
 /**
- * OpenAI Client config
- */
-export interface OpenAIClientConfig {
-	model: string
-	apiKey: string
-	baseURL: string
-	temperature?: number
-	maxTokens?: number
-	maxRetries?: number
-}
-
-/**
- * LLM configuration for PageAgent
+ * LLM configuration
  */
 export interface LLMConfig {
 	baseURL?: string
