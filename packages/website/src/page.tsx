@@ -1,4 +1,5 @@
 /* eslint-disable react-dom/no-dangerously-set-innerhtml */
+import { Bot, Box, MessageSquare, PlayCircle, Shield, Sparkles, Users, Zap } from 'lucide-react'
 import { PageAgent } from 'page-agent'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +7,11 @@ import { Link, useSearchParams } from 'wouter'
 
 import Footer from './components/Footer'
 import Header from './components/Header'
+import { AnimatedGradientText } from './components/ui/animated-gradient-text'
+import { Highlighter } from './components/ui/highlighter'
+import { NeonGradientCard } from './components/ui/neon-gradient-card'
+import { Particles } from './components/ui/particles'
+import { SparklesText } from './components/ui/sparkles-text'
 import { CDN_CN_URL, CDN_URL } from './constants'
 
 function getInjection(useCN?: boolean) {
@@ -82,19 +88,28 @@ export default function HomePage() {
 			<main id="main-content">
 				<section className="relative px-6 py-22 lg:py-28" aria-labelledby="hero-heading">
 					<div className="max-w-7xl mx-auto text-center">
-						{/* Background Pattern */}
+						{/* Background Pattern + Particles */}
 						<div className="absolute inset-0 opacity-30" aria-hidden="true">
 							<div className="absolute inset-0 bg-linear-to-r from-blue-400/20 to-purple-400/20 rounded-3xl transform rotate-1"></div>
 							<div className="absolute inset-0 bg-linear-to-l from-purple-400/20 to-blue-400/20 rounded-3xl transform -rotate-1"></div>
 						</div>
+						<Particles
+							className="absolute inset-0"
+							quantity={80}
+							staticity={30}
+							ease={80}
+							color="#6366f1"
+						/>
 
 						<div className="relative z-10">
-							<div className="inline-flex items-center px-4 py-2 mb-8 text-sm font-medium text-blue-700 bg-blue-100 rounded-full dark:text-blue-300 dark:bg-blue-900/30">
+							<div className="inline-flex items-center px-4 py-2 mb-8 text-sm font-medium bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
 								<span
 									className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"
 									aria-hidden="true"
 								></span>
-								{t('home:hero.badge')}
+								<AnimatedGradientText colorFrom="#3b82f6" colorTo="#8b5cf6">
+									{t('home:hero.badge')}
+								</AnimatedGradientText>
 							</div>
 
 							<h1
@@ -107,23 +122,29 @@ export default function HomePage() {
 							</h1>
 
 							<p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-								<span className="bg-linear-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">
-									{t('home:hero.subtitle_emoji')}
-								</span>
+								<Highlighter action="underline" color="#8b5cf6" strokeWidth={2}>
+									<span className="bg-linear-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">
+										{t('home:hero.subtitle_emoji')}
+									</span>
+								</Highlighter>
 								{t('home:hero.subtitle_main')}
 								<br />
 								{t('home:hero.subtitle_detail')}
 							</p>
 
 							{/* Try It Now Section - Tab Card */}
-							<div className="mt-8 mb-6">
+							<div className="mb-12">
 								<div className="max-w-3xl mx-auto">
-									<div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+									<NeonGradientCard
+										borderSize={2}
+										borderRadius={20}
+										neonColors={{ firstColor: '#ff00aa', secondColor: '#00FFF1' }}
+									>
 										{/* Tab Headers */}
 										<div className="flex border-b border-gray-200 dark:border-gray-700">
 											<button
 												onClick={() => setActiveTab('try')}
-												className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 ${
+												className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 rounded-tl-2xl ${
 													activeTab === 'try'
 														? 'bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-700 dark:text-blue-300 border-b-2 border-blue-500'
 														: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -133,7 +154,7 @@ export default function HomePage() {
 											</button>
 											<button
 												onClick={() => setActiveTab('other')}
-												className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 ${
+												className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 rounded-tr-2xl ${
 													activeTab === 'other'
 														? 'bg-linear-to-r from-green-50 to-blue-50 dark:from-green-900/30 dark:to-blue-900/30 text-green-700 dark:text-green-300 border-b-2 border-green-500'
 														: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -272,7 +293,7 @@ export default function HomePage() {
 												</div>
 											)}
 										</div>
-									</div>
+									</NeonGradientCard>
 								</div>
 							</div>
 
@@ -326,10 +347,10 @@ export default function HomePage() {
 								role="listitem"
 							>
 								<div
-									className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									className="w-14 h-14 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
 									aria-hidden="true"
 								>
-									<span className="text-white text-xl">📦</span>
+									<Box className="w-7 h-7 text-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
 									{t('home:features.in_page.title')}
@@ -345,10 +366,10 @@ export default function HomePage() {
 								role="listitem"
 							>
 								<div
-									className="w-12 h-12 bg-linear-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									className="w-14 h-14 bg-linear-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
 									aria-hidden="true"
 								>
-									<span className="text-white text-xl">⚡</span>
+									<Zap className="w-7 h-7 text-white fill-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
 									{t('home:features.zero_backend.title')}
@@ -364,10 +385,10 @@ export default function HomePage() {
 								role="listitem"
 							>
 								<div
-									className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									className="w-14 h-14 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
 									aria-hidden="true"
 								>
-									<span className="text-white text-xl">🌈</span>
+									<MessageSquare className="w-7 h-7 text-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
 									{t('home:features.accessible.title')}
@@ -383,10 +404,10 @@ export default function HomePage() {
 								role="listitem"
 							>
 								<div
-									className="w-12 h-12 bg-linear-to-br from-orange-500 to-orange-600  rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+									className="w-14 h-14 bg-linear-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
 									aria-hidden="true"
 								>
-									<span className="text-white text-xl">🔒</span>
+									<Shield className="w-7 h-7 text-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
 									{t('home:features.secure_integration.title')}
@@ -403,12 +424,12 @@ export default function HomePage() {
 				<section className="px-6 py-20" aria-labelledby="use-cases-heading">
 					<div className="max-w-7xl mx-auto">
 						<div className="text-center mb-16">
-							<h2
-								id="use-cases-heading"
-								className="text-4xl lg:text-5xl font-bold mb-6 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+							<SparklesText
+								className="text-4xl lg:text-5xl mb-6"
+								colors={{ first: '#3b82f6', second: '#8b5cf6' }}
 							>
 								{t('home:use_cases.section_title')}
-							</h2>
+							</SparklesText>
 							<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
 								{t('home:use_cases.section_subtitle')}
 							</p>
@@ -416,10 +437,10 @@ export default function HomePage() {
 
 						<div className="grid lg:grid-cols-2 gap-12" role="list">
 							{/* Use Case 1 */}
-							<div className="bg-linear-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="group bg-linear-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl hover:shadow-xl transition-all duration-300">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
-										<span className="text-white font-bold">1</span>
+									<div className="w-12 h-12 bg-linear-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md">
+										<Bot className="w-6 h-6 text-white" strokeWidth={2.5} />
 									</div>
 
 									<div>
@@ -434,10 +455,10 @@ export default function HomePage() {
 							</div>
 
 							{/* Use Case 2 */}
-							<div className="bg-linear-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="group bg-linear-to-br from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl hover:shadow-xl transition-all duration-300">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
-										<span className="text-white font-bold">2</span>
+									<div className="w-12 h-12 bg-linear-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md">
+										<Sparkles className="w-6 h-6 text-white" strokeWidth={2.5} />
 									</div>
 									<div>
 										<h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
@@ -451,10 +472,10 @@ export default function HomePage() {
 							</div>
 
 							{/* Use Case 3 */}
-							<div className="bg-linear-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="group bg-linear-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl hover:shadow-xl transition-all duration-300">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
-										<span className="text-white font-bold">3</span>
+									<div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md">
+										<PlayCircle className="w-6 h-6 text-white fill-white/30" strokeWidth={2.5} />
 									</div>
 									<div>
 										<h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
@@ -468,10 +489,10 @@ export default function HomePage() {
 							</div>
 
 							{/* Use Case 4 */}
-							<div className="bg-linear-to-br from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl">
+							<div className="group bg-linear-to-br from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-800 p-8 rounded-2xl hover:shadow-xl transition-all duration-300">
 								<div className="flex items-start space-x-4">
-									<div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
-										<span className="text-white font-bold">4</span>
+									<div className="w-12 h-12 bg-linear-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md">
+										<Users className="w-6 h-6 text-white" strokeWidth={2.5} />
 									</div>
 									<div>
 										<h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">

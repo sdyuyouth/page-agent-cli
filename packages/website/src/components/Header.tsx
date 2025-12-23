@@ -1,10 +1,12 @@
+import { BookOpen, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { siGithub } from 'simple-icons'
 import { Link } from 'wouter'
 
 import LanguageSwitcher from './LanguageSwitcher'
 import ThemeSwitcher from './ThemeSwitcher'
-import { BookIcon, CloseIcon, GithubIcon, MenuIcon } from './icons'
+import { HyperText } from './ui/hyper-text'
 
 export default function Header() {
 	const { t } = useTranslation('common')
@@ -34,9 +36,14 @@ export default function Header() {
 								<span className="text-base sm:text-xl font-bold text-gray-900 dark:text-white block leading-tight">
 									page-agent
 								</span>
-								<p className="hidden sm:block text-xs text-gray-600 dark:text-gray-300">
+								<HyperText
+									as="p"
+									className="hidden sm:block text-xs text-gray-600 dark:text-gray-300 py-0 font-normal overflow-visible"
+									duration={600}
+									animateOnHover={true}
+								>
 									{t('header.slogan')}
-								</p>
+								</HyperText>
 							</div>
 						</Link>
 
@@ -51,7 +58,7 @@ export default function Header() {
 								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
 								aria-label={t('header.nav_docs')}
 							>
-								<BookIcon className="w-5 h-5" />
+								<BookOpen className="w-5 h-5" />
 							</Link>
 							<a
 								href="https://github.com/alibaba/page-agent"
@@ -60,7 +67,14 @@ export default function Header() {
 								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
 								aria-label={t('header.nav_source')}
 							>
-								<GithubIcon className="w-5 h-5" />
+								<svg
+									role="img"
+									viewBox="0 0 24 24"
+									className="w-5 h-5 fill-current"
+									aria-hidden="true"
+								>
+									<path d={siGithub.path} />
+								</svg>
 							</a>
 						</nav>
 
@@ -74,7 +88,7 @@ export default function Header() {
 								href="/docs/introduction/overview"
 								className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
 							>
-								<BookIcon />
+								<BookOpen className="w-4 h-4" />
 								{t('header.nav_docs')}
 							</Link>
 							<a
@@ -84,7 +98,14 @@ export default function Header() {
 								className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
 								aria-label={t('header.nav_source')}
 							>
-								<GithubIcon />
+								<svg
+									role="img"
+									viewBox="0 0 24 24"
+									className="w-4 h-4 fill-current"
+									aria-hidden="true"
+								>
+									<path d={siGithub.path} />
+								</svg>
 								{t('header.nav_source')}
 							</a>
 							<ThemeSwitcher />
@@ -100,7 +121,7 @@ export default function Header() {
 							aria-controls="mobile-menu"
 							onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
 						>
-							{mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+							{mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
 						</button>
 					</div>
 
@@ -116,7 +137,7 @@ export default function Header() {
 								className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
 								onClick={() => setMobileMenuOpen(false)}
 							>
-								<BookIcon className="w-5 h-5" />
+								<BookOpen className="w-5 h-5" />
 								{t('header.nav_docs')}
 							</Link>
 							<a
@@ -126,7 +147,14 @@ export default function Header() {
 								className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
 								aria-label={t('header.nav_source')}
 							>
-								<GithubIcon className="w-5 h-5" />
+								<svg
+									role="img"
+									viewBox="0 0 24 24"
+									className="w-5 h-5 fill-current"
+									aria-hidden="true"
+								>
+									<path d={siGithub.path} />
+								</svg>
 								{t('header.nav_source')}
 							</a>
 							<div className="flex items-center gap-3 px-3 py-2">

@@ -141,7 +141,9 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
 				{sparkles.map((sparkle) => (
 					<Sparkle key={sparkle.id} {...sparkle} />
 				))}
-				<strong>{children}</strong>
+				<strong className="bg-linear-to-r from-[var(--sparkles-first-color)] to-[var(--sparkles-second-color)] bg-clip-text text-transparent">
+					{children}
+				</strong>
 			</span>
 		</div>
 	)

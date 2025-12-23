@@ -3,7 +3,7 @@ export default {
 		badge: 'GUI Agent in your webpage',
 		title_line1: '让你的 Web 应用',
 		title_line2: '拥有 AI 操作员',
-		subtitle_emoji: '🪄 一行 CDN 引入',
+		subtitle_emoji: '🪄一行代码',
 		subtitle_main: '，为你的网站添加 GUI Agent。',
 		subtitle_detail: '用户/答疑机器人给出文字指示，AI 帮你操作页面。',
 		tab_try: '🚀 立即尝试',
