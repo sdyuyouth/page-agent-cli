@@ -71,7 +71,7 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
 		maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
-		customFetch: config.customFetch ?? globalThis.fetch,
+		customFetch: (config.customFetch ?? fetch).bind(globalThis), // fetch will be illegal unless bound
 	}
 }
 
