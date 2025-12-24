@@ -263,9 +263,7 @@ export class PageAgent extends EventTarget {
 		const tools = this.tools
 
 		const actionSchemas = Array.from(tools.entries()).map(([toolName, tool]) => {
-			return zod.object({
-				[toolName]: tool.inputSchema,
-			})
+			return zod.object({ [toolName]: tool.inputSchema }).describe(tool.description)
 		})
 
 		const actionSchema = zod.union(
