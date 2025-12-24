@@ -21,6 +21,7 @@ export class OpenAIClient implements LLMClient {
 	): Promise<InvokeResult> {
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, tool]) => zodToOpenAITool(name, tool))
+		// console.log('openaiTools', openaiTools)
 
 		// 2. Call API
 		let response: Response
@@ -48,6 +49,7 @@ export class OpenAIClient implements LLMClient {
 			})
 		} catch (error: unknown) {
 			// Network error
+			console.error(error)
 			throw new InvokeError(InvokeErrorType.NETWORK_ERROR, 'Network request failed', error)
 		}
 
