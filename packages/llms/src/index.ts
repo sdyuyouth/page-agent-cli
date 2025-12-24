@@ -71,6 +71,7 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
 		maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
+		customFetch: config.customFetch ?? globalThis.fetch,
 	}
 }
 
@@ -83,13 +84,7 @@ export class LLM extends EventTarget {
 		this.config = parseLLMConfig(config)
 
 		// Default to OpenAI client
-		this.client = new OpenAIClient({
-			model: this.config.model,
-			apiKey: this.config.apiKey,
-			baseURL: this.config.baseURL,
-			temperature: this.config.temperature,
-			maxTokens: this.config.maxTokens,
-		})
+		this.client = new OpenAIClient(this.config)
 	}
 
 	/**

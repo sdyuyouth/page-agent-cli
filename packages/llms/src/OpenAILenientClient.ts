@@ -6,10 +6,12 @@ import type { InvokeResult, LLMClient, LLMConfig, MacroToolInput, Message, Tool 
 import { lenientParseMacroToolCall, modelPatch, zodToOpenAITool } from './utils'
 
 export class OpenAIClient implements LLMClient {
-	config: LLMConfig
+	config: Required<LLMConfig>
+	private fetch: typeof globalThis.fetch
 
-	constructor(config: LLMConfig) {
+	constructor(config: Required<LLMConfig>) {
 		this.config = config
+		this.fetch = config.customFetch
 	}
 
 	async invoke(
@@ -23,7 +25,7 @@ export class OpenAIClient implements LLMClient {
 		// 2. Call API
 		let response: Response
 		try {
-			response = await fetch(`${this.config.baseURL}/chat/completions`, {
+			response = await this.fetch(`${this.config.baseURL}/chat/completions`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

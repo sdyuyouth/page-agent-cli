@@ -18,6 +18,13 @@ interface LLMConfig {
 	temperature?: number
 	maxTokens?: number
 	maxRetries?: number
+
+	/**
+	 * Custom fetch function for LLM API requests.
+	 * Use this to customize headers, credentials, proxy, etc.
+	 * The response should follow OpenAI API format.
+	 */
+	customFetch?: typeof globalThis.fetch
 }
 
 interface AgentConfig {
