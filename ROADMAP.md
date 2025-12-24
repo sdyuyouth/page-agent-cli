@@ -49,7 +49,7 @@ The development progress and future plans for PageAgent.
 - [ ] **Tools for more complex tasks**
   - todo list
   - file sys
-- [ ] **Support custom llm fetch**
+- [x] **Support custom llm fetch**
 - [ ] **Testing suits**
 - [ ] **Same-origin multi-page-app rally**
 - [ ] **Local MCP proxy**
