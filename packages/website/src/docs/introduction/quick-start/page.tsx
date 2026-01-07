@@ -55,7 +55,7 @@ const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm
 const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 
 const agent = new PageAgent({
-  modelName: DEMO_MODEL,
+  model: DEMO_MODEL,
   baseURL: DEMO_BASE_URL,
   apiKey: DEMO_API_KEY,
   language: 'zh-CN'
