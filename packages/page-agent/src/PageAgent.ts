@@ -473,7 +473,11 @@ export class PageAgent extends EventTarget {
 		await this.pageController.updateTree()
 		this.mask.wrapper.style.pointerEvents = 'auto'
 
-		const simplifiedHTML = await this.pageController.getSimplifiedHTML()
+		let simplifiedHTML = await this.pageController.getSimplifiedHTML()
+
+		if (this.config.transformPageContent) {
+			simplifiedHTML = await this.config.transformPageContent(simplifiedHTML)
+		}
 
 		let prompt = trimLines(`<browser_state>
 			Current Page: [${pageTitle}](${pageUrl})

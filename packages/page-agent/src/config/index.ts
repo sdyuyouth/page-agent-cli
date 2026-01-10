@@ -62,6 +62,7 @@ export interface AgentConfig {
 
 	// lifecycle hooks
 	// @todo: use event instead of hooks
+	// @todo: remove `this` binding, pass agent as explicit parameter instead
 
 	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
 	onAfterStep?: (this: PageAgent, stepCnt: number, history: AgentHistory[]) => Promise<void> | void
@@ -71,6 +72,7 @@ export interface AgentConfig {
 	/**
 	 * @note this hook can block the disposal process
 	 * @note when dispose caused by page unload, reason will be 'PAGE_UNLOADING'. this method CANNOT block unloading. async operations may be cut.
+	 * @todo remove `this` binding, pass agent as explicit parameter instead
 	 */
 	onDispose?: (this: PageAgent, reason?: string) => void
 
@@ -85,9 +87,26 @@ export interface AgentConfig {
 	experimentalScriptExecutionTool?: boolean
 
 	/**
+	 * Transform page content before sending to LLM.
+	 * Called after DOM extraction and simplification, before LLM invocation.
+	 * Use cases: inspect extraction results, modify page info, mask sensitive data.
+	 *
+	 * @param content - Simplified page content that will be sent to LLM
+	 * @returns Transformed content
+	 *
+	 * @example
+	 * // Mask phone numbers
+	 * transformPageContent: async (content) => {
+	 *   return content.replace(/1[3-9]\d{9}/g, '***********')
+	 * }
+	 */
+	transformPageContent?: (content: string) => Promise<string> | string
+
+	/**
 	 * TODO: @unimplemented
 	 * hook when action causes a new page to be opened
 	 * @note PageAgent will try to detect new pages and decide if it's caused by an action. But not very reliable.
+	 * @todo remove `this` binding, pass agent as explicit parameter instead
 	 */
 	onNewPageOpen?: (this: PageAgent, url: string) => Promise<void> | void
 
