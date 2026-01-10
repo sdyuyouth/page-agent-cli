@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import CodeEditor from '@/components/CodeEditor'
 
-export default function KnowledgeInjection() {
+export default function Instructions() {
 	const { i18n } = useTranslation()
 	const isZh = i18n.language === 'zh-CN'
 
