@@ -42,6 +42,24 @@ export interface AgentConfig {
 	 */
 	customTools?: Record<string, PageAgentTool | null>
 
+	/**
+	 * Instructions to guide the agent's behavior
+	 */
+	instructions?: {
+		/**
+		 * Global system-level instructions, applied to all tasks
+		 */
+		system?: string
+
+		/**
+		 * Dynamic page-level instructions callback
+		 * Called before each step to get instructions for the current page
+		 * @param url - Current page URL (window.location.href)
+		 * @returns Instructions string, or undefined/null to skip
+		 */
+		getPageInstructions?: (url: string) => string | undefined | null
+	}
+
 	// lifecycle hooks
 	// @todo: use event instead of hooks
 

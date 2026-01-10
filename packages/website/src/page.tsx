@@ -64,6 +64,15 @@ export default function HomePage() {
 				interactiveBlacklist: [document.getElementById('root')!],
 				language: i18n.language as any,
 
+				instructions: {
+					system: 'You are a helpful assistant on PageAgent website.',
+					getPageInstructions: (url) => {
+						const hint = url.includes('page-agent') ? 'This is PageAgent demo page.' : undefined
+						console.log('[instructions] getPageInstructions:', url, '->', hint)
+						return hint
+					},
+				},
+
 				// experimentalScriptExecutionTool: true,
 
 				// testing server

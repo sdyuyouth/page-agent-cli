@@ -29,7 +29,7 @@ export default {
 		limitations: 'Limitations',
 		model_integration: 'Model Integration',
 		custom_tools: 'Custom Tools',
-		knowledge_injection: 'Knowledge Injection',
+		knowledge_injection: 'Instructions',
 		security_permissions: 'Security & Permissions',
 		data_masking: 'Data Masking',
 		cdn_setup: 'CDN Setup',

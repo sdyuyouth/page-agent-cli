@@ -34,7 +34,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 			items: [
 				{ title: t('nav.model_integration'), path: '/docs/features/model-integration' },
 				{ title: t('nav.custom_tools'), path: '/docs/features/custom-tools' },
-				{ title: t('nav.knowledge_injection'), path: '/docs/features/knowledge-injection' },
+				{ title: t('nav.knowledge_injection'), path: '/docs/features/custom-instructions' },
 				{ title: t('nav.security_permissions'), path: '/docs/features/security-permissions' },
 				{ title: t('nav.data_masking'), path: '/docs/features/data-masking' },
 			],

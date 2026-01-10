@@ -361,8 +361,49 @@ export class PageAgent extends EventTarget {
 		return systemPrompt
 	}
 
+	/**
+	 * Get instructions from config and format as XML block
+	 */
+	async #getInstructions(): Promise<string> {
+		const { instructions } = this.config
+		if (!instructions) return ''
+
+		const systemInstructions = instructions.system?.trim()
+		const url = await this.pageController.getCurrentUrl()
+		let pageInstructions: string | undefined
+
+		if (instructions.getPageInstructions) {
+			try {
+				pageInstructions = instructions.getPageInstructions(url)?.trim()
+			} catch (error) {
+				console.error(
+					chalk.red('[PageAgent] Failed to execute getPageInstructions callback:'),
+					error
+				)
+			}
+		}
+		if (!systemInstructions && !pageInstructions) return ''
+
+		let result = '<instructions>\n'
+
+		if (systemInstructions) {
+			result += `<system_instructions>\n${systemInstructions}\n</system_instructions>\n`
+		}
+
+		if (pageInstructions) {
+			result += `<page_instructions>\n${pageInstructions}\n</page_instructions>\n`
+		}
+
+		result += '</instructions>\n\n'
+
+		return result
+	}
+
 	async #assembleUserPrompt(): Promise<string> {
 		let prompt = ''
+
+		// <instructions> (optional)
+		prompt += await this.#getInstructions()
 
 		// <agent_state>
 		//  - <user_request>
