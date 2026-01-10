@@ -364,23 +364,6 @@ export class PageAgent extends EventTarget {
 	async #assembleUserPrompt(): Promise<string> {
 		let prompt = ''
 
-		// <agent_history>
-		//  - <step_>
-
-		prompt += '<agent_history>\n'
-
-		this.history.forEach((history, index) => {
-			prompt += `<step_${index + 1}>
-				Evaluation of Previous Step: ${history.brain.evaluation_previous_goal}
-				Memory: ${history.brain.memory}
-				Next Goal: ${history.brain.next_goal}
-				Action Results: ${history.action.output}
-				</step_${index + 1}>
-			`
-		})
-
-		prompt += '</agent_history>\n\n'
-
 		// <agent_state>
 		//  - <user_request>
 		//  - <step_info>
@@ -396,6 +379,23 @@ export class PageAgent extends EventTarget {
 			</step_info>
 			</agent_state>
 		`
+
+		// <agent_history>
+		//  - <step_>
+
+		prompt += '\n<agent_history>\n'
+
+		this.history.forEach((history, index) => {
+			prompt += `<step_${index + 1}>
+				Evaluation of Previous Step: ${history.brain.evaluation_previous_goal}
+				Memory: ${history.brain.memory}
+				Next Goal: ${history.brain.next_goal}
+				Action Results: ${history.action.output}
+				</step_${index + 1}>
+			`
+		})
+
+		prompt += '</agent_history>\n\n'
 
 		// <browser_state>
 
