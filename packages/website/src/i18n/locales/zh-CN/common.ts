@@ -28,7 +28,7 @@ export default {
 		limitations: '使用限制',
 		model_integration: '模型接入',
 		custom_tools: '自定义工具',
-		knowledge_injection: '知识库注入',
+		knowledge_injection: '知识注入',
 		security_permissions: '安全与权限',
 		data_masking: '数据脱敏',
 		cdn_setup: 'CDN 引入',

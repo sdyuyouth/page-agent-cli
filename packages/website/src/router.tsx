@@ -5,7 +5,7 @@ import Header from './components/Header'
 // Features pages
 import CustomTools from './docs/features/custom-tools/page'
 import DataMasking from './docs/features/data-masking/page'
-import KnowledgeInjection from './docs/features/knowledge-injection/page'
+import Instructions from './docs/features/instructions/page'
 import ModelIntegration from './docs/features/model-integration/page'
 import SecurityPermissions from './docs/features/security-permissions/page'
 import BestPractices from './docs/integration/best-practices/page'
@@ -80,11 +80,11 @@ export default function Router() {
 				</div>
 			</Route>
 
-			<Route path="/docs/features/knowledge-injection">
+			<Route path="/docs/features/instructions">
 				<div className="min-h-screen bg-white dark:bg-gray-900">
 					<Header />
 					<DocsLayout>
-						<KnowledgeInjection />
+						<Instructions />
 					</DocsLayout>
 				</div>
 			</Route>
