@@ -1,7 +1,7 @@
 {
 	"name": "page-agent",
 	"private": false,
-	"version": "0.0.19",
+	"version": "0.0.20",
 	"type": "module",
 	"main": "./dist/esm/page-agent.js",
 	"module": "./dist/esm/page-agent.js",
@@ -46,8 +46,8 @@
 	"dependencies": {
 		"chalk": "^5.6.2",
 		"zod": "^4.3.5",
-		"@page-agent/llms": "0.0.19",
-		"@page-agent/page-controller": "0.0.19",
-		"@page-agent/ui": "0.0.19"
+		"@page-agent/llms": "0.0.20",
+		"@page-agent/page-controller": "0.0.20",
+		"@page-agent/ui": "0.0.20"
 	}
 }

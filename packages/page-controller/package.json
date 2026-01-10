@@ -1,6 +1,6 @@
 {
 	"name": "@page-agent/page-controller",
-	"version": "0.0.19",
+	"version": "0.0.20",
 	"type": "module",
 	"main": "./dist/lib/page-controller.js",
 	"module": "./dist/lib/page-controller.js",
