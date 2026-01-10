@@ -1,48 +1,73 @@
-import BetaNotice from '@/components/BetaNotice'
+import { useTranslation } from 'react-i18next'
+
 import CodeEditor from '@/components/CodeEditor'
 
 export default function DataMasking() {
+	const { i18n } = useTranslation()
+	const isZh = i18n.language === 'zh-CN'
+
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">数据脱敏</h1>
+			<h1 className="text-4xl font-bold mb-6">{isZh ? '数据脱敏' : 'Data Masking'}</h1>
 
-			<BetaNotice />
-
-			<p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-				保护敏感数据，确保 AI 处理过程中的数据安全。
+			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+				{isZh
+					? '使用 transformPageContent 钩子在页面内容发送给 LLM 之前进行处理，可用于检查清洗效果、修改页面信息、隐藏敏感数据等。'
+					: 'Use the transformPageContent hook to process page content before sending to LLM. Useful for inspecting extraction results, modifying page info, and masking sensitive data.'}
 			</p>
 
-			<h2 className="text-2xl font-bold mb-3">脱敏策略</h2>
+			<section className="mb-12">
+				<h2 className="text-3xl font-bold mb-6">{isZh ? '接口定义' : 'API Definition'}</h2>
 
-			<div className="space-y-4 mb-6">
-				<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
-						🔒 自动脱敏
-					</h3>
-					<p className="text-gray-600 dark:text-gray-300">
-						自动识别并脱敏手机号、身份证号、银行卡号等敏感信息。
-					</p>
-				</div>
+				<CodeEditor
+					className="mb-6"
+					code={`interface PageAgentConfig {
+  /**
+   * Transform page content before sending to LLM.
+   * Called after DOM extraction and simplification.
+   */
+  transformPageContent?: (content: string) => Promise<string> | string
+}`}
+				/>
+			</section>
 
-				<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
-						⚙️ 自定义规则
-					</h3>
-					<p className="text-gray-600 dark:text-gray-300">
-						支持自定义脱敏规则，适应不同业务场景的数据保护需求。
-					</p>
-				</div>
-			</div>
+			<section className="mb-12">
+				<h2 className="text-3xl font-bold mb-6">
+					{isZh ? '常用脱敏规则' : 'Common Masking Patterns'}
+				</h2>
 
-			<CodeEditor
-				code={`// 数据脱敏配置
-// @todo
-const rules = [
-	{ pattern: /\\d{11}/, replacement: '***-****-****' },
-	{ pattern: /\\d{4}-\\d{4}-\\d{4}-\\d{4}/, replacement: '****-****-****-****' }
-]
-pageAgent.maskData(rules)`}
-			/>
+				<p className="text-gray-600 dark:text-gray-300 mb-6">
+					{isZh
+						? '以下示例展示了如何脱敏常见的敏感信息：'
+						: 'The following example shows how to mask common sensitive data:'}
+				</p>
+
+				<CodeEditor
+					code={`const agent = new PageAgent({
+  transformPageContent: async (content) => {
+    // China phone number (11 digits starting with 1)
+    content = content.replace(/\\b(1[3-9]\\d)(\\d{4})(\\d{4})\\b/g, '$1****$3')
+
+    // Email address
+    content = content.replace(
+      /\\b([a-zA-Z0-9._%+-])[^@]*(@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})\\b/g,
+      '$1***$2'
+    )
+
+    // China ID card number (18 digits)
+    content = content.replace(
+      /\\b(\\d{6})(19|20\\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])(\\d{3}[\\dXx])\\b/g,
+      '$1********$5'
+    )
+
+    // Bank card number (16-19 digits)
+    content = content.replace(/\\b(\\d{4})\\d{8,11}(\\d{4})\\b/g, '$1********$2')
+
+    return content
+  }
+})`}
+				/>
+			</section>
 		</div>
 	)
 }
