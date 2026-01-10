@@ -8,11 +8,11 @@ import Instructions from './pages/docs/features/custom-instructions/page'
 import CustomTools from './pages/docs/features/custom-tools/page'
 import DataMasking from './pages/docs/features/data-masking/page'
 import ModelIntegration from './pages/docs/features/model-integration/page'
-import SecurityPermissions from './pages/docs/features/security-permissions/page'
 // Integration pages
 import BestPractices from './pages/docs/integration/best-practices/page'
 import CdnSetup from './pages/docs/integration/cdn-setup/page'
 import Configuration from './pages/docs/integration/configuration/page'
+import SecurityPermissions from './pages/docs/integration/security-permissions/page'
 import ThirdPartyAgent from './pages/docs/integration/third-party-agent/page'
 // Introduction pages
 import Limitations from './pages/docs/introduction/limitations/page'
@@ -49,15 +49,6 @@ export default function Router() {
 					<Header />
 					<DocsLayout>
 						<Limitations />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/features/security-permissions">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
-						<SecurityPermissions />
 					</DocsLayout>
 				</div>
 			</Route>
@@ -103,6 +94,15 @@ export default function Router() {
 					<Header />
 					<DocsLayout>
 						<CdnSetup />
+					</DocsLayout>
+				</div>
+			</Route>
+
+			<Route path="/docs/integration/security-permissions">
+				<div className="min-h-screen bg-white dark:bg-gray-900">
+					<Header />
+					<DocsLayout>
+						<SecurityPermissions />
 					</DocsLayout>
 				</div>
 			</Route>

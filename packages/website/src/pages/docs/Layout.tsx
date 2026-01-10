@@ -32,20 +32,23 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 		{
 			title: t('nav.features'),
 			items: [
-				{ title: t('nav.model_integration'), path: '/docs/features/model-integration' },
+				{ title: t('nav.models'), path: '/docs/features/model-integration' },
 				{ title: t('nav.custom_tools'), path: '/docs/features/custom-tools' },
 				{ title: t('nav.knowledge_injection'), path: '/docs/features/custom-instructions' },
-				{ title: t('nav.security_permissions'), path: '/docs/features/security-permissions' },
 				{ title: t('nav.data_masking'), path: '/docs/features/data-masking' },
 			],
 		},
 		{
 			title: t('nav.integration'),
 			items: [
-				{ title: t('nav.cdn_setup'), path: '/docs/integration/cdn-setup' },
 				{ title: t('nav.configuration'), path: '/docs/integration/configuration' },
-				{ title: t('nav.best_practices'), path: '/docs/integration/best-practices' },
 				{ title: t('nav.third_party_agent'), path: '/docs/integration/third-party-agent' },
+				{ title: '🚧 ' + t('nav.cdn_setup'), path: '/docs/integration/cdn-setup' },
+				{
+					title: '🚧 ' + t('nav.security_permissions'),
+					path: '/docs/integration/security-permissions',
+				},
+				{ title: '🚧 ' + t('nav.best_practices'), path: '/docs/integration/best-practices' },
 			],
 		},
 	]
@@ -55,7 +58,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 			<div className="flex gap-8 min-w-[900px]">
 				{/* Sidebar */}
 				<aside className="w-64 shrink-0" role="complementary" aria-label="文档导航">
-					<div className="sticky top-8">
+					<div className="sticky">
 						<nav className="space-y-8" role="navigation" aria-label="文档章节">
 							{navigationSections.map((section) => (
 								<section key={section.title}>

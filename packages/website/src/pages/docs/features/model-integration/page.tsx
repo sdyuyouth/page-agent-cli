@@ -27,16 +27,14 @@ export default function ModelIntegration() {
 
 	return (
 		<div className="max-w-4xl">
-			<h1 className="text-4xl font-bold mb-4">{t('model_integration.title')}</h1>
-			<p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-				{t('model_integration.subtitle')}
-			</p>
+			<h1 className="text-4xl font-bold mb-4">{t('models.title')}</h1>
+			<p className="text-lg text-gray-600 dark:text-gray-400 mb-8">{t('models.subtitle')}</p>
 
 			{/* Models Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-3">{t('model_integration.available')}</h2>
+				<h2 className="text-2xl font-semibold mb-3">{t('models.available')}</h2>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-					{t('model_integration.recommendation_logic')}
+					{t('models.recommendation_logic')}
 				</p>
 				<div className="bg-linear-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30 rounded-xl p-6 border border-emerald-200/50 dark:border-emerald-800/50">
 					<div className="flex flex-wrap gap-2">
@@ -63,41 +61,41 @@ export default function ModelIntegration() {
 
 			{/* Tips Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{t('model_integration.tips')}</h2>
+				<h2 className="text-2xl font-semibold mb-4">{t('models.tips')}</h2>
 				<div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
 					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
-						<li>{t('model_integration.tip_2')}</li>
-						<li>{t('model_integration.tip_3')}</li>
+						<li>{t('models.tip_2')}</li>
+						<li>{t('models.tip_3')}</li>
 					</ul>
 				</div>
 			</section>
 
 			{/* Security Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{t('model_integration.security')}</h2>
+				<h2 className="text-2xl font-semibold mb-4">{t('models.security')}</h2>
 				<div className="bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-5 rounded-r-lg mb-4">
 					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
-						{t('model_integration.security_warning')}
+						{t('models.security_warning')}
 					</p>
 				</div>
 				<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
 					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-						{t('model_integration.security_backend_proxy')}
+						{t('models.security_backend_proxy')}
 					</h3>
 					<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-						{t('model_integration.security_backend_desc')}
+						{t('models.security_backend_desc')}
 					</p>
 					<ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-						<li>{t('model_integration.security_method_1')}</li>
-						<li>{t('model_integration.security_method_2')}</li>
-						<li>{t('model_integration.security_method_3')}</li>
+						<li>{t('models.security_method_1')}</li>
+						<li>{t('models.security_method_2')}</li>
+						<li>{t('models.security_method_3')}</li>
 					</ul>
 				</div>
 			</section>
 
 			{/* Configuration Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{t('model_integration.configuration')}</h2>
+				<h2 className="text-2xl font-semibold mb-4">{t('models.configuration')}</h2>
 				<CodeEditor
 					code={`// OpenAI-compatible services (e.g., Alibaba Bailian)
 const pageAgent = new PageAgent({

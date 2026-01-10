@@ -111,8 +111,8 @@ export default {
 		future_3: '• 基础的视觉理解能力',
 		future_4: '• 更智能的错误恢复机制',
 	},
-	model_integration: {
-		title: '模型接入',
+	models: {
+		title: '模型',
 		subtitle: '当前支持符合 OpenAI 接口规范且支持 tool call 的模型,包括公有云服务和私有部署方案。',
 		recommendation_logic: '推荐使用 ToolCall 能力强的轻量级模型。',
 		recommended: '推荐模型',

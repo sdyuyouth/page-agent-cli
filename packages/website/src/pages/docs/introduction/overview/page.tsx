@@ -6,13 +6,13 @@ export default function Overview() {
 	return (
 		<article>
 			{/* 头图 */}
-			<figure className="mb-8 rounded-xl overflow-hidden">
+			{/* <figure className="mb-8 rounded-xl overflow-hidden">
 				<img
 					src="https://img.alicdn.com/imgextra/i3/O1CN014xLeic1gnF2iWdzjJ_!!6000000004186-49-tps-1280-353.webp"
 					alt="page-agent"
 					className="w-full h-64 object-cover"
 				/>
-			</figure>
+			</figure> */}
 
 			<div className="mb-8">
 				<h1 className="text-4xl font-bold mb-4">{t('overview.title')}</h1>

@@ -74,19 +74,6 @@ const pageAgentTool = {
 				</div>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-4">最佳实践</h2>
-			<div className="space-y-4 mb-6">
-				<div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">错误处理</h3>
-					<CodeEditor code={`// @TODO`} language="javascript" />
-				</div>
-
-				<div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">权限控制</h3>
-					<CodeEditor code={`// @TODO`} language="javascript" />
-				</div>
-			</div>
-
 			<div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
 				<h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
 					⚠️ 注意事项
@@ -96,19 +83,6 @@ const pageAgentTool = {
 					<li>• 实现适当的频率限制</li>
 					<li>• 敏感操作建议要求人工确认</li>
 				</ul>
-			</div>
-
-			<div className="bg-linear-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg">
-				<h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">🎉 开始集成</h3>
-				<p className="mb-3 text-gray-700 dark:text-gray-300">
-					通过这种方式，你的 Agent 系统就能真正成为用户的智能助手。
-				</p>
-				<a
-					href="/docs/integration/configuration"
-					className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-				>
-					查看配置选项 →
-				</a>
 			</div>
 		</div>
 	)

@@ -5,7 +5,7 @@ export default {
 			'page-agent is a purely web-based GUI Agent. Gives your website an AI operator in simple steps.',
 		what_is: 'What is page-agent?',
 		what_is_desc:
-			'page-agent is an embedded GUI Agent. Unlike traditional browser automation tools, page-agent targets web developers, not scrapers or agent clients builders. Integrate it into your site to let users interact with pages through natural language.',
+			'page-agent is an embedded GUI Agent. Unlike traditional browser automation tools, page-agent is built for web developers and web applications first. Integrate it into your site to let users interact with pages through natural language.',
 		features_title: 'Core Features',
 		feature_dom: {
 			title: '🧠 Smart DOM Analysis',
@@ -112,8 +112,8 @@ export default {
 		future_3: '• Basic visual understanding',
 		future_4: '• Smarter error recovery',
 	},
-	model_integration: {
-		title: 'Model Integration',
+	models: {
+		title: 'Models',
 		subtitle:
 			'Supports models that comply with OpenAI API specification and support tool calls, including public cloud services and private deployments.',
 		recommendation_logic: 'Recommended: Lightweight models with strong ToolCall capabilities.',
