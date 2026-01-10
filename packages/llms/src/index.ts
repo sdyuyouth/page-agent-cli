@@ -35,7 +35,6 @@ import { OpenAIClient } from './OpenAILenientClient'
 import {
 	DEFAULT_API_KEY,
 	DEFAULT_BASE_URL,
-	DEFAULT_MAX_TOKENS,
 	DEFAULT_MODEL_NAME,
 	DEFAULT_TEMPERATURE,
 	LLM_MAX_RETRIES,
@@ -69,7 +68,6 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 		apiKey: config.apiKey ?? DEFAULT_API_KEY,
 		model: config.model ?? DEFAULT_MODEL_NAME,
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
-		maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
 		customFetch: (config.customFetch ?? fetch).bind(globalThis), // fetch will be illegal unless bound
 	}

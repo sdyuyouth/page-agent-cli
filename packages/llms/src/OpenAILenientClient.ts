@@ -35,7 +35,6 @@ export class OpenAIClient implements LLMClient {
 					modelPatch({
 						model: this.config.model,
 						temperature: this.config.temperature,
-						max_tokens: this.config.maxTokens,
 						messages,
 
 						tools: openaiTools,
