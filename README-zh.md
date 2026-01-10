@@ -8,7 +8,7 @@
 
 🌐 [English](./README.md) | **中文**
 
-👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> 
+👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
 <video id="demo-video" src="https://github.com/user-attachments/assets/141bbb01-8022-4d1f-919d-9efc9a1dc1cf" width="640" crossorigin muted autoplay loop></video>
 
@@ -24,18 +24,19 @@
 
 ## 🗺️ Roadmap
 
-👉 [**Roadmap**](./ROADMAP.md)
+👉 [**Roadmap**](https://github.com/alibaba/page-agent/issues/96)
 
 ## 🚀 快速开始
 
 ### CDN 集成
 
+- CDN - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
+- Mirror(CN) -https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
+
 ```html
-// CDN        - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
-// Mirror(CN) - https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
-<script 
-	src="https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js" 
-	crossorigin="true" 
+<script
+	src="https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js"
+	crossorigin="true"
 	type="text/javascript"
 ></script>
 ```

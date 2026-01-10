@@ -8,7 +8,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 🌐 **English** | [中文](./README-zh.md)
 
-👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> 
+👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
 <video id="demo-video" src="https://github.com/user-attachments/assets/de8d1964-8bde-494f-a52f-2975469557a5" width="640" crossorigin muted autoplay loop></video>
 
@@ -24,18 +24,19 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## 🗺️ Roadmap
 
-👉 [**Roadmap**](./ROADMAP.md)
+👉 [**Roadmap**](https://github.com/alibaba/page-agent/issues/96)
 
 ## 🚀 Quick Start
 
 ### CDN Integration
 
+- CDN - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
+- Mirror(CN) -https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
+
 ```html
-// CDN        - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
-// Mirror(CN) - https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
-<script 
-	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js" 
-	crossorigin="true" 
+<script
+	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js"
+	crossorigin="true"
 	type="text/javascript"
 ></script>
 ```
