@@ -370,8 +370,18 @@ export class PageAgent extends EventTarget {
 
 		const systemInstructions = instructions.system?.trim()
 		const url = await this.pageController.getCurrentUrl()
-		const pageInstructions = instructions.getPageInstructions?.(url)?.trim()
+		let pageInstructions: string | undefined
 
+		if (instructions.getPageInstructions) {
+			try {
+				pageInstructions = instructions.getPageInstructions(url)?.trim()
+			} catch (error) {
+				console.error(
+					chalk.red('[PageAgent] Failed to execute getPageInstructions callback:'),
+					error
+				)
+			}
+		}
 		if (!systemInstructions && !pageInstructions) return ''
 
 		let result = '<instructions>\n'
