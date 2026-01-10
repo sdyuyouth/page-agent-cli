@@ -5,14 +5,14 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'wouter'
 
-import Footer from './components/Footer'
-import Header from './components/Header'
-import { AnimatedGradientText } from './components/ui/animated-gradient-text'
-import { Highlighter } from './components/ui/highlighter'
-import { NeonGradientCard } from './components/ui/neon-gradient-card'
-import { Particles } from './components/ui/particles'
-import { SparklesText } from './components/ui/sparkles-text'
-import { CDN_CN_URL, CDN_URL } from './constants'
+import Footer from '../components/Footer'
+import Header from '../components/Header'
+import { AnimatedGradientText } from '../components/ui/animated-gradient-text'
+import { Highlighter } from '../components/ui/highlighter'
+import { NeonGradientCard } from '../components/ui/neon-gradient-card'
+import { Particles } from '../components/ui/particles'
+import { SparklesText } from '../components/ui/sparkles-text'
+import { CDN_CN_URL, CDN_URL } from '../constants'
 
 function getInjection(useCN?: boolean) {
 	const cdn = useCN ? CDN_CN_URL : CDN_URL

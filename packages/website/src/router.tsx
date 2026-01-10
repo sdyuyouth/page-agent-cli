@@ -1,23 +1,23 @@
 import { Route, Switch } from 'wouter'
 
-import DocsLayout from './components/DocsLayout'
 import Header from './components/Header'
-import Instructions from './docs/features/custom-instructions/page'
+import HomePage from './pages/Home'
+import DocsLayout from './pages/docs/Layout'
 // Features pages
-import CustomTools from './docs/features/custom-tools/page'
-import DataMasking from './docs/features/data-masking/page'
-import ModelIntegration from './docs/features/model-integration/page'
-import SecurityPermissions from './docs/features/security-permissions/page'
-import BestPractices from './docs/integration/best-practices/page'
+import Instructions from './pages/docs/features/custom-instructions/page'
+import CustomTools from './pages/docs/features/custom-tools/page'
+import DataMasking from './pages/docs/features/data-masking/page'
+import ModelIntegration from './pages/docs/features/model-integration/page'
+import SecurityPermissions from './pages/docs/features/security-permissions/page'
 // Integration pages
-import CdnSetup from './docs/integration/cdn-setup/page'
-import Configuration from './docs/integration/configuration/page'
-import ThirdPartyAgent from './docs/integration/third-party-agent/page'
-import Limitations from './docs/introduction/limitations/page'
+import BestPractices from './pages/docs/integration/best-practices/page'
+import CdnSetup from './pages/docs/integration/cdn-setup/page'
+import Configuration from './pages/docs/integration/configuration/page'
+import ThirdPartyAgent from './pages/docs/integration/third-party-agent/page'
 // Introduction pages
-import Overview from './docs/introduction/overview/page'
-import QuickStart from './docs/introduction/quick-start/page'
-import HomePage from './page'
+import Limitations from './pages/docs/introduction/limitations/page'
+import Overview from './pages/docs/introduction/overview/page'
+import QuickStart from './pages/docs/introduction/quick-start/page'
 
 export default function Router() {
 	return (

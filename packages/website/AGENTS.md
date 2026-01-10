@@ -61,16 +61,17 @@ Located in `src/components/ui/`:
 
 ```
 src/
+├── pages/
+│   ├── Home.tsx         # Homepage
+│   └── docs/
+│       ├── Layout.tsx   # Documentation sidebar
+│       └── [section]/[topic]/page.tsx
 ├── components/
 │   ├── ui/              # shadcn/ui + Magic UI components
 │   ├── Header.tsx       # Site header
-│   ├── Footer.tsx       # Site footer
-│   └── DocsLayout.tsx   # Documentation sidebar
-├── docs/                # Documentation pages
-│   └── [section]/[topic]/page.tsx
+│   └── Footer.tsx       # Site footer
 ├── i18n/                # Internationalization
 ├── router.tsx           # Central routing
-├── page.tsx             # Homepage
 └── main.tsx             # App entry
 ```
 
@@ -78,9 +79,9 @@ src/
 
 ### Documentation Page
 
-1. Create `src/docs/<section>/<slug>/page.tsx`
+1. Create `src/pages/docs/<section>/<slug>/page.tsx`
 2. Add route to `src/router.tsx` with `<Header /> + <DocsLayout>` wrapper
-3. Add navigation item to `DocsLayout.tsx`
+3. Add navigation item to `pages/docs/Layout.tsx`
 
 ## Routing
 
