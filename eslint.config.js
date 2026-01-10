@@ -8,12 +8,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-	globalIgnores([
-		'**/dist',
-		'**/test-pages',
-		'**/node_modules',
-		'packages/website/src/components/ui',
-	]),
+	globalIgnores(['**/dist', '**/node_modules', 'packages/website/src/components/ui']),
 	{
 		plugins: {
 			'react-hooks': reactHooks,

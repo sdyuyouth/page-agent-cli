@@ -37,14 +37,17 @@ Available Magic UI components: https://magicui.design/docs/components
 Located in `src/components/ui/`:
 
 **From shadcn/ui:**
+
 - `alert`, `badge`, `button`, `separator`, `sonner`, `switch`, `tooltip`
 
 **From Magic UI:**
+
 - `animated-gradient-text`, `animated-shiny-text`, `aurora-text`
 - `hyper-text`, `magic-card`, `neon-gradient-card`, `particles`
 - `sparkles-text`, `text-animate`, `typing-animation`
 
 **Custom:**
+
 - `highlighter`, `kbd`, `spinner`
 
 ### Styling Rules
@@ -65,7 +68,6 @@ src/
 │   └── DocsLayout.tsx   # Documentation sidebar
 ├── docs/                # Documentation pages
 │   └── [section]/[topic]/page.tsx
-├── test-pages/          # Library integration tests
 ├── i18n/                # Internationalization
 ├── router.tsx           # Central routing
 ├── page.tsx             # Homepage
@@ -80,11 +82,6 @@ src/
 2. Add route to `src/router.tsx` with `<Header /> + <DocsLayout>` wrapper
 3. Add navigation item to `DocsLayout.tsx`
 
-### Test Page
-
-1. Create `src/test-pages/<name>.tsx`
-2. Add route to `src/test-pages/router.tsx`
-
 ## Routing
 
 Uses hash-based routing for static hosting:
@@ -93,18 +90,16 @@ Uses hash-based routing for static hosting:
 import { Router } from 'wouter'
 import { useHashLocation } from 'wouter/use-hash-location'
 
-<Router hook={useHashLocation}>
-  {/* routes */}
-</Router>
+;<Router hook={useHashLocation}>{/* routes */}</Router>
 ```
 
 ## Configuration Files
 
-| File | Purpose |
-|------|---------|
+| File              | Purpose                 |
+| ----------------- | ----------------------- |
 | `components.json` | shadcn/ui configuration |
-| `vite.config.js` | Vite build settings |
-| `tsconfig.json` | TypeScript config |
+| `vite.config.js`  | Vite build settings     |
+| `tsconfig.json`   | TypeScript config       |
 
 ## Commands
 
@@ -112,4 +107,3 @@ import { useHashLocation } from 'wouter/use-hash-location'
 npm start        # Dev server (from root)
 npm run build:website    # Build website (from root)
 ```
-
