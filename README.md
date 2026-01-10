@@ -28,19 +28,6 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## 🚀 Quick Start
 
-### CDN Integration
-
-- CDN - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
-- Mirror(CN) -https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
-
-```html
-<script
-	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js"
-	crossorigin="true"
-	type="text/javascript"
-></script>
-```
-
 ### NPM Installation
 
 ```bash
@@ -65,6 +52,23 @@ const agent = new PageAgent({
 })
 
 await agent.execute('Click the login button')
+```
+
+### CDN Integration
+
+Fastest way to try PageAgent is to include it via CDN. Demo model will be used by default.
+
+| Location | URL                                                                           |
+| -------- | ----------------------------------------------------------------------------- |
+| Global   | https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js         |
+| China    | https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js |
+
+```html
+<script
+	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js"
+	crossorigin="true"
+	type="text/javascript"
+></script>
 ```
 
 ## 🏗️ Structure

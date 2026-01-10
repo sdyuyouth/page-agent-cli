@@ -28,19 +28,6 @@
 
 ## 🚀 快速开始
 
-### CDN 集成
-
-- CDN - https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js
-- Mirror(CN) -https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js
-
-```html
-<script
-	src="https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js"
-	crossorigin="true"
-	type="text/javascript"
-></script>
-```
-
 ### NPM 安装
 
 ```bash
@@ -65,6 +52,23 @@ const agent = new PageAgent({
 })
 
 await agent.execute('点击登录按钮')
+```
+
+### CDN 集成
+
+Fastest way to try PageAgent is to include it via CDN. Demo model will be used by default.
+
+| Location | URL                                                                           |
+| -------- | ----------------------------------------------------------------------------- |
+| Global   | https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js         |
+| China    | https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js |
+
+```html
+<script
+	src="https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js"
+	crossorigin="true"
+	type="text/javascript"
+></script>
 ```
 
 ## 🏗️ 架构设计
