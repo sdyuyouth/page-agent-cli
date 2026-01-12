@@ -123,4 +123,5 @@ Query params configure `PageAgentConfig` in `src/umd.ts`.
 
 - Explicit typing for exported/public APIs
 - ESLint relaxes some unsafe rules for rapid iteration
+- Every change you make should not only implement the desired functionality but also improve the quality of the codebase
 - All code and comments must be in English.
