@@ -81,6 +81,7 @@ packages/
 ├── llms/                # LLM client (npm: @page-agent/llms)
 ├── page-controller/     # DOM operations & Visual Mask (npm: @page-agent/page-controller)
 ├── ui/                  # Panel & i18n (npm: @page-agent/ui)
+├── cdn/                 # CDN IIFE builds (npm: @page-agent/cdn)
 └── website/             # Demo & Documentation site
 ```
 

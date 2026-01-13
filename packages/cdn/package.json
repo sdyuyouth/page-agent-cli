@@ -1,0 +1,23 @@
+{
+	"name": "@page-agent/cdn",
+	"private": false,
+	"version": "0.0.21",
+	"type": "module",
+	"files": [
+		"dist/"
+	],
+	"description": "CDN builds for page-agent - IIFE bundles for script tag usage",
+	"author": "Simon<gaomeng1900>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/alibaba/page-agent.git"
+	},
+	"homepage": "https://alibaba.github.io/page-agent/",
+	"scripts": {
+		"build": "vite build && vite build --mode demo"
+	},
+	"dependencies": {
+		"page-agent": "0.0.21"
+	}
+}

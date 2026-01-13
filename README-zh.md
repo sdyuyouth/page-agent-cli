@@ -81,6 +81,7 @@ packages/
 ├── llms/                # LLM 客户端 (npm: @page-agent/llms)
 ├── page-controller/     # DOM 操作 & 蒙层 & 模拟鼠标 (npm: @page-agent/page-controller)
 ├── ui/                  # 面板 & i18n (npm: @page-agent/ui)
+├── cdn/                 # CDN IIFE builds (npm: @page-agent/cdn)
 └── website/             # 文档站点
 ```
 
