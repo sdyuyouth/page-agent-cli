@@ -2,13 +2,7 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
-import {
-	type AgentBrain,
-	LLM,
-	type MacroToolInput,
-	type MacroToolResult,
-	type Tool,
-} from '@page-agent/llms'
+import { LLM, type Tool } from '@page-agent/llms'
 import { PageController } from '@page-agent/page-controller'
 import { Panel, SimulatorMask } from '@page-agent/ui'
 import chalk from 'chalk'
@@ -18,15 +12,46 @@ import type { PageAgentConfig } from './config'
 import { MAX_STEPS } from './config/constants'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
-import { trimLines, uid, waitUntil } from './utils'
+import { normalizeResponse, trimLines, uid, waitUntil } from './utils'
 import { assert } from './utils/assert'
+
+/**
+ * Agent brain state - the reflection-before-action model
+ *
+ * Every tool call must first reflect on:
+ * - evaluation_previous_goal: How well did the previous action achieve its goal?
+ * - memory: Key information to remember for future steps
+ * - next_goal: What should be accomplished in the next action?
+ */
+export interface AgentReflection {
+	evaluation_previous_goal: string
+	memory: string
+	next_goal: string
+}
+
+/**
+ * MacroTool input structure
+ *
+ * This is the core abstraction that enforces the "reflection-before-action" mental model.
+ * Before executing any action, the LLM must output its reasoning state.
+ */
+export interface MacroToolInput extends Partial<AgentReflection> {
+	action: Record<string, any>
+}
+
+/**
+ * MacroTool output structure
+ */
+export interface MacroToolResult {
+	input: MacroToolInput
+	output: string
+}
 
 export type { PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
-export type { AgentBrain, MacroToolInput, MacroToolResult }
 
 export interface AgentHistory {
-	brain: AgentBrain
+	brain: AgentReflection
 	action: {
 		name: string
 		input: any
@@ -124,9 +149,6 @@ export class PageAgent extends EventTarget {
 		window.addEventListener('beforeunload', this.#beforeUnloadListener)
 	}
 
-	/**
-	 * @todo maybe return something?
-	 */
 	async execute(task: string): Promise<ExecutionResult> {
 		if (!task) throw new Error('Task is required')
 		this.task = task
@@ -183,7 +205,11 @@ export class PageAgent extends EventTarget {
 						},
 					],
 					{ AgentOutput: this.#packMacroTool() },
-					this.#abortController.signal
+					this.#abortController.signal,
+					{
+						toolChoiceName: 'AgentOutput',
+						normalizeResponse,
+					}
 				)
 
 				const macroResult = result.toolResult as MacroToolResult

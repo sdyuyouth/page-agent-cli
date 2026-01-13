@@ -2,8 +2,8 @@
  * OpenAI Client implementation
  */
 import { InvokeError, InvokeErrorType } from './errors'
-import type { InvokeResult, LLMClient, LLMConfig, MacroToolInput, Message, Tool } from './types'
-import { lenientParseMacroToolCall, modelPatch, zodToOpenAITool } from './utils'
+import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
+import { modelPatch, zodToOpenAITool } from './utils'
 
 export class OpenAIClient implements LLMClient {
 	config: Required<LLMConfig>
@@ -16,11 +16,25 @@ export class OpenAIClient implements LLMClient {
 
 	async invoke(
 		messages: Message[],
-		tools: { AgentOutput: Tool<MacroToolInput> },
-		abortSignal?: AbortSignal
+		tools: Record<string, Tool>,
+		abortSignal?: AbortSignal,
+		options?: InvokeOptions
 	): Promise<InvokeResult> {
 		// 1. Convert tools to OpenAI format
-		const openaiTools = Object.entries(tools).map(([name, tool]) => zodToOpenAITool(name, tool))
+		const openaiTools = Object.entries(tools).map(([name, t]) => zodToOpenAITool(name, t))
+
+		// Build request body
+		const requestBody: Record<string, unknown> = {
+			model: this.config.model,
+			temperature: this.config.temperature,
+			messages,
+			tools: openaiTools,
+			parallel_tool_calls: false,
+			// Require tool call: specific tool if provided, otherwise any tool
+			tool_choice: options?.toolChoiceName
+				? { type: 'function', function: { name: options.toolChoiceName } }
+				: 'required',
+		}
 
 		// 2. Call API
 		let response: Response
@@ -31,22 +45,10 @@ export class OpenAIClient implements LLMClient {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${this.config.apiKey}`,
 				},
-				body: JSON.stringify(
-					modelPatch({
-						model: this.config.model,
-						temperature: this.config.temperature,
-						messages,
-
-						tools: openaiTools,
-						// tool_choice: 'required',
-						tool_choice: { type: 'function', function: { name: 'AgentOutput' } },
-						parallel_tool_calls: false,
-					})
-				),
+				body: JSON.stringify(modelPatch(requestBody)),
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
-			// Network error
 			console.error(error)
 			throw new InvokeError(InvokeErrorType.NETWORK_ERROR, 'Network request failed', error)
 		}
@@ -85,16 +87,94 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
-		// parse response
-
+		// 4. Parse and validate response
 		const data = await response.json()
-		const tool = tools.AgentOutput
-		const macroToolInput = lenientParseMacroToolCall(data, tool.inputSchema as any)
 
-		// Execute tool
+		// Basic validation before normalize (these are structural issues, not format issues)
+		const choice = data.choices?.[0]
+		if (!choice) {
+			throw new InvokeError(InvokeErrorType.UNKNOWN, 'No choices in response', data)
+		}
+
+		// Check finish_reason
+		switch (choice.finish_reason) {
+			case 'tool_calls':
+			case 'function_call': // gemini
+			case 'stop': // some models use this even with tool calls
+				break
+			case 'length':
+				throw new InvokeError(
+					InvokeErrorType.CONTEXT_LENGTH,
+					'Response truncated: max tokens reached'
+				)
+			case 'content_filter':
+				throw new InvokeError(InvokeErrorType.CONTENT_FILTER, 'Content filtered by safety system')
+			default:
+				throw new InvokeError(
+					InvokeErrorType.UNKNOWN,
+					`Unexpected finish_reason: ${choice.finish_reason}`
+				)
+		}
+
+		// Apply normalizeResponse if provided (for fixing format issues like wrong tool name)
+		const normalizedData = options?.normalizeResponse ? options.normalizeResponse(data) : data
+		const normalizedChoice = (normalizedData as any).choices?.[0]
+
+		// Get tool name from response
+		const toolCallName = normalizedChoice?.message?.tool_calls?.[0]?.function?.name
+		if (!toolCallName) {
+			throw new InvokeError(
+				InvokeErrorType.NO_TOOL_CALL,
+				'No tool call found in response',
+				normalizedData
+			)
+		}
+
+		const tool = tools[toolCallName]
+		if (!tool) {
+			throw new InvokeError(
+				InvokeErrorType.UNKNOWN,
+				`Tool "${toolCallName}" not found in tools`,
+				normalizedData
+			)
+		}
+
+		// Extract and parse tool arguments
+		const argString = normalizedChoice.message?.tool_calls?.[0]?.function?.arguments
+		if (!argString) {
+			throw new InvokeError(
+				InvokeErrorType.NO_TOOL_CALL,
+				'No tool call arguments found',
+				normalizedData
+			)
+		}
+
+		let parsedArgs: unknown
+		try {
+			parsedArgs = JSON.parse(argString)
+		} catch (error) {
+			throw new InvokeError(
+				InvokeErrorType.INVALID_TOOL_ARGS,
+				'Failed to parse tool arguments as JSON',
+				error
+			)
+		}
+
+		// Validate with schema
+		const validation = tool.inputSchema.safeParse(parsedArgs)
+		if (!validation.success) {
+			throw new InvokeError(
+				InvokeErrorType.INVALID_TOOL_ARGS,
+				'Tool arguments validation failed',
+				validation.error
+			)
+		}
+		const toolInput = validation.data
+
+		// 5. Execute tool
 		let toolResult: unknown
 		try {
-			toolResult = await tool.execute(macroToolInput)
+			toolResult = await tool.execute(toolInput)
 		} catch (e) {
 			throw new InvokeError(
 				InvokeErrorType.TOOL_EXECUTION_ERROR,
@@ -103,12 +183,11 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
-		// Return result (including cache tokens)
+		// Return result
 		return {
 			toolCall: {
-				// id: toolCall.id,
-				name: 'AgentOutput',
-				args: macroToolInput,
+				name: toolCallName,
+				args: toolInput,
 			},
 			toolResult,
 			usage: {

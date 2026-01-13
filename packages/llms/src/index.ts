@@ -40,27 +40,9 @@ import {
 	LLM_MAX_RETRIES,
 } from './constants'
 import { InvokeError } from './errors'
-import type {
-	AgentBrain,
-	InvokeResult,
-	LLMClient,
-	LLMConfig,
-	MacroToolInput,
-	MacroToolResult,
-	Message,
-	Tool,
-} from './types'
+import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 
-export type {
-	AgentBrain,
-	InvokeResult,
-	LLMClient,
-	LLMConfig,
-	MacroToolInput,
-	MacroToolResult,
-	Message,
-	Tool,
-}
+export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 	return {
@@ -93,11 +75,12 @@ export class LLM extends EventTarget {
 	async invoke(
 		messages: Message[],
 		tools: Record<string, Tool>,
-		abortSignal: AbortSignal
+		abortSignal: AbortSignal,
+		options?: InvokeOptions
 	): Promise<InvokeResult> {
 		return await withRetry(
 			async () => {
-				const result = await this.client.invoke(messages, tools, abortSignal)
+				const result = await this.client.invoke(messages, tools, abortSignal, options)
 
 				return result
 			},

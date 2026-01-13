@@ -1,3 +1,5 @@
+export { normalizeResponse } from './normalize'
+
 /**
  * Wait until condition becomes true
  * @returns Returns when condition becomes true, throws otherwise
