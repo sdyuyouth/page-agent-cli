@@ -33,6 +33,24 @@ export interface Tool<TParams = any, TResult = any> {
 }
 
 /**
+ * Invoke options for LLM call
+ */
+export interface InvokeOptions {
+	/**
+	 * Force LLM to call a specific tool by name.
+	 * If provided: tool_choice = { type: 'function', function: { name: toolChoiceName } }
+	 * If not provided: tool_choice = 'required' (must call some tool, but model chooses which)
+	 */
+	toolChoiceName?: string
+	/**
+	 * Response normalization function.
+	 * Called before parsing the response.
+	 * Used to fix various response format errors from the model.
+	 */
+	normalizeResponse?: (response: any) => any
+}
+
+/**
  * LLM Client interface
  * Note: Does not use generics because each tool in the tools array has different types
  */
@@ -40,7 +58,8 @@ export interface LLMClient {
 	invoke(
 		messages: Message[],
 		tools: Record<string, Tool>,
-		abortSignal?: AbortSignal
+		abortSignal?: AbortSignal,
+		options?: InvokeOptions
 	): Promise<InvokeResult>
 }
 
@@ -81,37 +100,4 @@ export interface LLMConfig {
 	 * The response should follow OpenAI API format.
 	 */
 	customFetch?: typeof globalThis.fetch
-}
-
-/**
- * Agent brain state - the reflection-before-action model
- *
- * Every tool call must first reflect on:
- * - evaluation_previous_goal: How well did the previous action achieve its goal?
- * - memory: Key information to remember for future steps
- * - next_goal: What should be accomplished in the next action?
- */
-export interface AgentBrain {
-	// thinking?: string
-	evaluation_previous_goal: string
-	memory: string
-	next_goal: string
-}
-
-/**
- * MacroTool input structure
- *
- * This is the core abstraction that enforces the "reflection-before-action" mental model.
- * Before executing any action, the LLM must output its reasoning state.
- */
-export interface MacroToolInput extends AgentBrain {
-	action: Record<string, any>
-}
-
-/**
- * MacroTool output structure
- */
-export interface MacroToolResult {
-	input: MacroToolInput
-	output: string
 }

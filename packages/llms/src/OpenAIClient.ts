@@ -1,60 +1,58 @@
 /**
  * OpenAI Client implementation
- * @note This client is only for demonstrating how to implement a LLM client.
- * @note Use OpenAILenientClient instead.
  */
 import { InvokeError, InvokeErrorType } from './errors'
-import type { InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
+import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
 
 /**
- * @deprecated Use OpenAILenientClient instead.
+ * Client for OpenAI compatible APIs
  */
 export class OpenAIClient implements LLMClient {
-	config: LLMConfig
+	config: Required<LLMConfig>
+	private fetch: typeof globalThis.fetch
 
-	constructor(config: LLMConfig) {
+	constructor(config: Required<LLMConfig>) {
 		this.config = config
+		this.fetch = config.customFetch
 	}
 
 	async invoke(
 		messages: Message[],
 		tools: Record<string, Tool>,
-		abortSignal?: AbortSignal
+		abortSignal?: AbortSignal,
+		options?: InvokeOptions
 	): Promise<InvokeResult> {
 		// 1. Convert tools to OpenAI format
-		const openaiTools = Object.entries(tools).map(([name, tool]) => zodToOpenAITool(name, tool))
+		const openaiTools = Object.entries(tools).map(([name, t]) => zodToOpenAITool(name, t))
+
+		// Build request body
+		const requestBody: Record<string, unknown> = {
+			model: this.config.model,
+			temperature: this.config.temperature,
+			messages,
+			tools: openaiTools,
+			parallel_tool_calls: false,
+			// Require tool call: specific tool if provided, otherwise any tool
+			tool_choice: options?.toolChoiceName
+				? { type: 'function', function: { name: options.toolChoiceName } }
+				: 'required',
+		}
 
 		// 2. Call API
 		let response: Response
 		try {
-			response = await fetch(`${this.config.baseURL}/chat/completions`, {
+			response = await this.fetch(`${this.config.baseURL}/chat/completions`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${this.config.apiKey}`,
 				},
-				body: JSON.stringify(
-					modelPatch({
-						model: this.config.model,
-						temperature: this.config.temperature,
-						messages,
-
-						tools: openaiTools,
-						// tool_choice: 'required',
-						tool_choice: { type: 'function', function: { name: 'AgentOutput' } },
-
-						// model specific params
-
-						// reasoning_effort: 'minimal',
-						// verbosity: 'low',
-						parallel_tool_calls: false,
-					})
-				),
+				body: JSON.stringify(modelPatch(requestBody)),
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
-			// Network error
+			console.error(error)
 			throw new InvokeError(InvokeErrorType.NETWORK_ERROR, 'Network request failed', error)
 		}
 
@@ -92,77 +90,93 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
+		// 4. Parse and validate response
 		const data = await response.json()
 
-		// 4. Check finish_reason
 		const choice = data.choices?.[0]
 		if (!choice) {
 			throw new InvokeError(InvokeErrorType.UNKNOWN, 'No choices in response', data)
 		}
 
+		// Check finish_reason
 		switch (choice.finish_reason) {
 			case 'tool_calls':
-				// ✅ Normal
+			case 'function_call': // gemini
+			case 'stop': // some models use this even with tool calls
 				break
 			case 'length':
-				// ⚠️ Token limit reached
 				throw new InvokeError(
 					InvokeErrorType.CONTEXT_LENGTH,
-					'Response truncated: max tokens reached',
-					data
+					'Response truncated: max tokens reached'
 				)
 			case 'content_filter':
-				// ❌ Content filtered
-				throw new InvokeError(
-					InvokeErrorType.CONTENT_FILTER,
-					'Content filtered by safety system',
-					data
-				)
-			case 'stop':
-				// ❌ Did not call tool (we require tool call)
-				throw new InvokeError(InvokeErrorType.NO_TOOL_CALL, 'Model did not call any tool', data)
+				throw new InvokeError(InvokeErrorType.CONTENT_FILTER, 'Content filtered by safety system')
 			default:
 				throw new InvokeError(
 					InvokeErrorType.UNKNOWN,
-					`Unexpected finish_reason: ${choice.finish_reason}`,
-					data
+					`Unexpected finish_reason: ${choice.finish_reason}`
 				)
 		}
 
-		// 5. Parse tool call
-		const toolCall = choice.message?.tool_calls?.[0]
-		if (!toolCall) {
-			throw new InvokeError(InvokeErrorType.NO_TOOL_CALL, 'No tool call found in response', data)
-		}
+		// Apply normalizeResponse if provided (for fixing format issues automatically)
+		const normalizedData = options?.normalizeResponse ? options.normalizeResponse(data) : data
+		const normalizedChoice = (normalizedData as any).choices?.[0]
 
-		const toolName = toolCall.function.name
-		const tool = tools[toolName]
-		if (!tool) {
-			throw new InvokeError(InvokeErrorType.UNKNOWN, `Tool ${toolName} not found`, data)
-		}
-
-		// 6. Parse and validate arguments
-		let toolArgs: unknown
-		try {
-			toolArgs = JSON.parse(toolCall.function.arguments)
-		} catch (e) {
-			throw new InvokeError(InvokeErrorType.INVALID_TOOL_ARGS, 'Invalid JSON in tool arguments', e)
-		}
-
-		// Validate against zod schema
-		const validation = tool.inputSchema.safeParse(toolArgs)
-		if (!validation.success) {
+		// Get tool name from response
+		const toolCallName = normalizedChoice?.message?.tool_calls?.[0]?.function?.name
+		if (!toolCallName) {
 			throw new InvokeError(
-				InvokeErrorType.INVALID_TOOL_ARGS,
-				`Tool arguments validation failed: ${validation.error.message}`,
-				validation.error
+				InvokeErrorType.NO_TOOL_CALL,
+				'No tool call found in response',
+				normalizedData
 			)
 		}
 
-		// 7. Execute tool
+		const tool = tools[toolCallName]
+		if (!tool) {
+			throw new InvokeError(
+				InvokeErrorType.UNKNOWN,
+				`Tool "${toolCallName}" not found in tools`,
+				normalizedData
+			)
+		}
+
+		// Extract and parse tool arguments
+		const argString = normalizedChoice.message?.tool_calls?.[0]?.function?.arguments
+		if (!argString) {
+			throw new InvokeError(
+				InvokeErrorType.INVALID_TOOL_ARGS,
+				'No tool call arguments found',
+				normalizedData
+			)
+		}
+
+		let parsedArgs: unknown
+		try {
+			parsedArgs = JSON.parse(argString)
+		} catch (error) {
+			throw new InvokeError(
+				InvokeErrorType.INVALID_TOOL_ARGS,
+				'Failed to parse tool arguments as JSON',
+				error
+			)
+		}
+
+		// Validate with schema
+		const validation = tool.inputSchema.safeParse(parsedArgs)
+		if (!validation.success) {
+			throw new InvokeError(
+				InvokeErrorType.INVALID_TOOL_ARGS,
+				'Tool arguments validation failed',
+				validation.error
+			)
+		}
+		const toolInput = validation.data
+
+		// 5. Execute tool
 		let toolResult: unknown
 		try {
-			toolResult = await tool.execute(validation.data)
+			toolResult = await tool.execute(toolInput)
 		} catch (e) {
 			throw new InvokeError(
 				InvokeErrorType.TOOL_EXECUTION_ERROR,
@@ -171,12 +185,11 @@ export class OpenAIClient implements LLMClient {
 			)
 		}
 
-		// 8. Return result (including cache tokens)
+		// Return result
 		return {
 			toolCall: {
-				// id: toolCall.id,
-				name: toolName,
-				args: validation.data as Record<string, unknown>,
+				name: toolCallName,
+				args: toolInput,
 			},
 			toolResult,
 			usage: {
