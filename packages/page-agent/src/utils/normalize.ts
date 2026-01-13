@@ -120,9 +120,9 @@ function safeJsonParse(input: any): any {
 }
 
 /**
- * Retrieve the JSON part from a string.
- * - treat content between the first `{` and the last `}` as JSON.
- * - try to parse as JSON, return the parsed result if successful, otherwise return null.
+ * Extract and parse JSON from a string.
+ * - Treat content between the first `{` and the last `}` as JSON.
+ * - Try to parse that content as JSON and return the parsed value (object/array/primitive) if successful, otherwise return null.
  */
 function retrieveJsonFromString(str: string): any {
 	try {
