@@ -51,7 +51,7 @@ export type { PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
 
 export interface AgentHistory {
-	brain: AgentReflection
+	brain: Partial<AgentReflection>
 	action: {
 		name: string
 		input: any
