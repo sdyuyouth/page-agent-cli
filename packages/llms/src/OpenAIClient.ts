@@ -145,7 +145,7 @@ export class OpenAIClient implements LLMClient {
 		const argString = normalizedChoice.message?.tool_calls?.[0]?.function?.arguments
 		if (!argString) {
 			throw new InvokeError(
-				InvokeErrorType.NO_TOOL_CALL,
+				InvokeErrorType.INVALID_TOOL_ARGS,
 				'No tool call arguments found',
 				normalizedData
 			)
