@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 
 /**
- * Normalize LLM response to fix common format issues.
+ * Normalize LLM response and fix common format issues.
  *
  * Handles:
  * - No tool_calls but JSON in message.content (fallback)
@@ -65,7 +65,7 @@ export function normalizeResponse(response: any): any {
 					resolvedArguments = { action: safeJsonParse(resolvedArguments) }
 				}
 			} else {
-				throw new Error('No tool_call and message content does not contain valid JSON')
+				throw new Error('No tool_call and the message content does not contain valid JSON')
 			}
 		} else {
 			throw new Error('No tool_call nor message content is present')

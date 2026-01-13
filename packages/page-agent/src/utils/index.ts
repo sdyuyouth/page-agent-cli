@@ -1,4 +1,4 @@
-export { normalizeResponse } from './normalize'
+export { normalizeResponse } from './autoFixer'
 
 /**
  * Wait until condition becomes true
