@@ -5,6 +5,9 @@ import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
 
+/**
+ * Client for OpenAI compatible APIs
+ */
 export class OpenAIClient implements LLMClient {
 	config: Required<LLMConfig>
 	private fetch: typeof globalThis.fetch
