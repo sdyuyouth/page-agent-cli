@@ -29,7 +29,7 @@ export default defineConfig({
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
-			external: ['@page-agent/*'],
+			external: ['@page-agent/*', 'ai-motion'],
 		},
 		minify: false,
 		sourcemap: true,

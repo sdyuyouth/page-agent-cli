@@ -6,6 +6,7 @@
  * Designed to be independent of LLM and can be tested in unit tests.
  * All public methods are async for potential remote calling support.
  */
+import { SimulatorMask } from './SimulatorMask'
 import {
 	clickElement,
 	getElementByIndex,
@@ -20,11 +21,15 @@ import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type
 import { getPageInfo } from './dom/getPageInfo'
 import { patchReact } from './patches/react'
 
+export { SimulatorMask }
+
 /**
  * Configuration for PageController
  */
 export interface PageControllerConfig extends dom.DomConfig {
 	viewportExpansion?: number
+	/** Enable visual mask overlay during operations (default: false) */
+	enableMask?: boolean
 }
 
 interface ActionResult {
@@ -64,12 +69,19 @@ export class PageController extends EventTarget {
 	/** last time the tree was updated */
 	private lastTimeUpdate = 0
 
+	/** Visual mask overlay for blocking user interaction during automation */
+	private mask: SimulatorMask | null = null
+
 	constructor(config: PageControllerConfig = {}) {
 		super()
 
 		this.config = config
 
 		patchReact(this)
+
+		if (config.enableMask) {
+			this.mask = new SimulatorMask()
+		}
 	}
 
 	// ======= State Queries =======
@@ -136,11 +148,17 @@ export class PageController extends EventTarget {
 	/**
 	 * Update DOM tree, returns simplified HTML for LLM.
 	 * This is the main method to refresh the page state.
+	 * Automatically bypasses mask during DOM extraction if enabled.
 	 */
 	async updateTree(): Promise<string> {
 		this.dispatchEvent(new Event('beforeUpdate'))
 
 		this.lastTimeUpdate = Date.now()
+
+		// Temporarily bypass mask to allow DOM extraction
+		if (this.mask) {
+			this.mask.wrapper.style.pointerEvents = 'none'
+		}
 
 		dom.cleanUpHighlights()
 
@@ -161,6 +179,11 @@ export class PageController extends EventTarget {
 
 		this.elementTextMap.clear()
 		this.elementTextMap = dom.getElementTextMap(this.simplifiedHTML)
+
+		// Restore mask blocking
+		if (this.mask) {
+			this.mask.wrapper.style.pointerEvents = 'auto'
+		}
 
 		this.dispatchEvent(new Event('afterUpdate'))
 
@@ -326,6 +349,24 @@ export class PageController extends EventTarget {
 		}
 	}
 
+	// ======= Mask Operations =======
+
+	/**
+	 * Show the visual mask overlay.
+	 * Only works if enableMask was set to true in config.
+	 */
+	showMask(): void {
+		this.mask?.show()
+	}
+
+	/**
+	 * Hide the visual mask overlay.
+	 * Only works if enableMask was set to true in config.
+	 */
+	hideMask(): void {
+		this.mask?.hide()
+	}
+
 	/**
 	 * Dispose and clean up resources
 	 */
@@ -335,5 +376,7 @@ export class PageController extends EventTarget {
 		this.selectorMap.clear()
 		this.elementTextMap.clear()
 		this.simplifiedHTML = '<EMPTY>'
+		this.mask?.dispose()
+		this.mask = null
 	}
 }

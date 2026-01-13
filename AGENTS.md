@@ -10,8 +10,8 @@ This is a **monorepo** with npm workspaces:
 Internal packages:
 
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
-- **Page Controller** (`packages/page-controller/`) - DOM operations, independent of LLM
-- **UI** (`packages/ui/`) - Panel, SimulatorMask, i18n. Decoupled from PageAgent
+- **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
+- **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageAgent
 
 ## Development Commands
 
@@ -43,8 +43,8 @@ packages/
 
 - **Page Agent**: Core lib. Imports from `@page-agent/llms`, `@page-agent/page-controller`, `@page-agent/ui`
 - **LLMs**: LLM client with MacroToolInput contract. No dependency on page-agent
-- **UI**: Panel, Mask, i18n. No dependency on page-agent
-- **Page Controller**: Pure DOM operations. No LLM or UI dependency
+- **UI**: Panel and i18n. No dependency on page-agent
+- **Page Controller**: DOM operations with optional visual feedback (SimulatorMask). No LLM dependency. Enable mask via `enableMask: true` config
 
 ### PageController ↔ PageAgent Communication
 
@@ -101,7 +101,8 @@ Query params configure `PageAgentConfig` in `src/umd.ts`.
 
 | File | Description |
 |------|-------------|
-| `src/PageController.ts` | ⭐ Main controller class |
+| `src/PageController.ts` | ⭐ Main controller class with optional mask support |
+| `src/SimulatorMask.ts` | Visual overlay blocking user interaction during automation |
 | `src/actions.ts` | Element interactions (click, input, scroll) |
 | `src/dom/dom_tree/index.js` | Core DOM extraction engine |
 

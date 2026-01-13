@@ -4,7 +4,7 @@
  */
 import { LLM, type Tool } from '@page-agent/llms'
 import { PageController } from '@page-agent/page-controller'
-import { Panel, SimulatorMask } from '@page-agent/ui'
+import { Panel } from '@page-agent/ui'
 import chalk from 'chalk'
 import zod from 'zod'
 
@@ -92,8 +92,6 @@ export class PageAgent extends EventTarget {
 	/** PageController for DOM operations */
 	pageController: PageController
 
-	/** Fullscreen mask */
-	mask = new SimulatorMask()
 	/** History records */
 	history: AgentHistory[] = []
 
@@ -114,8 +112,11 @@ export class PageAgent extends EventTarget {
 		})
 		this.tools = new Map(tools)
 
-		// Initialize PageController with config
-		this.pageController = new PageController(this.config)
+		// Initialize PageController with config (mask enabled by default)
+		this.pageController = new PageController({
+			...this.config,
+			enableMask: this.config.enableMask ?? true,
+		})
 
 		// Listen to LLM events
 		this.#llmRetryListener = (e) => {
@@ -162,7 +163,7 @@ export class PageAgent extends EventTarget {
 		await onBeforeTask.call(this)
 
 		// Show mask and panel
-		this.mask.show()
+		this.pageController.showMask()
 
 		this.panel.show()
 		this.panel.reset()
@@ -485,7 +486,7 @@ export class PageAgent extends EventTarget {
 		// Task completed
 		this.panel.update({ type: 'completed' })
 
-		this.mask.hide()
+		this.pageController.hideMask()
 
 		this.#abortController.abort()
 	}
@@ -496,9 +497,7 @@ export class PageAgent extends EventTarget {
 		const pi = await this.pageController.getPageInfo()
 		const viewportExpansion = await this.pageController.getViewportExpansion()
 
-		this.mask.wrapper.style.pointerEvents = 'none'
 		await this.pageController.updateTree()
-		this.mask.wrapper.style.pointerEvents = 'auto'
 
 		let simplifiedHTML = await this.pageController.getSimplifiedHTML()
 
@@ -545,7 +544,6 @@ export class PageAgent extends EventTarget {
 		this.disposed = true
 		this.pageController.dispose()
 		this.panel.dispose()
-		this.mask.dispose()
 		this.history = []
 		this.#abortController.abort(reason ?? 'PageAgent disposed')
 
