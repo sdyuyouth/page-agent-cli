@@ -31,7 +31,7 @@
  * - 永远使用 tool call 来返回结构化数据，禁止模型直接返回（视为出错）
  * - 不能假设 tool 参数合法，必须有修复机制，而且修复也应该使用 tool call 返回
  */
-import { OpenAIClient } from './OpenAILenientClient'
+import { OpenAIClient } from './OpenAICompatibleClient'
 import {
 	DEFAULT_API_KEY,
 	DEFAULT_BASE_URL,
