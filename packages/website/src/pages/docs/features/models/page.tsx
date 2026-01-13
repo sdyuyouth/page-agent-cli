@@ -4,13 +4,19 @@ import CodeEditor from '@/components/CodeEditor'
 
 // Recommended models: lightweight with excellent tool call capabilities
 const MODELS = {
-	recommended: ['gpt-4.1-mini', 'claude-haiku-4.5', 'gemini-3-flash', 'deepseek-3.2', 'gpt-5.2'],
-	verified: [
+	recommended: [
+		'gpt-4.1-mini',
+		'claude-haiku-4.5',
+		'gemini-3-flash',
+		'deepseek-3.2',
+		'gpt-5.2',
 		'qwen-3-max',
+	],
+	verified: [
+		'qwen-3-plus',
 		'gpt-4.1',
 		'gpt-5',
 		'gpt-5-mini',
-		'gpt-5.1',
 		'grok-4',
 		'grok-code-fast',
 		'claude-sonnet-3.5',
@@ -21,7 +27,7 @@ const MODELS = {
 	],
 }
 
-export default function ModelIntegration() {
+export default function Models() {
 	const { t } = useTranslation('docs')
 	const allModels = [...MODELS.recommended, ...MODELS.verified]
 

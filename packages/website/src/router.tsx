@@ -7,7 +7,7 @@ import DocsLayout from './pages/docs/Layout'
 import Instructions from './pages/docs/features/custom-instructions/page'
 import CustomTools from './pages/docs/features/custom-tools/page'
 import DataMasking from './pages/docs/features/data-masking/page'
-import ModelIntegration from './pages/docs/features/model-integration/page'
+import Models from './pages/docs/features/models/page'
 // Integration pages
 import BestPractices from './pages/docs/integration/best-practices/page'
 import CdnSetup from './pages/docs/integration/cdn-setup/page'
@@ -80,11 +80,11 @@ export default function Router() {
 				</div>
 			</Route>
 
-			<Route path="/docs/features/model-integration">
+			<Route path="/docs/features/models">
 				<div className="min-h-screen bg-white dark:bg-gray-900">
 					<Header />
 					<DocsLayout>
-						<ModelIntegration />
+						<Models />
 					</DocsLayout>
 				</div>
 			</Route>
