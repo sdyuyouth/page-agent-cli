@@ -6,7 +6,6 @@
  * Designed to be independent of LLM and can be tested in unit tests.
  * All public methods are async for potential remote calling support.
  */
-import { SimulatorMask } from './SimulatorMask'
 import {
 	clickElement,
 	getElementByIndex,
@@ -19,6 +18,7 @@ import { VIEWPORT_EXPANSION } from './constants'
 import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
+import { SimulatorMask } from './mask/SimulatorMask'
 import { patchReact } from './patches/react'
 
 export { SimulatorMask }
