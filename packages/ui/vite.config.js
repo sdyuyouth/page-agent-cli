@@ -29,7 +29,7 @@ export default defineConfig({
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
-			external: ['ai-motion'],
+			external: [],
 		},
 		minify: false,
 		sourcemap: true,

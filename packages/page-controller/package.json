@@ -34,5 +34,8 @@
 		"build": "vite build",
 		"prepublishOnly": "node -e \"const fs=require('fs');['LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
 		"postpublish": "node -e \"['LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
+	},
+	"dependencies": {
+		"ai-motion": "^0.4.8"
 	}
 }

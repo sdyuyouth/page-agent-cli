@@ -121,6 +121,13 @@ export default function Configuration() {
 
   /** Viewport expansion in pixels (-1 for full page) */
   viewportExpansion?: number
+
+  /**
+   * Enable visual mask overlay during automation.
+   * Blocks user interaction while agent is running.
+   * Default: false for PageController, true for PageAgent.
+   */
+  enableMask?: boolean
 }`}
 				/>
 			</section>
