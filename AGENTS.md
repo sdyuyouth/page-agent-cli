@@ -9,6 +9,7 @@ This is a **monorepo** with npm workspaces:
 
 Internal packages:
 
+- **CDN** (`packages/cdn/`) - IIFE builds for script tag usage (npm: `@page-agent/cdn`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
 - **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageAgent
@@ -31,6 +32,7 @@ Simple monorepo solution: TypeScript references + Vite aliases. Update tsconfig 
 ```
 packages/
 ├── page-agent/              # npm: "page-agent" ⭐ MAIN
+├── cdn/                     # npm: "@page-agent/cdn" (IIFE builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
 ├── page-controller/         # @page-agent/page-controller
@@ -69,42 +71,43 @@ const pageInfo = await this.pageController.getPageInfo()
 3. **LLM Processing**: AI returns action plans (page-agent)
 4. **Indexed Operations**: PageAgent calls PageController by element index
 
-### CDN Auto-Injection
+### CDN Builds (`packages/cdn/`)
 
-Library auto-initializes via script tag:
+Two IIFE builds for script tag usage:
 
-```html
-<script src="page-agent.js?model=gpt-4"></script>
-```
+| Build | File                 | Description                      |
+| ----- | -------------------- | -------------------------------- |
+| Demo  | `page-agent.demo.js` | Auto-init with built-in test API |
+| Full  | `page-agent.js`      | Exposes `PageAgent` class only   |
 
-Query params configure `PageAgentConfig` in `src/umd.ts`.
+Demo build supports query params (e.g., `?model=gpt-4&lang=en-US`).
 
 ## Key Files Reference
 
 ### Page Agent (`packages/page-agent/`)
 
-| File | Description |
-|------|-------------|
-| `src/PageAgent.ts` | ⭐ Main AI agent class |
-| `src/umd.ts` | CDN/UMD entry with auto-init |
-| `src/tools/` | Tool definitions calling PageController |
+| File               | Description                             |
+| ------------------ | --------------------------------------- |
+| `src/PageAgent.ts` | ⭐ Main AI agent class                  |
+| `src/umd.ts`       | CDN/UMD entry with auto-init            |
+| `src/tools/`       | Tool definitions calling PageController |
 
 ### LLMs (`packages/llms/`)
 
-| File | Description |
-|------|-------------|
-| `src/index.ts` | ⭐ LLM class with retry logic |
-| `src/types.ts` | MacroToolInput, AgentBrain, LLMConfig |
-| `src/OpenAILenientClient.ts` | OpenAI-compatible client |
+| File                         | Description                           |
+| ---------------------------- | ------------------------------------- |
+| `src/index.ts`               | ⭐ LLM class with retry logic         |
+| `src/types.ts`               | MacroToolInput, AgentBrain, LLMConfig |
+| `src/OpenAILenientClient.ts` | OpenAI-compatible client              |
 
 ### Page Controller (`packages/page-controller/`)
 
-| File | Description |
-|------|-------------|
-| `src/PageController.ts` | ⭐ Main controller class with optional mask support |
-| `src/SimulatorMask.ts` | Visual overlay blocking user interaction during automation |
-| `src/actions.ts` | Element interactions (click, input, scroll) |
-| `src/dom/dom_tree/index.js` | Core DOM extraction engine |
+| File                        | Description                                                |
+| --------------------------- | ---------------------------------------------------------- |
+| `src/PageController.ts`     | ⭐ Main controller class with optional mask support        |
+| `src/SimulatorMask.ts`      | Visual overlay blocking user interaction during automation |
+| `src/actions.ts`            | Element interactions (click, input, scroll)                |
+| `src/dom/dom_tree/index.js` | Core DOM extraction engine                                 |
 
 ## Adding New Features
 
