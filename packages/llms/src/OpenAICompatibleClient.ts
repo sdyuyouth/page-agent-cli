@@ -90,7 +90,6 @@ export class OpenAIClient implements LLMClient {
 		// 4. Parse and validate response
 		const data = await response.json()
 
-		// Basic validation before normalize (these are structural issues, not format issues)
 		const choice = data.choices?.[0]
 		if (!choice) {
 			throw new InvokeError(InvokeErrorType.UNKNOWN, 'No choices in response', data)
@@ -116,7 +115,7 @@ export class OpenAIClient implements LLMClient {
 				)
 		}
 
-		// Apply normalizeResponse if provided (for fixing format issues like wrong tool name)
+		// Apply normalizeResponse if provided (for fixing format issues automatically)
 		const normalizedData = options?.normalizeResponse ? options.normalizeResponse(data) : data
 		const normalizedChoice = (normalizedData as any).choices?.[0]
 
