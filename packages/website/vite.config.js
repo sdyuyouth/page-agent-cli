@@ -1,12 +1,16 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
 import { config as dotenvConfig } from 'dotenv'
+import { readFileSync } from 'node:fs'
 import process from 'node:process'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+const pageAgentPkg = JSON.parse(
+	readFileSync(resolve(__dirname, '../page-agent/package.json'), 'utf-8')
+)
 
 // Load .env from repo root
 dotenvConfig({ path: resolve(__dirname, '../../.env') })
@@ -32,5 +36,6 @@ export default defineConfig({
 		'import.meta.env.LLM_MODEL_NAME': JSON.stringify(process.env.LLM_MODEL_NAME),
 		'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
 		'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
+		'import.meta.env.VERSION': JSON.stringify(pageAgentPkg.version),
 	},
 })

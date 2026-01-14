@@ -84,6 +84,9 @@ export default function Header() {
 							role="navigation"
 							aria-label={t('header.nav_docs')}
 						>
+							<span className="text-xs font-mono text-gray-400 dark:text-gray-500 tabular-nums">
+								v{import.meta.env.VERSION}
+							</span>
 							<Link
 								href="/docs/introduction/overview"
 								className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
