@@ -1,21 +1,23 @@
 import { OpenAIClient } from './OpenAIClient'
-import {
-	DEFAULT_API_KEY,
-	DEFAULT_BASE_URL,
-	DEFAULT_MODEL_NAME,
-	DEFAULT_TEMPERATURE,
-	LLM_MAX_RETRIES,
-} from './constants'
+import { DEFAULT_TEMPERATURE, LLM_MAX_RETRIES } from './constants'
 import { InvokeError } from './errors'
 import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 
 export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
+	// Runtime validation as defensive programming (types already guarantee these)
+	if (!config.baseURL || !config.apiKey || !config.model) {
+		throw new Error(
+			'[PageAgent] LLM configuration required. Please provide: baseURL, apiKey, model. ' +
+				'See: https://alibaba.github.io/page-agent/#/docs/features/models'
+		)
+	}
+
 	return {
-		baseURL: config.baseURL ?? DEFAULT_BASE_URL,
-		apiKey: config.apiKey ?? DEFAULT_API_KEY,
-		model: config.model ?? DEFAULT_MODEL_NAME,
+		baseURL: config.baseURL,
+		apiKey: config.apiKey,
+		model: config.model,
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
 		customFetch: (config.customFetch ?? fetch).bind(globalThis), // fetch will be illegal unless bound

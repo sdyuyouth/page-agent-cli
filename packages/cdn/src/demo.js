@@ -50,7 +50,12 @@ setTimeout(() => {
 		window.pageAgent = new PageAgent(config)
 	} else {
 		console.log('🚀 page-agent.js no current script detected, using default demo config')
-		window.pageAgent = new PageAgent()
+		const config = {
+			model: DEMO_MODEL,
+			baseURL: DEMO_BASE_URL,
+			apiKey: DEMO_API_KEY,
+		}
+		window.pageAgent = new PageAgent(config)
 	}
 
 	console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)

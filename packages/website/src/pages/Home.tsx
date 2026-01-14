@@ -12,7 +12,13 @@ import { Highlighter } from '../components/ui/highlighter'
 import { NeonGradientCard } from '../components/ui/neon-gradient-card'
 import { Particles } from '../components/ui/particles'
 import { SparklesText } from '../components/ui/sparkles-text'
-import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '../constants'
+import {
+	CDN_DEMO_CN_URL,
+	CDN_DEMO_URL,
+	DEMO_API_KEY,
+	DEMO_BASE_URL,
+	DEMO_MODEL,
+} from '../constants'
 
 function getInjection(useCN?: boolean) {
 	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL
@@ -73,13 +79,18 @@ export default function HomePage() {
 					},
 				},
 
-				// experimentalScriptExecutionTool: true,
-
-				// testing server
-				// @note: rate limit. prompt limit.
-				// model: DEMO_MODEL,
-				// baseURL: DEMO_BASE_URL,
-				// apiKey: DEMO_API_KEY,
+				model:
+					import.meta.env.DEV && import.meta.env.LLM_MODEL_NAME
+						? import.meta.env.LLM_MODEL_NAME
+						: DEMO_MODEL,
+				baseURL:
+					import.meta.env.DEV && import.meta.env.LLM_BASE_URL
+						? import.meta.env.LLM_BASE_URL
+						: DEMO_BASE_URL,
+				apiKey:
+					import.meta.env.DEV && import.meta.env.LLM_API_KEY
+						? import.meta.env.LLM_API_KEY
+						: DEMO_API_KEY,
 			})
 			win.pageAgent = pageAgent
 		}

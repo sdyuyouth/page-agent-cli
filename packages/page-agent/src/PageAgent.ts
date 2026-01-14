@@ -95,7 +95,7 @@ export class PageAgent extends EventTarget {
 	/** History records */
 	history: AgentHistory[] = []
 
-	constructor(config: PageAgentConfig = {}) {
+	constructor(config: PageAgentConfig) {
 		super()
 
 		this.config = config

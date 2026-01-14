@@ -87,9 +87,9 @@ export interface InvokeResult<TResult = unknown> {
  * LLM configuration
  */
 export interface LLMConfig {
-	baseURL?: string
-	apiKey?: string
-	model?: string
+	baseURL: string
+	apiKey: string
+	model: string
 
 	temperature?: number
 	maxRetries?: number
