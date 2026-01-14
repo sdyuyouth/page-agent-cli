@@ -28,7 +28,22 @@
 
 ## 🚀 快速开始
 
-### NPM 安装
+### 快速体验 (Demo CDN)
+
+最快的体验方式：
+
+```html
+<script src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js" crossorigin="true"></script>
+```
+
+> ⚠️ **仅用于技术评估。** Demo 模型有速率限制和使用限制，生产环境请使用 NPM 方式。
+
+| 位置   | URL                                                                                     |
+| ------ | --------------------------------------------------------------------------------------- |
+| 全球   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                    |
+| 中国   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js     |
+
+### NPM 安装（推荐）
 
 ```bash
 npm install page-agent
@@ -37,39 +52,36 @@ npm install page-agent
 ```javascript
 import { PageAgent } from 'page-agent'
 
-// 测试接口
-// @note: 限流，限制 prompt 内容，限制来源，随时变更，请替换成你自己的
-// @note: 使用 DeepSeek-chat(3.2) 官方版本，使用协议和隐私策略见 DeepSeek 网站
-const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-
 const agent = new PageAgent({
-	model: DEMO_MODEL,
-	baseURL: DEMO_BASE_URL,
-	apiKey: DEMO_API_KEY,
+	model: 'deepseek-chat',
+	baseURL: 'https://api.deepseek.com',
+	apiKey: 'YOUR_API_KEY',
 	language: 'zh-CN',
 })
 
 await agent.execute('点击登录按钮')
 ```
 
-### CDN 集成
+### CDN 引入
 
-Fastest way to try PageAgent is to include it via CDN. Demo model will be used by default.
-
-| Location | URL                                                                           |
-| -------- | ----------------------------------------------------------------------------- |
-| Global   | https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js         |
-| China    | https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js |
+适用于无法使用 NPM 的环境，用法与 NPM 一致：
 
 ```html
-<script
-	src="https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js"
-	crossorigin="true"
-	type="text/javascript"
-></script>
+<script src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.js" crossorigin="true"></script>
+<script>
+const agent = new PageAgent({
+	model: 'deepseek-chat',
+	baseURL: 'https://api.deepseek.com',
+	apiKey: 'YOUR_API_KEY',
+})
+await agent.execute('点击登录按钮')
+</script>
 ```
+
+| 位置   | URL                                                                                 |
+| ------ | ----------------------------------------------------------------------------------- |
+| 全球   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.js                     |
+| 中国   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.js      |
 
 ## 🏗️ 架构设计
 

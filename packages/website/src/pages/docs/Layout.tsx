@@ -43,7 +43,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 			items: [
 				{ title: t('nav.configuration'), path: '/docs/integration/configuration' },
 				{ title: t('nav.third_party_agent'), path: '/docs/integration/third-party-agent' },
-				{ title: '🚧 ' + t('nav.cdn_setup'), path: '/docs/integration/cdn-setup' },
+				{ title: t('nav.cdn_setup'), path: '/docs/integration/cdn-setup' },
 				{
 					title: '🚧 ' + t('nav.security_permissions'),
 					path: '/docs/integration/security-permissions',

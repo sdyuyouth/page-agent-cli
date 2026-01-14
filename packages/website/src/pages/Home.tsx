@@ -12,10 +12,10 @@ import { Highlighter } from '../components/ui/highlighter'
 import { NeonGradientCard } from '../components/ui/neon-gradient-card'
 import { Particles } from '../components/ui/particles'
 import { SparklesText } from '../components/ui/sparkles-text'
-import { CDN_CN_URL, CDN_URL } from '../constants'
+import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '../constants'
 
 function getInjection(useCN?: boolean) {
-	const cdn = useCN ? CDN_CN_URL : CDN_URL
+	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL
 
 	const injection = encodeURI(
 		`javascript:(function(){var s=document.createElement('script');s.src=\`${cdn}?t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();`

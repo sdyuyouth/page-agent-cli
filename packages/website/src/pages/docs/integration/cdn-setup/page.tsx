@@ -1,81 +1,124 @@
 import { useTranslation } from 'react-i18next'
 
-import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
-import { CDN_CN_URL, CDN_URL } from '@/constants'
+import { CDN_DEMO_CN_URL, CDN_DEMO_URL, CDN_FULL_CN_URL, CDN_FULL_URL } from '@/constants'
 
 export default function CdnSetup() {
 	const { i18n } = useTranslation()
 	const isZh = i18n.language === 'zh-CN'
 
 	return (
-		<div>
-			<BetaNotice />
+		<div className="space-y-10">
+			<header>
+				<h1 className="text-4xl font-bold mb-4">{isZh ? 'CDN 引入' : 'CDN Setup'}</h1>
+				<p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+					{isZh
+						? 'CDN 提供两种构建版本：Demo 版用于快速体验，标准版用法与 NPM 一致。'
+						: 'CDN provides two builds: Demo for quick testing, standard build with usage identical to NPM.'}
+				</p>
+			</header>
 
-			<h1 className="text-4xl font-bold mb-6">{isZh ? 'CDN 引入' : 'CDN Setup'}</h1>
+			{/* Demo Build Section */}
+			<section>
+				<h2 className="text-2xl font-bold mb-3">{isZh ? '🚀 快速体验' : '🚀 Quick Try'}</h2>
 
-			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-				{isZh
-					? '通过 CDN 快速集成 page-agent，无需复杂的构建配置。默认使用演示模型。'
-					: 'Fastest way to integrate page-agent via CDN. No complex build setup needed. Demo model will be used by default.'}
-			</p>
-
-			<section className="mb-8">
-				<h2 className="text-2xl font-bold mb-4">{isZh ? 'CDN 地址' : 'CDN URLs'}</h2>
-
-				<div className="overflow-x-auto mb-6">
-					<table className="w-full border-collapse text-sm">
-						<thead>
-							<tr className="border-b border-gray-200 dark:border-gray-700">
-								<th className="text-left py-3 px-4 font-semibold">{isZh ? '位置' : 'Location'}</th>
-								<th className="text-left py-3 px-4 font-semibold">URL</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr className="border-b border-gray-100 dark:border-gray-800">
-								<td className="py-3 px-4">{isZh ? '全球' : 'Global'}</td>
-								<td className="py-3 px-4 font-mono text-xs break-all">{CDN_URL}</td>
-							</tr>
-							<tr className="border-b border-gray-100 dark:border-gray-800">
-								<td className="py-3 px-4">{isZh ? '中国镜像' : 'China Mirror'}</td>
-								<td className="py-3 px-4 font-mono text-xs break-all">{CDN_CN_URL}</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</section>
-
-			<section className="mb-8">
-				<h2 className="text-2xl font-bold mb-4">{isZh ? '快速开始' : 'Quick Start'}</h2>
+				<p className="text-gray-600 dark:text-gray-300 mb-3">
+					{isZh
+						? '自动初始化并使用内置 Demo LLM，无需任何配置：'
+						: 'Auto-initializes with built-in demo LLM, no configuration needed:'}
+				</p>
 
 				<CodeEditor
-					className="mb-6"
-					code={`<script
-  src="${CDN_URL}"
-  crossorigin="true"
-  type="text/javascript"
-></script>`}
+					className="mb-3"
+					code={`<script src="${CDN_DEMO_URL}" crossorigin="true"></script>`}
 				/>
+
+				<div className="bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 rounded-lg mb-4 text-sm">
+					<span className="text-yellow-800 dark:text-yellow-200">
+						⚠️{' '}
+						{isZh
+							? '仅用于技术评估，Demo 模型有速率限制。'
+							: 'For evaluation only. Demo model has rate limits.'}
+					</span>
+				</div>
+
+				<table className="w-full border-collapse text-sm">
+					<thead>
+						<tr className="border-b border-gray-200 dark:border-gray-700">
+							<th className="text-left py-2 px-3 font-semibold w-28">
+								{isZh ? '位置' : 'Location'}
+							</th>
+							<th className="text-left py-2 px-3 font-semibold">URL</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr className="border-b border-gray-100 dark:border-gray-800">
+							<td className="py-2 px-3">{isZh ? '全球' : 'Global'}</td>
+							<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_URL}</td>
+						</tr>
+						<tr>
+							<td className="py-2 px-3">{isZh ? '中国' : 'China'}</td>
+							<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_CN_URL}</td>
+						</tr>
+					</tbody>
+				</table>
 			</section>
 
-			<section className="mb-8">
-				<div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-					<h3 className="text-lg font-semibold mb-2 text-yellow-900 dark:text-yellow-300">
-						⚠️ {isZh ? '注意事项' : 'Notes'}
-					</h3>
-					<ul className="text-gray-600 dark:text-gray-300 space-y-1">
-						<li>
-							• {isZh ? '生产环境建议使用固定版本号' : 'Use fixed version number in production'}
-						</li>
-						<li>• {isZh ? '确保 HTTPS 环境下使用' : 'Ensure HTTPS environment'}</li>
-						<li>
-							•{' '}
-							{isZh
-								? '配置 CSP 策略允许脚本执行'
-								: 'Configure CSP policy to allow script execution'}
-						</li>
-					</ul>
-				</div>
+			{/* CDN Build Section */}
+			<section>
+				<h2 className="text-2xl font-bold mb-3">{isZh ? '📦 标准版' : '📦 Standard Build'}</h2>
+
+				<p className="text-gray-600 dark:text-gray-300 mb-3">
+					{isZh
+						? '将 PageAgent 类暴露到 globalThis，用法与 NPM 一致：'
+						: 'Exposes PageAgent class to globalThis, usage identical to NPM:'}
+				</p>
+
+				<CodeEditor
+					className="mb-4"
+					code={`<script src="${CDN_FULL_URL}" crossorigin="true"></script>
+<script>
+const agent = new PageAgent({
+  model: 'deepseek-chat',
+  baseURL: 'https://api.deepseek.com',
+  apiKey: 'YOUR_API_KEY',
+})
+await agent.execute('Click the submit button')
+</script>`}
+				/>
+
+				<table className="w-full border-collapse text-sm">
+					<thead>
+						<tr className="border-b border-gray-200 dark:border-gray-700">
+							<th className="text-left py-2 px-3 font-semibold w-28">
+								{isZh ? '位置' : 'Location'}
+							</th>
+							<th className="text-left py-2 px-3 font-semibold">URL</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr className="border-b border-gray-100 dark:border-gray-800">
+							<td className="py-2 px-3">{isZh ? '全球' : 'Global'}</td>
+							<td className="py-2 px-3 font-mono text-xs break-all">{CDN_FULL_URL}</td>
+						</tr>
+						<tr>
+							<td className="py-2 px-3">{isZh ? '中国' : 'China'}</td>
+							<td className="py-2 px-3 font-mono text-xs break-all">{CDN_FULL_CN_URL}</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+
+			{/* Tips */}
+			<section className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+				<h3 className="text-base font-semibold mb-2 text-blue-900 dark:text-blue-300">
+					💡 {isZh ? '提示' : 'Tips'}
+				</h3>
+				<ul className="text-gray-600 dark:text-gray-300 text-sm space-y-1">
+					<li>• {isZh ? '生产环境推荐使用 NPM' : 'NPM is recommended for production'}</li>
+					<li>• {isZh ? '生产环境建议锁定版本号' : 'Lock version number in production'}</li>
+					<li>• {isZh ? '确保 HTTPS 环境' : 'Ensure HTTPS environment'}</li>
+				</ul>
 			</section>
 		</div>
 	)

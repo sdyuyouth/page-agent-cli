@@ -28,7 +28,22 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## 🚀 Quick Start
 
-### NPM Installation
+### Quick Try (Demo CDN)
+
+Fastest way to try PageAgent:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js" crossorigin="true"></script>
+```
+
+> ⚠️ **For technical evaluation only.** Demo model has rate limits and usage restrictions. Use NPM for production.
+
+| Location | URL                                                                                     |
+| -------- | --------------------------------------------------------------------------------------- |
+| Global   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                    |
+| China    | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js     |
+
+### NPM Installation (Recommended)
 
 ```bash
 npm install page-agent
@@ -37,39 +52,36 @@ npm install page-agent
 ```javascript
 import { PageAgent } from 'page-agent'
 
-// test server
-// @note: rate limit. prompt limit. Origin limit. May change anytime. Use your own llm!
-// @note Using official DeepSeek-chat(3.2). Go to DeepSeek website for privacy policy.
-const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-
 const agent = new PageAgent({
-	model: DEMO_MODEL,
-	baseURL: DEMO_BASE_URL,
-	apiKey: DEMO_API_KEY,
+	model: 'deepseek-chat',
+	baseURL: 'https://api.deepseek.com',
+	apiKey: 'YOUR_API_KEY',
 	language: 'en-US',
 })
 
 await agent.execute('Click the login button')
 ```
 
-### CDN Integration
+### CDN Build
 
-Fastest way to try PageAgent is to include it via CDN. Demo model will be used by default.
-
-| Location | URL                                                                           |
-| -------- | ----------------------------------------------------------------------------- |
-| Global   | https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js         |
-| China    | https://registry.npmmirror.com/page-agent/latest/files/dist/umd/page-agent.js |
+For environments where NPM is not available. Usage is identical to NPM:
 
 ```html
-<script
-	src="https://cdn.jsdelivr.net/npm/page-agent@latest/dist/umd/page-agent.js"
-	crossorigin="true"
-	type="text/javascript"
-></script>
+<script src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.js" crossorigin="true"></script>
+<script>
+const agent = new PageAgent({
+	model: 'deepseek-chat',
+	baseURL: 'https://api.deepseek.com',
+	apiKey: 'YOUR_API_KEY',
+})
+await agent.execute('Click the login button')
+</script>
 ```
+
+| Location | URL                                                                                 |
+| -------- | ----------------------------------------------------------------------------------- |
+| Global   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.js                     |
+| China    | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.js      |
 
 ## 🏗️ Structure
 
