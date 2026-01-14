@@ -16,6 +16,7 @@
  * @edit scrollable element detection
  * @edit add `data-browser-use-ignore` attribute
  * @edit improve `sampleRect`, filter out rects with 0 area
+ * @edit exclude aria-hidden elements
  */
 
 export default (
@@ -1446,7 +1447,14 @@ export default (
 		 * @edit add `data-browser-use-ignore` attribute
 		 */
 		if (node.dataset?.browserUseIgnore === 'true') {
-			return true // Skip this node and its children
+			return null // Skip this node and its children
+		}
+
+		/**
+		 * @edit exclude aria-hidden elements
+		 */
+		if (node.getAttribute && node.getAttribute('aria-hidden') === 'true') {
+			return null // Skip this node and its children
 		}
 
 		// Special handling for root node (body)

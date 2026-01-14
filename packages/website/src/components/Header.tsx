@@ -85,8 +85,8 @@ export default function Header() {
 							role="navigation"
 							aria-label={t('header.nav_docs')}
 						>
-							<span className="text-xs font-mono text-gray-400 dark:text-gray-500 tabular-nums">
-								v{import.meta.env.VERSION}
+							<span className="text-xs font-mono text-gray-400 dark:text-gray-500 tabular-nums before:content-['v']">
+								{import.meta.env.VERSION}
 							</span>
 							<Link
 								href="/docs/introduction/overview"
