@@ -1,6 +1,6 @@
 import { type Step, UIState } from './UIState'
 import { I18n, type SupportedLanguage } from './i18n'
-import { truncate } from './utils'
+import { escapeHtml, truncate } from './utils'
 
 import styles from './Panel.module.css'
 
@@ -163,6 +163,20 @@ export class Panel {
 	 * Convert semantic update to step data with i18n
 	 */
 	#toStepData(data: PanelUpdate): Omit<Step, 'id' | 'stepNumber' | 'timestamp'> {
+		// #region agent log
+		fetch('http://127.0.0.1:7243/ingest/bc2a9e35-f282-4f4f-a970-887c381f4d18', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				location: 'Panel.ts:#toStepData',
+				message: 'Converting update to step',
+				data: { type: data.type, rawData: JSON.stringify(data).substring(0, 200) },
+				timestamp: Date.now(),
+				sessionId: 'debug-session',
+				hypothesisId: 'D',
+			}),
+		}).catch(() => {})
+		// #endregion
 		switch (data.type) {
 			case 'thinking':
 				return { type: 'thinking', displayText: data.text ?? this.#i18n.t('ui.panel.thinking') }
@@ -591,7 +605,26 @@ export class Panel {
 	#updateHistory(): void {
 		const steps = this.#state.getAllSteps()
 
-		this.#historySection.innerHTML = steps.map((step) => this.#createHistoryItem(step)).join('')
+		const html = steps.map((step) => this.#createHistoryItem(step)).join('')
+		// #region agent log
+		fetch('http://127.0.0.1:7243/ingest/bc2a9e35-f282-4f4f-a970-887c381f4d18', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				location: 'Panel.ts:#updateHistory',
+				message: 'Setting innerHTML',
+				data: {
+					htmlLength: html.length,
+					stepsCount: steps.length,
+					htmlPreview: html.substring(0, 300),
+				},
+				timestamp: Date.now(),
+				sessionId: 'debug-session',
+				hypothesisId: 'C',
+			}),
+		}).catch(() => {})
+		// #endregion
+		this.#historySection.innerHTML = html
 
 		// Scroll to bottom to show latest records
 		this.#scrollToBottom()
@@ -605,6 +638,24 @@ export class Panel {
 	}
 
 	#createHistoryItem(step: Step): string {
+		// #region agent log
+		fetch('http://127.0.0.1:7243/ingest/bc2a9e35-f282-4f4f-a970-887c381f4d18', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				location: 'Panel.ts:#createHistoryItem',
+				message: 'Creating history item',
+				data: {
+					displayText: step.displayText,
+					type: step.type,
+					hasAngleBrackets: /[<>]/.test(step.displayText),
+				},
+				timestamp: Date.now(),
+				sessionId: 'debug-session',
+				hypothesisId: 'A',
+			}),
+		}).catch(() => {})
+		// #endregion
 		const time = step.timestamp.toLocaleTimeString('zh-CN', {
 			hour12: false,
 			hour: '2-digit',
@@ -656,16 +707,34 @@ export class Panel {
 			duration: durationText || '', // Explicitly pass empty string to replace template
 		})
 
-		return `
+		const htmlOutput = `
 			<div class="${styles.historyItem} ${typeClass}">
 				<div class="${styles.historyContent}">
 					<span class="${styles.statusIcon}">${statusIcon}</span>
-					<span>${step.displayText}</span>
+					<span>${escapeHtml(step.displayText)}</span>
 				</div>
 				<div class="${styles.historyMeta}">
 					${stepLabel}
 				</div>
 			</div>
 		`
+		// #region agent log
+		fetch('http://127.0.0.1:7243/ingest/bc2a9e35-f282-4f4f-a970-887c381f4d18', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				location: 'Panel.ts:#createHistoryItem:return',
+				message: 'Generated HTML output',
+				data: {
+					htmlOutputLength: htmlOutput.length,
+					htmlOutputPreview: htmlOutput.substring(0, 200),
+				},
+				timestamp: Date.now(),
+				sessionId: 'debug-session',
+				hypothesisId: 'A',
+			}),
+		}).catch(() => {})
+		// #endregion
+		return htmlOutput
 	}
 }
