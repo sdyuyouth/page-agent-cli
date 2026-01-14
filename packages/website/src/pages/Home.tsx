@@ -95,7 +95,10 @@ export default function HomePage() {
 
 			{/* Hero Section */}
 			<main id="main-content">
-				<section className="relative px-6 py-22 lg:py-28" aria-labelledby="hero-heading">
+				<section
+					className="relative px-6 py-22 lg:py-28 overflow-hidden"
+					aria-labelledby="hero-heading"
+				>
 					<div className="max-w-7xl mx-auto text-center">
 						{/* Background Pattern + Particles */}
 						<div className="absolute inset-0 opacity-30" aria-hidden="true">

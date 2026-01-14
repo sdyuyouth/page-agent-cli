@@ -41,6 +41,7 @@ export default function Header() {
 									className="hidden sm:block text-xs text-gray-600 dark:text-gray-300 py-0 font-normal overflow-visible"
 									duration={600}
 									animateOnHover={true}
+									aria-hidden="true"
 								>
 									{t('header.slogan')}
 								</HyperText>
