@@ -50,7 +50,11 @@ export interface MacroToolResult {
 export type { PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
 
-export interface AgentHistory {
+/**
+ * A single agent step with reflection and action
+ */
+export interface AgentStep {
+	type: 'step'
 	brain: Partial<AgentReflection>
 	action: {
 		name: string
@@ -66,10 +70,33 @@ export interface AgentHistory {
 	}
 }
 
+/**
+ * Persistent observation event (stays in memory)
+ */
+export interface ObservationEvent {
+	type: 'observation'
+	content: string
+}
+
+/**
+ * User takeover event
+ */
+export interface UserTakeoverEvent {
+	type: 'user_takeover'
+}
+
+/**
+ * Union type for all history events
+ */
+export type HistoryEvent = AgentStep | ObservationEvent | UserTakeoverEvent
+
+/** @deprecated Use AgentStep instead */
+export type AgentHistory = AgentStep
+
 export interface ExecutionResult {
 	success: boolean
 	data: string
-	history: AgentHistory[]
+	history: HistoryEvent[]
 }
 
 export class PageAgent extends EventTarget {
@@ -92,8 +119,8 @@ export class PageAgent extends EventTarget {
 	/** PageController for DOM operations */
 	pageController: PageController
 
-	/** History records */
-	history: AgentHistory[] = []
+	/** History event stream */
+	history: HistoryEvent[] = []
 
 	constructor(config: PageAgentConfig) {
 		super()
@@ -148,6 +175,14 @@ export class PageAgent extends EventTarget {
 			if (!this.disposed) this.dispose('PAGE_UNLOADING')
 		}
 		window.addEventListener('beforeunload', this.#beforeUnloadListener)
+	}
+
+	/**
+	 * Push a persistent observation to the history event stream.
+	 * This will be visible in <agent_history> and remain in memory across steps.
+	 */
+	pushObservation(content: string): void {
+		this.history.push({ type: 'observation', content })
 	}
 
 	async execute(task: string): Promise<ExecutionResult> {
@@ -229,6 +264,7 @@ export class PageAgent extends EventTarget {
 				}
 
 				this.history.push({
+					type: 'step',
 					brain,
 					action,
 					usage: result.usage,
@@ -438,31 +474,42 @@ export class PageAgent extends EventTarget {
 		//  - <step_info>
 		// <agent_state>
 
+		const stepCount = this.history.filter((e) => e.type === 'step').length
+
 		prompt += `<agent_state>
 			<user_request>
 			${this.task}
 			</user_request>
 			<step_info>
-			Step ${this.history.length + 1} of ${MAX_STEPS} max possible steps
+			Step ${stepCount + 1} of ${MAX_STEPS} max possible steps
 			Current date and time: ${new Date().toISOString()}
 			</step_info>
 			</agent_state>
 		`
 
 		// <agent_history>
-		//  - <step_>
+		//  - <step_N> for steps
+		//  - <sys> for observations and system messages
 
 		prompt += '\n<agent_history>\n'
 
-		this.history.forEach((history, index) => {
-			prompt += `<step_${index + 1}>
-				Evaluation of Previous Step: ${history.brain.evaluation_previous_goal}
-				Memory: ${history.brain.memory}
-				Next Goal: ${history.brain.next_goal}
-				Action Results: ${history.action.output}
-				</step_${index + 1}>
+		let stepIndex = 0
+		for (const event of this.history) {
+			if (event.type === 'step') {
+				stepIndex++
+				prompt += `<step_${stepIndex}>
+				Evaluation of Previous Step: ${event.brain.evaluation_previous_goal}
+				Memory: ${event.brain.memory}
+				Next Goal: ${event.brain.next_goal}
+				Action Results: ${event.action.output}
+				</step_${stepIndex}>
 			`
-		})
+			} else if (event.type === 'observation') {
+				prompt += `<sys>${event.content}</sys>\n`
+			} else if (event.type === 'user_takeover') {
+				prompt += `<sys>User took over control and made changes to the page.</sys>\n`
+			}
+		}
 
 		prompt += '</agent_history>\n\n'
 
