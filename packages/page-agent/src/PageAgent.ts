@@ -16,7 +16,7 @@ import { normalizeResponse, trimLines, uid, waitUntil } from './utils'
 import { assert } from './utils/assert'
 
 /**
- * Agent brain state - the reflection-before-action model
+ * Agent reflection state - the reflection-before-action model
  *
  * Every tool call must first reflect on:
  * - evaluation_previous_goal: How well did the previous action achieve its goal?
@@ -55,7 +55,7 @@ export { tool, type PageAgentTool } from './tools'
  */
 export interface AgentStep {
 	type: 'step'
-	brain: Partial<AgentReflection>
+	reflection: Partial<AgentReflection>
 	action: {
 		name: string
 		input: any
@@ -266,13 +266,13 @@ export class PageAgent extends EventTarget {
 				const macroResult = result.toolResult as MacroToolResult
 				const input = macroResult.input
 				const output = macroResult.output
-				const brain = {
-					evaluation_previous_goal: input.evaluation_previous_goal || '',
-					memory: input.memory || '',
-					next_goal: input.next_goal || '',
+				const reflection: Partial<AgentReflection> = {
+					evaluation_previous_goal: input.evaluation_previous_goal,
+					memory: input.memory,
+					next_goal: input.next_goal,
 				}
 				const actionName = Object.keys(input.action)[0]
-				const action = {
+				const action: AgentStep['action'] = {
 					name: actionName,
 					input: input.action[actionName],
 					output: output,
@@ -280,10 +280,10 @@ export class PageAgent extends EventTarget {
 
 				this.history.push({
 					type: 'step',
-					brain,
+					reflection,
 					action,
 					usage: result.usage,
-				})
+				} as AgentStep)
 
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
@@ -370,13 +370,20 @@ export class PageAgent extends EventTarget {
 
 				const toolName = Object.keys(action)[0]
 				const toolInput = action[toolName]
-				const brain = trimLines(`✅: ${input.evaluation_previous_goal}
-						💾: ${input.memory}
-						🎯: ${input.next_goal}
-					`)
 
-				console.log(brain)
-				this.panel.update({ type: 'thinking', text: brain })
+				// Build reflection text, only include non-empty fields
+				const reflectionLines: string[] = []
+				if (input.evaluation_previous_goal)
+					reflectionLines.push(`✅: ${input.evaluation_previous_goal}`)
+				if (input.memory) reflectionLines.push(`💾: ${input.memory}`)
+				if (input.next_goal) reflectionLines.push(`🎯: ${input.next_goal}`)
+
+				const reflectionText = reflectionLines.length > 0 ? reflectionLines.join('\n') : ''
+
+				if (reflectionText) {
+					console.log(reflectionText)
+					this.panel.update({ type: 'thinking', text: reflectionText })
+				}
 
 				// Find the corresponding tool
 				const tool = tools.get(toolName)
@@ -482,10 +489,10 @@ export class PageAgent extends EventTarget {
 	async #generateObservations(stepCount: number): Promise<void> {
 		// Detect URL change
 		const currentURL = await this.pageController.getCurrentUrl()
-		if (this.states.lastURL && currentURL !== this.states.lastURL) {
+		if (currentURL !== this.states.lastURL) {
 			this.pushObservation(`Page navigated to → ${currentURL}`)
+			this.states.lastURL = currentURL
 		}
-		this.states.lastURL = currentURL
 
 		// Warn about remaining steps
 		const remaining = MAX_STEPS - stepCount
@@ -535,9 +542,9 @@ export class PageAgent extends EventTarget {
 			if (event.type === 'step') {
 				stepIndex++
 				prompt += `<step_${stepIndex}>
-				Evaluation of Previous Step: ${event.brain.evaluation_previous_goal}
-				Memory: ${event.brain.memory}
-				Next Goal: ${event.brain.next_goal}
+				Evaluation of Previous Step: ${event.reflection.evaluation_previous_goal}
+				Memory: ${event.reflection.memory}
+				Next Goal: ${event.reflection.next_goal}
 				Action Results: ${event.action.output}
 				</step_${stepIndex}>
 			`
