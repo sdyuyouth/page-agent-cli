@@ -118,8 +118,13 @@ export class PageAgent extends EventTarget {
 	/** PageController for DOM operations */
 	pageController: PageController
 
-	/** Accumulated wait time in seconds, used by wait tool to track total waiting */
-	totalWaitTime = 0
+	/** Runtime states for tracking across steps */
+	states = {
+		/** Accumulated wait time in seconds, used by wait tool */
+		totalWaitTime: 0,
+		/** Last known URL for detecting navigation */
+		lastURL: '',
+	}
 
 	/** History event stream */
 	history: HistoryEvent[] = []
@@ -214,10 +219,18 @@ export class PageAgent extends EventTarget {
 
 		this.history = []
 
+		// Reset states
+		this.states = {
+			totalWaitTime: 0,
+			lastURL: '',
+		}
+
 		try {
 			let step = 0
 
 			while (true) {
+				await this.#generateObservations(step)
+
 				await onBeforeStep.call(this, step)
 
 				console.group(`step: ${step}`)
@@ -382,7 +395,7 @@ export class PageAgent extends EventTarget {
 
 				// Reset wait time for non-wait tools
 				if (toolName !== 'wait') {
-					this.totalWaitTime = 0
+					this.states.totalWaitTime = 0
 				}
 
 				// Briefly display execution result
@@ -457,6 +470,34 @@ export class PageAgent extends EventTarget {
 		result += '</instructions>\n\n'
 
 		return result
+	}
+
+	/**
+	 * Generate observations before each step
+	 * - URL change detection
+	 * - Too many steps warning
+	 * @todo loop detection
+	 * @todo console error
+	 */
+	async #generateObservations(stepCount: number): Promise<void> {
+		// Detect URL change
+		const currentURL = await this.pageController.getCurrentUrl()
+		if (this.states.lastURL && currentURL !== this.states.lastURL) {
+			this.pushObservation(`Page navigated to → ${currentURL}`)
+		}
+		this.states.lastURL = currentURL
+
+		// Warn about remaining steps
+		const remaining = MAX_STEPS - stepCount
+		if (remaining === 5) {
+			this.pushObservation(
+				`⚠️ Only ${remaining} steps remaining. Consider wrapping up or calling done with partial results.`
+			)
+		} else if (remaining === 2) {
+			this.pushObservation(
+				`⚠️ Critical: Only ${remaining} steps left! You must finish the task or call done immediately.`
+			)
+		}
 	}
 
 	async #assembleUserPrompt(): Promise<string> {
@@ -544,7 +585,7 @@ export class PageAgent extends EventTarget {
 
 		return trimLines(`<browser_state>
 			Current Page: [${state.title}](${state.url})
-			
+
 			${state.header}
 			${content}
 			${state.footer}

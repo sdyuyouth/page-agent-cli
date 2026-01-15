@@ -58,11 +58,11 @@ tools.set(
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
 			await waitFor(actualWaitTime)
 
-			this.totalWaitTime += input.seconds
+			this.states.totalWaitTime += input.seconds
 
-			if (this.totalWaitTime >= 3) {
+			if (this.states.totalWaitTime >= 3) {
 				this.pushObservation(
-					`You have waited ${this.totalWaitTime} seconds accumulatively. Do NOT wait any longer unless you have a good reason.`
+					`You have waited ${this.states.totalWaitTime} seconds accumulatively. Do NOT wait any longer unless you have a good reason.`
 				)
 			}
 
