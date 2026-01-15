@@ -6,7 +6,15 @@ export interface Step {
 	id: string
 	stepNumber: number
 	timestamp: Date
-	type: 'thinking' | 'tool_executing' | 'completed' | 'error' | 'output' | 'input' | 'retry'
+	type:
+		| 'thinking'
+		| 'tool_executing'
+		| 'completed'
+		| 'error'
+		| 'output'
+		| 'input'
+		| 'retry'
+		| 'observation'
 
 	// Tool execution related
 	toolName?: string
@@ -18,7 +26,7 @@ export interface Step {
 	duration?: number
 }
 
-export type AgentStatus = 'idle' | 'running' | 'paused' | 'completed' | 'error'
+export type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
 
 export class UIState {
 	private steps: Step[] = []

@@ -11,8 +11,6 @@ export interface PanelConfig {
 	language?: SupportedLanguage
 	onExecuteTask: (task: string) => void
 	onStop: () => void
-	onPauseToggle: () => boolean // returns new paused state
-	getPaused: () => boolean
 }
 
 /**
@@ -29,6 +27,7 @@ export type PanelUpdate =
 	| { type: 'completed' }
 	| { type: 'toolExecuting'; toolName: string; args: any }
 	| { type: 'toolCompleted'; toolName: string; args: any; result?: string; duration?: number }
+	| { type: 'observation'; content: string }
 
 /**
  * Agent control panel
@@ -39,7 +38,6 @@ export class Panel {
 	#statusText: HTMLElement
 	#historySection: HTMLElement
 	#expandButton: HTMLElement
-	#pauseButton: HTMLElement
 	#stopButton: HTMLElement
 	#inputSection: HTMLElement
 	#taskInput: HTMLInputElement
@@ -66,7 +64,6 @@ export class Panel {
 		this.#statusText = this.#wrapper.querySelector(`.${styles.statusText}`)!
 		this.#historySection = this.#wrapper.querySelector(`.${styles.historySection}`)!
 		this.#expandButton = this.#wrapper.querySelector(`.${styles.expandButton}`)!
-		this.#pauseButton = this.#wrapper.querySelector(`.${styles.pauseButton}`)!
 		this.#stopButton = this.#wrapper.querySelector(`.${styles.stopButton}`)!
 		this.#inputSection = this.#wrapper.querySelector(`.${styles.inputSectionWrapper}`)!
 		this.#taskInput = this.#wrapper.querySelector(`.${styles.taskInput}`)!
@@ -120,11 +117,6 @@ export class Panel {
 		this.#updateStatusIndicator('thinking')
 		this.#updateHistory()
 		this.#collapse()
-		// Reset pause state via callback
-		if (this.#config.getPaused()) {
-			this.#config.onPauseToggle()
-		}
-		this.#updatePauseButton()
 		// Reset user input state
 		this.#isWaitingForUserAnswer = false
 		this.#userAnswerResolver = null
@@ -205,6 +197,8 @@ export class Panel {
 					duration: data.duration,
 				}
 			}
+			case 'observation':
+				return { type: 'observation', displayText: data.content }
 		}
 	}
 
@@ -274,39 +268,6 @@ export class Panel {
 			this.#showInputArea()
 		} else {
 			this.#hideInputArea()
-		}
-	}
-
-	/**
-	 * Toggle pause state
-	 */
-	#togglePause(): void {
-		const paused = this.#config.onPauseToggle()
-		this.#updatePauseButton()
-
-		// Update status display
-		if (paused) {
-			this.#statusText.textContent = this.#i18n.t('ui.panel.paused')
-			this.#updateStatusIndicator('thinking')
-		} else {
-			this.#statusText.textContent = this.#i18n.t('ui.panel.continueExecution')
-			this.#updateStatusIndicator('tool_executing')
-		}
-	}
-
-	/**
-	 * Update pause button state
-	 */
-	#updatePauseButton(): void {
-		const paused = this.#config.getPaused()
-		if (paused) {
-			this.#pauseButton.textContent = '▶'
-			this.#pauseButton.title = this.#i18n.t('ui.panel.continue')
-			this.#pauseButton.classList.add(styles.paused)
-		} else {
-			this.#pauseButton.textContent = '⏸︎'
-			this.#pauseButton.title = this.#i18n.t('ui.panel.pause')
-			this.#pauseButton.classList.remove(styles.paused)
 		}
 	}
 
@@ -426,9 +387,6 @@ export class Panel {
 					<button class="${styles.controlButton} ${styles.expandButton}" title="${this.#i18n.t('ui.panel.expand')}">
 						▼
 					</button>
-					<button class="${styles.controlButton} ${styles.pauseButton}" title="${this.#i18n.t('ui.panel.pause')}">
-						⏸︎
-					</button>
 					<button class="${styles.controlButton} ${styles.stopButton}" title="${this.#i18n.t('ui.panel.stop')}">
 						X
 					</button>
@@ -464,12 +422,6 @@ export class Panel {
 		this.#expandButton.addEventListener('click', (e) => {
 			e.stopPropagation()
 			this.#toggle()
-		})
-
-		// Pause/continue button
-		this.#pauseButton.addEventListener('click', (e) => {
-			e.stopPropagation()
-			this.#togglePause()
 		})
 
 		// Stop button
@@ -632,7 +584,7 @@ export class Panel {
 			typeClass = styles.error
 			statusIcon = '❌'
 		} else if (step.type === 'tool_executing') {
-			statusIcon = '⚙️'
+			statusIcon = '🔨'
 		} else if (step.type === 'output') {
 			typeClass = styles.output
 			statusIcon = '🤖'
@@ -642,6 +594,9 @@ export class Panel {
 		} else if (step.type === 'retry') {
 			typeClass = styles.retry
 			statusIcon = '🔄'
+		} else if (step.type === 'observation') {
+			typeClass = styles.observation
+			statusIcon = '👁️'
 		} else {
 			statusIcon = '🧠'
 		}
