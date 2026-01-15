@@ -57,6 +57,15 @@ tools.set(
 			const actualWaitTime = Math.max(0, input.seconds - (Date.now() - lastTimeUpdate) / 1000)
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
 			await waitFor(actualWaitTime)
+
+			this.totalWaitTime += input.seconds
+
+			if (this.totalWaitTime >= 3) {
+				this.pushObservation(
+					`You have waited ${this.totalWaitTime} seconds accumulatively. Do NOT wait any longer unless you have a good reason.`
+				)
+			}
+
 			return `✅ Waited for ${input.seconds} seconds.`
 		},
 	})

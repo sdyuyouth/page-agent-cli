@@ -110,7 +110,6 @@ export class PageAgent extends EventTarget {
 	taskId = ''
 
 	#llm: LLM
-	#totalWaitTime = 0
 	#abortController = new AbortController()
 	#llmRetryListener: ((e: Event) => void) | null = null
 	#llmErrorListener: ((e: Event) => void) | null = null
@@ -118,6 +117,9 @@ export class PageAgent extends EventTarget {
 
 	/** PageController for DOM operations */
 	pageController: PageController
+
+	/** Accumulated wait time in seconds, used by wait tool to track total waiting */
+	totalWaitTime = 0
 
 	/** History event stream */
 	history: HistoryEvent[] = []
@@ -373,20 +375,14 @@ export class PageAgent extends EventTarget {
 				const startTime = Date.now()
 
 				// Execute tool, bind `this` to PageAgent
-				let result = await tool.execute.bind(this)(toolInput)
+				const result = await tool.execute.bind(this)(toolInput)
 
 				const duration = Date.now() - startTime
 				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)
 
-				if (toolName === 'wait') {
-					this.#totalWaitTime += Math.round(toolInput.seconds + duration / 1000)
-					result += `\n<sys> You have waited ${this.#totalWaitTime} seconds accumulatively.`
-					if (this.#totalWaitTime >= 3)
-						result += '\nDo NOT wait any longer unless you have a good reason.\n'
-					result += '</sys>'
-				} else {
-					// For other tools, reset wait time
-					this.#totalWaitTime = 0
+				// Reset wait time for non-wait tools
+				if (toolName !== 'wait') {
+					this.totalWaitTime = 0
 				}
 
 				// Briefly display execution result
@@ -539,51 +535,22 @@ export class PageAgent extends EventTarget {
 	}
 
 	async #getBrowserState(): Promise<string> {
-		const pageUrl = await this.pageController.getCurrentUrl()
-		const pageTitle = await this.pageController.getPageTitle()
-		const pi = await this.pageController.getPageInfo()
-		const viewportExpansion = await this.pageController.getViewportExpansion()
+		const state = await this.pageController.getBrowserState()
 
-		await this.pageController.updateTree()
-
-		let simplifiedHTML = await this.pageController.getSimplifiedHTML()
-
+		let content = state.content
 		if (this.config.transformPageContent) {
-			simplifiedHTML = await this.config.transformPageContent(simplifiedHTML)
+			content = await this.config.transformPageContent(content)
 		}
 
-		let prompt = trimLines(`<browser_state>
-			Current Page: [${pageTitle}](${pageUrl})
+		return trimLines(`<browser_state>
+			Current Page: [${state.title}](${state.url})
+			
+			${state.header}
+			${content}
+			${state.footer}
 
-			Page info: ${pi.viewport_width}x${pi.viewport_height}px viewport, ${pi.page_width}x${pi.page_height}px total page size, ${pi.pages_above.toFixed(1)} pages above, ${pi.pages_below.toFixed(1)} pages below, ${pi.total_pages.toFixed(1)} total pages, at ${(pi.current_page_position * 100).toFixed(0)}% of page
-
-			${viewportExpansion === -1 ? 'Interactive elements from top layer of the current page (full page):' : 'Interactive elements from top layer of the current page inside the viewport:'}
-
+			</browser_state>
 		`)
-
-		// Page header info
-		const has_content_above = pi.pixels_above > 4
-		if (has_content_above && viewportExpansion !== -1) {
-			prompt += `... ${pi.pixels_above} pixels above (${pi.pages_above.toFixed(1)} pages) - scroll to see more ...\n`
-		} else {
-			prompt += `[Start of page]\n`
-		}
-
-		// Current viewport info
-		prompt += simplifiedHTML
-		prompt += `\n`
-
-		// Page footer info
-		const has_content_below = pi.pixels_below > 4
-		if (has_content_below && viewportExpansion !== -1) {
-			prompt += `... ${pi.pixels_below} pixels below (${pi.pages_below.toFixed(1)} pages) - scroll to see more ...\n`
-		} else {
-			prompt += `[End of page]\n`
-		}
-
-		prompt += `</browser_state>\n`
-
-		return prompt
 	}
 
 	dispose(reason?: string) {

@@ -32,6 +32,20 @@ export interface PageControllerConfig extends dom.DomConfig {
 	enableMask?: boolean
 }
 
+/**
+ * Structured browser state for LLM consumption
+ */
+export interface BrowserState {
+	url: string
+	title: string
+	/** Page info + scroll position hint (e.g. "Page info: 1920x1080px...\n[Start of page]") */
+	header: string
+	/** Simplified HTML of interactive elements */
+	content: string
+	/** Page footer hint (e.g. "... 300 pixels below ..." or "[End of page]") */
+	footer: string
+}
+
 interface ActionResult {
 	success: boolean
 	message: string
@@ -94,42 +108,6 @@ export class PageController extends EventTarget {
 	}
 
 	/**
-	 * Get current page title
-	 */
-	async getPageTitle(): Promise<string> {
-		return document.title
-	}
-
-	/**
-	 * Get page scroll and size info
-	 */
-	async getPageInfo() {
-		return getPageInfo()
-	}
-
-	/**
-	 * Get the simplified HTML representation of the page.
-	 * This is used by LLM to understand the page structure.
-	 */
-	async getSimplifiedHTML(): Promise<string> {
-		return this.simplifiedHTML
-	}
-
-	/**
-	 * Get text description for an element by index
-	 */
-	async getElementText(index: number): Promise<string | undefined> {
-		return this.elementTextMap.get(index)
-	}
-
-	/**
-	 * Get total number of indexed interactive elements
-	 */
-	async getElementCount(): Promise<number> {
-		return this.selectorMap.size
-	}
-
-	/**
 	 * Get last tree update timestamp
 	 */
 	async getLastUpdateTime(): Promise<number> {
@@ -137,10 +115,43 @@ export class PageController extends EventTarget {
 	}
 
 	/**
-	 * Get the viewport expansion setting
+	 * Get structured browser state for LLM consumption.
+	 * Automatically calls updateTree() to refresh the DOM state.
 	 */
-	async getViewportExpansion(): Promise<number> {
-		return this.config.viewportExpansion ?? VIEWPORT_EXPANSION
+	async getBrowserState(): Promise<BrowserState> {
+		const url = window.location.href
+		const title = document.title
+		const pi = getPageInfo()
+		const viewportExpansion = this.config.viewportExpansion ?? VIEWPORT_EXPANSION
+
+		await this.updateTree()
+
+		const content = this.simplifiedHTML
+
+		// Build header: page info + scroll position hint
+		const pageInfoLine = `Page info: ${pi.viewport_width}x${pi.viewport_height}px viewport, ${pi.page_width}x${pi.page_height}px total page size, ${pi.pages_above.toFixed(1)} pages above, ${pi.pages_below.toFixed(1)} pages below, ${pi.total_pages.toFixed(1)} total pages, at ${(pi.current_page_position * 100).toFixed(0)}% of page`
+
+		const elementsLabel =
+			viewportExpansion === -1
+				? 'Interactive elements from top layer of the current page (full page):'
+				: 'Interactive elements from top layer of the current page inside the viewport:'
+
+		const hasContentAbove = pi.pixels_above > 4
+		const scrollHintAbove =
+			hasContentAbove && viewportExpansion !== -1
+				? `... ${pi.pixels_above} pixels above (${pi.pages_above.toFixed(1)} pages) - scroll to see more ...`
+				: '[Start of page]'
+
+		const header = `${pageInfoLine}\n\n${elementsLabel}\n\n${scrollHintAbove}`
+
+		// Build footer: scroll position hint
+		const hasContentBelow = pi.pixels_below > 4
+		const footer =
+			hasContentBelow && viewportExpansion !== -1
+				? `... ${pi.pixels_below} pixels below (${pi.pages_below.toFixed(1)} pages) - scroll to see more ...`
+				: '[End of page]'
+
+		return { url, title, header, content, footer }
 	}
 
 	// ======= DOM Tree Operations =======
