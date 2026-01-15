@@ -1,7 +1,7 @@
 {
 	"name": "@page-agent/cdn",
 	"private": false,
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"type": "module",
 	"files": [
 		"dist/"
@@ -18,6 +18,6 @@
 		"build": "vite build && vite build --mode demo"
 	},
 	"dependencies": {
-		"page-agent": "0.1.0"
+		"page-agent": "0.2.0"
 	}
 }
