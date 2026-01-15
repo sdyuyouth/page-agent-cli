@@ -27,6 +27,7 @@ export type PanelUpdate =
 	| { type: 'completed' }
 	| { type: 'toolExecuting'; toolName: string; args: any }
 	| { type: 'toolCompleted'; toolName: string; args: any; result?: string; duration?: number }
+	| { type: 'observation'; content: string }
 
 /**
  * Agent control panel
@@ -196,6 +197,8 @@ export class Panel {
 					duration: data.duration,
 				}
 			}
+			case 'observation':
+				return { type: 'observation', displayText: data.content }
 		}
 	}
 
@@ -581,7 +584,7 @@ export class Panel {
 			typeClass = styles.error
 			statusIcon = '❌'
 		} else if (step.type === 'tool_executing') {
-			statusIcon = '⚙️'
+			statusIcon = '🔨'
 		} else if (step.type === 'output') {
 			typeClass = styles.output
 			statusIcon = '🤖'
@@ -591,6 +594,9 @@ export class Panel {
 		} else if (step.type === 'retry') {
 			typeClass = styles.retry
 			statusIcon = '🔄'
+		} else if (step.type === 'observation') {
+			typeClass = styles.observation
+			statusIcon = '👁️'
 		} else {
 			statusIcon = '🧠'
 		}

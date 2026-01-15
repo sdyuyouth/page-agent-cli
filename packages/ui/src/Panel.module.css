@@ -352,6 +352,11 @@
 				background: linear-gradient(135deg, rgba(255, 214, 0, 0.1), rgba(255, 214, 0, 0.05));
 			}
 
+			&.observation {
+				border-left-color: rgb(147, 51, 234);
+				background: linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(147, 51, 234, 0.05));
+			}
+
 			/* 突出显示 done 成功结果 */
 			&.doneSuccess {
 				background: linear-gradient(

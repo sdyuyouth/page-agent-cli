@@ -6,7 +6,15 @@ export interface Step {
 	id: string
 	stepNumber: number
 	timestamp: Date
-	type: 'thinking' | 'tool_executing' | 'completed' | 'error' | 'output' | 'input' | 'retry'
+	type:
+		| 'thinking'
+		| 'tool_executing'
+		| 'completed'
+		| 'error'
+		| 'output'
+		| 'input'
+		| 'retry'
+		| 'observation'
 
 	// Tool execution related
 	toolName?: string

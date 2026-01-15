@@ -184,6 +184,7 @@ export class PageAgent extends EventTarget {
 	 */
 	pushObservation(content: string): void {
 		this.history.push({ type: 'observation', content })
+		this.panel.update({ type: 'observation', content })
 	}
 
 	async execute(task: string): Promise<ExecutionResult> {
