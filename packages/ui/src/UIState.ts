@@ -18,7 +18,7 @@ export interface Step {
 	duration?: number
 }
 
-export type AgentStatus = 'idle' | 'running' | 'paused' | 'completed' | 'error'
+export type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
 
 export class UIState {
 	private steps: Step[] = []

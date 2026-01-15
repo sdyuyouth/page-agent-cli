@@ -12,7 +12,7 @@ import type { PageAgentConfig } from './config'
 import { MAX_STEPS } from './config/constants'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
-import { normalizeResponse, trimLines, uid, waitUntil } from './utils'
+import { normalizeResponse, trimLines, uid } from './utils'
 import { assert } from './utils/assert'
 
 /**
@@ -104,7 +104,6 @@ export class PageAgent extends EventTarget {
 	id = uid()
 	panel: Panel
 	tools: typeof tools
-	paused = false
 	disposed = false
 	task = ''
 	taskId = ''
@@ -138,11 +137,6 @@ export class PageAgent extends EventTarget {
 			language: this.config.language,
 			onExecuteTask: (task) => this.execute(task),
 			onStop: () => this.dispose(),
-			onPauseToggle: () => {
-				this.paused = !this.paused
-				return this.paused
-			},
-			getPaused: () => this.paused,
 		})
 		this.tools = new Map(tools)
 
@@ -237,8 +231,6 @@ export class PageAgent extends EventTarget {
 
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
-				// pause
-				await waitUntil(() => !this.paused)
 
 				// Update status to thinking
 				console.log(chalk.blue('Thinking...'))
@@ -362,8 +354,6 @@ export class PageAgent extends EventTarget {
 			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
-				// pause
-				await waitUntil(() => !this.paused)
 
 				console.log(chalk.blue.bold('MacroTool execute'), input)
 				const action = input.action

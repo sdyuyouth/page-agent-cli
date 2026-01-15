@@ -6,8 +6,6 @@ export interface PageAgentEventMap {
 	// PageAgent status events
 	// 'agent:execute': { params: { task: string } }
 	// 'agent:done': { params: { text: string; success: boolean } }
-	// 'agent:paused': { params: undefined }
-	// 'agent:resumed': { params: undefined }
 	// 'agent:disposed': { params: undefined }
 	// 'agent:error': { params: { error: string | Error } }
 
