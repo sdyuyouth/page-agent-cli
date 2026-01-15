@@ -2,7 +2,7 @@ import type { LLMConfig } from '@page-agent/llms'
 import type { PageControllerConfig } from '@page-agent/page-controller'
 import type { SupportedLanguage } from '@page-agent/ui'
 
-import type { AgentHistory, ExecutionResult, PageAgent } from '../PageAgent'
+import type { ExecutionResult, HistoryEvent, PageAgent } from '../PageAgent'
 import type { PageAgentTool } from '../tools'
 
 export type { LLMConfig }
@@ -65,7 +65,7 @@ export interface AgentConfig {
 	// @todo: remove `this` binding, pass agent as explicit parameter instead
 
 	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
-	onAfterStep?: (this: PageAgent, stepCnt: number, history: AgentHistory[]) => Promise<void> | void
+	onAfterStep?: (this: PageAgent, stepCnt: number, history: HistoryEvent[]) => Promise<void> | void
 	onBeforeTask?: (this: PageAgent) => Promise<void> | void
 	onAfterTask?: (this: PageAgent, result: ExecutionResult) => Promise<void> | void
 
