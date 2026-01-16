@@ -37,9 +37,8 @@
 	},
 	"homepage": "https://alibaba.github.io/page-agent/",
 	"scripts": {
-		"build": "vite build && vite build --config vite.umd.config.js",
-		"serve": "npx serve dist/umd -p 5173",
-		"dev:umd": "concurrently \"vite build --config vite.umd.config.js --watch\" \"npm run serve\"",
+		"build": "vite build",
+		"dev:iife": "concurrently \"vite build --config vite.iife.config.js --watch\" \"npx serve dist/iife -p 5174\"",
 		"prepublishOnly": "node -e \"const fs=require('fs');['README.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
 		"postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
 	},

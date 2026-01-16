@@ -16,7 +16,7 @@ const pageAgentPkg = JSON.parse(
 dotenvConfig({ path: resolve(__dirname, '../../.env') })
 
 // Website Config (React Documentation Site)
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	base: './',
 	clearScreen: false,
 	plugins: [react(), tailwindcss()],
@@ -43,9 +43,11 @@ export default defineConfig({
 		},
 	},
 	define: {
-		'import.meta.env.LLM_MODEL_NAME': JSON.stringify(process.env.LLM_MODEL_NAME),
-		'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
-		'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
+		...(mode === 'development' && {
+			'import.meta.env.LLM_MODEL_NAME': JSON.stringify(process.env.LLM_MODEL_NAME),
+			'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
+			'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
+		}),
 		'import.meta.env.VERSION': JSON.stringify(pageAgentPkg.version),
 	},
-})
+}))

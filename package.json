@@ -29,7 +29,7 @@
 		"build:website": "npm run build:website --workspace=@page-agent/website",
 		"build:libs": "npm run build --workspaces --if-present",
 		"build": "npm run build:libs && npm run build:website",
-		"dev:umd": "npm run dev:umd --workspace=page-agent",
+		"dev:iife": "npm run dev:iife --workspace=page-agent",
 		"version": "node scripts/sync-version.js",
 		"lint": "eslint .",
 		"prepare": "husky"

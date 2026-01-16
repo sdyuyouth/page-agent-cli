@@ -14,7 +14,7 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 2. **Setup**
 
    ```bash
-   npm install
+   npm ci
    npm start          # Start demo and documentation site
    ```
 
@@ -25,11 +25,11 @@ This is a **monorepo** with npm workspaces containing **two main packages**:
 1. **Core Library** (`packages/page-agent/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation, published as `page-agent` on npm
 2. **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
-We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required. 
+We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required.
 
 - When developing. Use alias so that we don't have to pre-build.
 - When bundling. Use external and disable ts `paths` alias to leave deps out.
-- When bundling `UMD` and `Website`. Bundle everything including local packages.
+- When bundling `IIFE` and `Website`. Bundle everything including local packages.
 
 ## 🤝 How to Contribute
 
@@ -61,10 +61,9 @@ We use a simplified monorepo solution with `native npm-workspace + ts reference 
    - Update documentation as needed
 
 4. **Test Your Changes**
-
-   ```bash
-   # TODO
-   ```
+   - Test in our demo website
+   - Test it on other websites if applicable
+   - `@TODO: test suite`
 
 5. **Commit and Push**
 
@@ -94,41 +93,52 @@ We use a simplified monorepo solution with `native npm-workspace + ts reference 
 - It's **recommended** to heavily rely on AI (aka "vibe coding") when maintaining **demo pages and tests**.
 - BUT **NOT the core lib!!!** Be very careful if AI ever touched the core lib!!!
 - Review anything AI wrote before make a commit. You are the author of anything you commit. NOT AI.
-- Update the AI instructions when structure changed.
-   - Cursor and Cline: `./.cursor/rules`
-   - Github Copilot: `./.github/copilot-instructions.md`
-   - Claude Code: `./CLAUDE.md`
+- Update the [AI instructions](AGENTS.md) when structure changed.
 
 ## 🔧 Development Workflows
+
+### Test With Your Own LLM API
+
+- Create a `.env` file in the repo root with your LLM API config
+
+  ```env
+  LLM_MODEL_NAME=gpt-5.2
+  LLM_API_KEY=your-api-key
+  LLM_BASE_URL=https://api.your-llm-provider.com/v1
+  ```
+
+- Restart the dev server to load new env vars
+- If not provided, the demo will the free testing proxy by default
 
 ### Website Development
 
 ```bash
-npm start                # React development server
+npm start
 ```
 
-### Core Lib Development and Testing
+### Testing on Other Websites
 
-> @TODO this part is outdated. Update this.
+- Start and serve a local `iife` script
 
-- Config your LLM API
-- Start and serve a local umd script
+  ```bash
+  npm run dev:iife # Serving IIFE with auto rebuild at http://localhost:5174/page-agent.js
+  ```
 
-   ```bash
-   npm run dev:umd # Serving UMD with auto rebuild at http://localhost:5173/page-agent.umd.cjs
-   ```
+- Add a new bookmark
 
-- Add a new bookmark enable it on other website
+  ```javascript
+  javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5174/page-agent.js?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
+  ```
 
-   ```
-   javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5173/page-agent.umd.cjs?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
-   ```
+- Click the bookmark on any page to load Page-Agent
+
+> Warning: AK in your local `.env` will be inlined in the iife script.
 
 ### Adding Documentation
 
-1. Create `website/src/docs/section/page-name/page.tsx`
-2. Add route to `website/src/router.tsx`
-3. Add navigation link to `website/src/components/DocsLayout.tsx`
+Ask an AI to help you add documentation to the `website/` package. Follow the existing style.
+
+> Our AGENTS.md file and guardrails are designed for this purpose. But please be careful and review anything AI generated.
 
 ## 🎯 Contribution Areas
 
@@ -143,7 +153,7 @@ We especially welcome contributions in:
 
 ## 🚫 What We Don't Accept
 
-- Changes that break existing API compatibility
+- Changes that break existing API compatibility (Discuss first)
 - Heavy dependencies to core library
 - Contributions without proper testing
 - Code that doesn't follow project conventions
