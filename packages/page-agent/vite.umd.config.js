@@ -31,13 +31,17 @@ export default defineConfig({
 			formats: ['umd'],
 		},
 		outDir: resolve(__dirname, 'dist', 'umd'),
+		cssCodeSplit: true,
 		rollupOptions: {
 			output: {
 				// force use .js as extension
 				entryFileNames: 'page-agent.js',
 			},
+			onwarn: function (message, handler) {
+				if (message.code === 'EVAL') return
+				handler(message)
+			},
 		},
-		cssCodeSplit: true,
 	},
 	define: {
 		'process.env.NODE_ENV': '"production"',

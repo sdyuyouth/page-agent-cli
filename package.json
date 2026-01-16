@@ -59,6 +59,9 @@
 		"vite": "^7.3.1",
 		"vite-plugin-css-injected-by-js": "^3.5.2"
 	},
+	"overrides": {
+		"typescript": "^5.9.3"
+	},
 	"lint-staged": {
 		"*.{js,ts,cjs,cts,mjs,mts}": [
 			"npx prettier --write --ignore-unknown",

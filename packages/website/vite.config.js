@@ -20,6 +20,16 @@ export default defineConfig({
 	base: './',
 	clearScreen: false,
 	plugins: [react(), tailwindcss()],
+	build: {
+		chunkSizeWarningLimit: 2000,
+		cssCodeSplit: true,
+		rollupOptions: {
+			onwarn: function (message, handler) {
+				if (message.code === 'EVAL') return
+				handler(message)
+			},
+		},
+	},
 	resolve: {
 		alias: {
 			// Self root

@@ -34,6 +34,13 @@ export default defineConfig(({ mode }) => {
 			outDir: resolve(__dirname, 'dist'),
 			emptyOutDir: !isDemo, // only empty on first build (full)
 			minify: false,
+			cssCodeSplit: true,
+			rollupOptions: {
+				onwarn: function (message, handler) {
+					if (message.code === 'EVAL') return
+					handler(message)
+				},
+			},
 		},
 		define: {
 			'process.env.NODE_ENV': '"production"',
