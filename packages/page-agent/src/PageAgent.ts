@@ -90,9 +90,6 @@ export interface UserTakeoverEvent {
  */
 export type HistoryEvent = AgentStep | ObservationEvent | UserTakeoverEvent
 
-/** @deprecated Use AgentStep instead */
-export type AgentHistory = AgentStep
-
 export interface ExecutionResult {
 	success: boolean
 	data: string
