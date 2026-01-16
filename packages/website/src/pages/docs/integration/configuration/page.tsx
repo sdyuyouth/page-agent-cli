@@ -28,15 +28,17 @@ export default function Configuration() {
 					className="mb-4"
 					language="typescript"
 					code={`interface LLMConfig {
-  baseURL?: string
-  apiKey?: string
-  model?: string
+  baseURL: string
+  apiKey: string
+  model: string
+
   temperature?: number
   maxRetries?: number
 
   /**
    * Custom fetch function for LLM API requests.
    * Use this to customize headers, credentials, proxy, etc.
+   * The response should follow OpenAI API format.
    */
   customFetch?: typeof globalThis.fetch
 }`}
@@ -71,12 +73,12 @@ export default function Configuration() {
     getPageInstructions?: (url: string) => string | undefined | null
   }
 
-  // Lifecycle hooks
-  onBeforeStep?: (stepCnt: number) => Promise<void> | void
-  onAfterStep?: (stepCnt: number, history: AgentHistory[]) => Promise<void> | void
-  onBeforeTask?: () => Promise<void> | void
-  onAfterTask?: (result: ExecutionResult) => Promise<void> | void
-  onDispose?: (reason?: string) => void
+  // Lifecycle hooks (with \`this\` bound to PageAgent instance)
+  onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
+  onAfterStep?: (this: PageAgent, stepCnt: number, history: HistoryEvent[]) => Promise<void> | void
+  onBeforeTask?: (this: PageAgent) => Promise<void> | void
+  onAfterTask?: (this: PageAgent, result: ExecutionResult) => Promise<void> | void
+  onDispose?: (this: PageAgent, reason?: string) => void
 
   /**
    * Transform page content before sending to LLM.
@@ -103,7 +105,7 @@ export default function Configuration() {
 				<CodeEditor
 					className="mb-4"
 					language="typescript"
-					code={`interface PageControllerConfig {
+					code={`interface DomConfig {
   /** Elements to exclude from interaction */
   interactiveBlacklist?: (Element | (() => Element))[]
 
@@ -118,15 +120,13 @@ export default function Configuration() {
 
   /** Highlight label opacity (0-1) */
   highlightLabelOpacity?: number
+}
 
-  /** Viewport expansion in pixels (-1 for full page) */
+interface PageControllerConfig extends DomConfig {
+  /** Viewport expansion in pixels */
   viewportExpansion?: number
 
-  /**
-   * Enable visual mask overlay during automation.
-   * Blocks user interaction while agent is running.
-   * Default: false for PageController, true for PageAgent.
-   */
+  /** Enable visual mask overlay during operations (default: false) */
   enableMask?: boolean
 }`}
 				/>
