@@ -22,7 +22,7 @@ export default function Header() {
 					<div className="flex items-center justify-between gap-2">
 						{/* Logo */}
 						<Link
-							href="/"
+							href="~/"
 							className="flex items-center gap-2 sm:gap-3 group shrink-0"
 							aria-label={t('header.logo_alt')}
 							onClick={() => setMobileMenuOpen(false)}

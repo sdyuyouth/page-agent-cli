@@ -34,66 +34,66 @@ export default function DocsRouter() {
 	return (
 		<Switch>
 			{/* Introduction */}
-			<Route path="/docs/introduction/overview">
+			<Route path="/introduction/overview">
 				<DocsPage>
 					<Overview />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/introduction/quick-start">
+			<Route path="/introduction/quick-start">
 				<DocsPage>
 					<QuickStart />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/introduction/limitations">
+			<Route path="/introduction/limitations">
 				<DocsPage>
 					<Limitations />
 				</DocsPage>
 			</Route>
 
 			{/* Features */}
-			<Route path="/docs/features/custom-tools">
+			<Route path="/features/custom-tools">
 				<DocsPage>
 					<CustomTools />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/features/data-masking">
+			<Route path="/features/data-masking">
 				<DocsPage>
 					<DataMasking />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/features/custom-instructions">
+			<Route path="/features/custom-instructions">
 				<DocsPage>
 					<Instructions />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/features/models">
+			<Route path="/features/models">
 				<DocsPage>
 					<Models />
 				</DocsPage>
 			</Route>
 
 			{/* Integration */}
-			<Route path="/docs/integration/cdn-setup">
+			<Route path="/integration/cdn-setup">
 				<DocsPage>
 					<CdnSetup />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/integration/security-permissions">
+			<Route path="/integration/security-permissions">
 				<DocsPage>
 					<SecurityPermissions />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/integration/configuration">
+			<Route path="/integration/configuration">
 				<DocsPage>
 					<Configuration />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/integration/best-practices">
+			<Route path="/integration/best-practices">
 				<DocsPage>
 					<BestPractices />
 				</DocsPage>
 			</Route>
-			<Route path="/docs/integration/third-party-agent">
+			<Route path="/integration/third-party-agent">
 				<DocsPage>
 					<ThirdPartyAgent />
 				</DocsPage>

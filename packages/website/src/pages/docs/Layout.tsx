@@ -24,31 +24,31 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 		{
 			title: t('nav.introduction'),
 			items: [
-				{ title: t('nav.overview'), path: '/docs/introduction/overview' },
-				{ title: t('nav.quick_start'), path: '/docs/introduction/quick-start' },
-				{ title: t('nav.limitations'), path: '/docs/introduction/limitations' },
+				{ title: t('nav.overview'), path: '/introduction/overview' },
+				{ title: t('nav.quick_start'), path: '/introduction/quick-start' },
+				{ title: t('nav.limitations'), path: '/introduction/limitations' },
 			],
 		},
 		{
 			title: t('nav.features'),
 			items: [
-				{ title: t('nav.models'), path: '/docs/features/models' },
-				{ title: t('nav.custom_tools'), path: '/docs/features/custom-tools' },
-				{ title: t('nav.knowledge_injection'), path: '/docs/features/custom-instructions' },
-				{ title: t('nav.data_masking'), path: '/docs/features/data-masking' },
+				{ title: t('nav.models'), path: '/features/models' },
+				{ title: t('nav.custom_tools'), path: '/features/custom-tools' },
+				{ title: t('nav.knowledge_injection'), path: '/features/custom-instructions' },
+				{ title: t('nav.data_masking'), path: '/features/data-masking' },
 			],
 		},
 		{
 			title: t('nav.integration'),
 			items: [
-				{ title: t('nav.configuration'), path: '/docs/integration/configuration' },
-				{ title: t('nav.third_party_agent'), path: '/docs/integration/third-party-agent' },
-				{ title: t('nav.cdn_setup'), path: '/docs/integration/cdn-setup' },
+				{ title: t('nav.configuration'), path: '/integration/configuration' },
+				{ title: t('nav.third_party_agent'), path: '/integration/third-party-agent' },
+				{ title: t('nav.cdn_setup'), path: '/integration/cdn-setup' },
 				{
 					title: '🚧 ' + t('nav.security_permissions'),
-					path: '/docs/integration/security-permissions',
+					path: '/integration/security-permissions',
 				},
-				{ title: '🚧 ' + t('nav.best_practices'), path: '/docs/integration/best-practices' },
+				{ title: '🚧 ' + t('nav.best_practices'), path: '/integration/best-practices' },
 			],
 		},
 	]

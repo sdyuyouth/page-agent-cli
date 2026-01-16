@@ -15,7 +15,7 @@ export default function Router() {
 				</Route>
 
 				{/* All docs pages */}
-				<Route path="/docs/:rest*">
+				<Route path="/docs" nest>
 					<DocsPages />
 				</Route>
 
