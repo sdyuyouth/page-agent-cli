@@ -55,7 +55,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 
 	return (
 		<div className="max-w-7xl mx-auto px-6 py-8 overflow-x-auto">
-			<div className="flex gap-8 min-w-[900px]">
+			<div className="flex gap-8 min-w-225">
 				{/* Sidebar */}
 				<aside className="w-64 shrink-0" role="complementary" aria-label="文档导航">
 					<div className="sticky">
