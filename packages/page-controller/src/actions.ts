@@ -287,12 +287,52 @@ export async function scrollVertically(
 			(document.documentElement as HTMLElement)
 
 	if (el === document.scrollingElement || el === document.documentElement || el === document.body) {
+		// Page-level scroll
+		const scrollBefore = window.scrollY
+		const scrollMax = document.documentElement.scrollHeight - window.innerHeight
+
 		window.scrollBy(0, dy)
-		return `✅ Scrolled page by ${dy}px.`
+
+		const scrollAfter = window.scrollY
+		const scrolled = scrollAfter - scrollBefore
+
+		if (Math.abs(scrolled) < 1) {
+			return dy > 0
+				? `⚠️ Already at the bottom of the page, cannot scroll down further.`
+				: `⚠️ Already at the top of the page, cannot scroll up further.`
+		}
+
+		const reachedBottom = dy > 0 && scrollAfter >= scrollMax - 1
+		const reachedTop = dy < 0 && scrollAfter <= 1
+
+		if (reachedBottom) return `✅ Scrolled page by ${scrolled}px. Reached the bottom of the page.`
+		if (reachedTop) return `✅ Scrolled page by ${scrolled}px. Reached the top of the page.`
+		return `✅ Scrolled page by ${scrolled}px.`
 	} else {
+		// Container scroll
+		const scrollBefore = el!.scrollTop
+		const scrollMax = el!.scrollHeight - el!.clientHeight
+
 		el!.scrollBy({ top: dy, behavior: 'smooth' })
-		await waitFor(0.1) // Animation playback
-		return `✅ Scrolled container (${el!.tagName}) by ${dy}px.`
+		await waitFor(0.1)
+
+		const scrollAfter = el!.scrollTop
+		const scrolled = scrollAfter - scrollBefore
+
+		if (Math.abs(scrolled) < 1) {
+			return dy > 0
+				? `⚠️ Already at the bottom of container (${el!.tagName}), cannot scroll down further.`
+				: `⚠️ Already at the top of container (${el!.tagName}), cannot scroll up further.`
+		}
+
+		const reachedBottom = dy > 0 && scrollAfter >= scrollMax - 1
+		const reachedTop = dy < 0 && scrollAfter <= 1
+
+		if (reachedBottom)
+			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the bottom.`
+		if (reachedTop)
+			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the top.`
+		return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px.`
 	}
 }
 
@@ -410,11 +450,52 @@ export async function scrollHorizontally(
 			(document.documentElement as HTMLElement)
 
 	if (el === document.scrollingElement || el === document.documentElement || el === document.body) {
+		// Page-level scroll
+		const scrollBefore = window.scrollX
+		const scrollMax = document.documentElement.scrollWidth - window.innerWidth
+
 		window.scrollBy(dx, 0)
-		return `✅ Scrolled page horizontally by ${dx}px`
+
+		const scrollAfter = window.scrollX
+		const scrolled = scrollAfter - scrollBefore
+
+		if (Math.abs(scrolled) < 1) {
+			return dx > 0
+				? `⚠️ Already at the right edge of the page, cannot scroll right further.`
+				: `⚠️ Already at the left edge of the page, cannot scroll left further.`
+		}
+
+		const reachedRight = dx > 0 && scrollAfter >= scrollMax - 1
+		const reachedLeft = dx < 0 && scrollAfter <= 1
+
+		if (reachedRight)
+			return `✅ Scrolled page by ${scrolled}px. Reached the right edge of the page.`
+		if (reachedLeft) return `✅ Scrolled page by ${scrolled}px. Reached the left edge of the page.`
+		return `✅ Scrolled page horizontally by ${scrolled}px.`
 	} else {
+		// Container scroll
+		const scrollBefore = el!.scrollLeft
+		const scrollMax = el!.scrollWidth - el!.clientWidth
+
 		el!.scrollBy({ left: dx, behavior: 'smooth' })
-		await waitFor(0.1) // Animation playback
-		return `✅ Scrolled container (${el!.tagName}) horizontally by ${dx}px`
+		await waitFor(0.1)
+
+		const scrollAfter = el!.scrollLeft
+		const scrolled = scrollAfter - scrollBefore
+
+		if (Math.abs(scrolled) < 1) {
+			return dx > 0
+				? `⚠️ Already at the right edge of container (${el!.tagName}), cannot scroll right further.`
+				: `⚠️ Already at the left edge of container (${el!.tagName}), cannot scroll left further.`
+		}
+
+		const reachedRight = dx > 0 && scrollAfter >= scrollMax - 1
+		const reachedLeft = dx < 0 && scrollAfter <= 1
+
+		if (reachedRight)
+			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the right edge.`
+		if (reachedLeft)
+			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the left edge.`
+		return `✅ Scrolled container (${el!.tagName}) horizontally by ${scrolled}px.`
 	}
 }
