@@ -21,12 +21,38 @@ export default defineConfig({
 	clearScreen: false,
 	plugins: [react(), tailwindcss()],
 	build: {
-		chunkSizeWarningLimit: 2000,
 		cssCodeSplit: true,
 		rollupOptions: {
 			onwarn: function (message, handler) {
 				if (message.code === 'EVAL') return
 				handler(message)
+			},
+			output: {
+				manualChunks(id) {
+					// React core
+					if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+						return 'react'
+					}
+					// Radix UI
+					if (id.includes('node_modules/@radix-ui')) {
+						return 'radix'
+					}
+					// Motion animation
+					if (id.includes('node_modules/motion')) {
+						return 'motion'
+					}
+					// Icons
+					if (
+						id.includes('node_modules/lucide-react') ||
+						id.includes('node_modules/simple-icons')
+					) {
+						return 'icons'
+					}
+					// i18n
+					if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+						return 'i18n'
+					}
+				},
 			},
 		},
 	},

@@ -1,148 +1,123 @@
+import { Suspense, lazy } from 'react'
 import { Route, Switch } from 'wouter'
 
 import Header from './components/Header'
-import HomePage from './pages/Home'
 import DocsLayout from './pages/docs/Layout'
-// Features pages
-import Instructions from './pages/docs/features/custom-instructions/page'
-import CustomTools from './pages/docs/features/custom-tools/page'
-import DataMasking from './pages/docs/features/data-masking/page'
-import Models from './pages/docs/features/models/page'
-// Integration pages
-import BestPractices from './pages/docs/integration/best-practices/page'
-import CdnSetup from './pages/docs/integration/cdn-setup/page'
-import Configuration from './pages/docs/integration/configuration/page'
-import SecurityPermissions from './pages/docs/integration/security-permissions/page'
-import ThirdPartyAgent from './pages/docs/integration/third-party-agent/page'
-// Introduction pages
-import Limitations from './pages/docs/introduction/limitations/page'
-import Overview from './pages/docs/introduction/overview/page'
-import QuickStart from './pages/docs/introduction/quick-start/page'
+
+// Lazy load pages
+const HomePage = lazy(() => import('./pages/Home'))
+// Introduction
+const Overview = lazy(() => import('./pages/docs/introduction/overview/page'))
+const QuickStart = lazy(() => import('./pages/docs/introduction/quick-start/page'))
+const Limitations = lazy(() => import('./pages/docs/introduction/limitations/page'))
+// Features
+const CustomTools = lazy(() => import('./pages/docs/features/custom-tools/page'))
+const DataMasking = lazy(() => import('./pages/docs/features/data-masking/page'))
+const Instructions = lazy(() => import('./pages/docs/features/custom-instructions/page'))
+const Models = lazy(() => import('./pages/docs/features/models/page'))
+// Integration
+const CdnSetup = lazy(() => import('./pages/docs/integration/cdn-setup/page'))
+const SecurityPermissions = lazy(() => import('./pages/docs/integration/security-permissions/page'))
+const Configuration = lazy(() => import('./pages/docs/integration/configuration/page'))
+const BestPractices = lazy(() => import('./pages/docs/integration/best-practices/page'))
+const ThirdPartyAgent = lazy(() => import('./pages/docs/integration/third-party-agent/page'))
+
+function DocsPage({ children }: { children: React.ReactNode }) {
+	return (
+		<div className="min-h-screen bg-white dark:bg-gray-900">
+			<Header />
+			<DocsLayout>
+				<Suspense>{children}</Suspense>
+			</DocsLayout>
+		</div>
+	)
+}
 
 export default function Router() {
 	return (
-		<Switch>
-			{/* Home page */}
-			<Route path="/" component={HomePage} />
+		<Suspense>
+			<Switch>
+				{/* Home page */}
+				<Route path="/">
+					<HomePage />
+				</Route>
 
-			{/* Documentation pages with layout */}
-			<Route path="/docs/introduction/overview">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+				{/* Introduction */}
+				<Route path="/docs/introduction/overview">
+					<DocsPage>
 						<Overview />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/introduction/quick-start">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/introduction/quick-start">
+					<DocsPage>
 						<QuickStart />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/introduction/limitations">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/introduction/limitations">
+					<DocsPage>
 						<Limitations />
-					</DocsLayout>
-				</div>
-			</Route>
+					</DocsPage>
+				</Route>
 
-			<Route path="/docs/features/custom-tools">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+				{/* Features */}
+				<Route path="/docs/features/custom-tools">
+					<DocsPage>
 						<CustomTools />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/features/data-masking">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/features/data-masking">
+					<DocsPage>
 						<DataMasking />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/features/custom-instructions">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/features/custom-instructions">
+					<DocsPage>
 						<Instructions />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/features/models">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/features/models">
+					<DocsPage>
 						<Models />
-					</DocsLayout>
-				</div>
-			</Route>
+					</DocsPage>
+				</Route>
 
-			<Route path="/docs/integration/cdn-setup">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+				{/* Integration */}
+				<Route path="/docs/integration/cdn-setup">
+					<DocsPage>
 						<CdnSetup />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/integration/security-permissions">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/integration/security-permissions">
+					<DocsPage>
 						<SecurityPermissions />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/integration/configuration">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/integration/configuration">
+					<DocsPage>
 						<Configuration />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/integration/best-practices">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/integration/best-practices">
+					<DocsPage>
 						<BestPractices />
-					</DocsLayout>
-				</div>
-			</Route>
-
-			<Route path="/docs/integration/third-party-agent">
-				<div className="min-h-screen bg-white dark:bg-gray-900">
-					<Header />
-					<DocsLayout>
+					</DocsPage>
+				</Route>
+				<Route path="/docs/integration/third-party-agent">
+					<DocsPage>
 						<ThirdPartyAgent />
-					</DocsLayout>
-				</div>
-			</Route>
+					</DocsPage>
+				</Route>
 
-			{/* 404 page */}
-			<Route>
-				<div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
-					<div className="text-center">
-						<h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">404</h1>
-						<p className="text-xl text-gray-600 dark:text-gray-300">页面未找到</p>
+				{/* 404 */}
+				<Route>
+					<div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+						<div className="text-center">
+							<h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">404</h1>
+							<p className="text-xl text-gray-600 dark:text-gray-300">页面未找到</p>
+						</div>
 					</div>
-				</div>
-			</Route>
-		</Switch>
+				</Route>
+			</Switch>
+		</Suspense>
 	)
 }
