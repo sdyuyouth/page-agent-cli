@@ -72,6 +72,8 @@ export class Panel {
 		this.#startHeaderUpdateLoop()
 
 		this.#showInputArea()
+
+		this.hide() // Start hidden
 	}
 
 	/**
@@ -362,7 +364,7 @@ export class Panel {
 	#createWrapper(): HTMLElement {
 		const wrapper = document.createElement('div')
 		wrapper.id = 'page-agent-runtime_agent-panel'
-		wrapper.className = `${styles.wrapper} ${styles.collapsed}`
+		wrapper.className = styles.wrapper
 		wrapper.setAttribute('data-browser-use-ignore', 'true')
 
 		wrapper.innerHTML = `
@@ -455,7 +457,6 @@ export class Panel {
 
 	#expand(): void {
 		this.#isExpanded = true
-		this.wrapper.classList.remove(styles.collapsed)
 		this.wrapper.classList.add(styles.expanded)
 		this.#expandButton.textContent = '▲'
 	}
@@ -463,7 +464,6 @@ export class Panel {
 	#collapse(): void {
 		this.#isExpanded = false
 		this.wrapper.classList.remove(styles.expanded)
-		this.wrapper.classList.add(styles.collapsed)
 		this.#expandButton.textContent = '▼'
 	}
 
