@@ -122,7 +122,7 @@ export class PageAgent extends EventTarget {
 		lastURL: '',
 	}
 
-	/** History event stream */
+	/** History events */
 	history: HistoryEvent[] = []
 
 	constructor(config: PageAgentConfig) {
