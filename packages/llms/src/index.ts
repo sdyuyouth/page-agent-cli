@@ -56,9 +56,9 @@ export class LLM extends EventTarget {
 			// retry settings
 			{
 				maxRetries: this.config.maxRetries,
-				onRetry: (current: number) => {
+				onRetry: (attempt: number) => {
 					this.dispatchEvent(
-						new CustomEvent('retry', { detail: { current, max: this.config.maxRetries } })
+						new CustomEvent('retry', { detail: { attempt, maxAttempts: this.config.maxRetries } })
 					)
 				},
 				onError: (error: Error) => {
@@ -73,15 +73,15 @@ async function withRetry<T>(
 	fn: () => Promise<T>,
 	settings: {
 		maxRetries: number
-		onRetry: (retries: number) => void
+		onRetry: (attempt: number) => void
 		onError: (error: Error) => void
 	}
 ): Promise<T> {
-	let retries = 0
+	let attempt = 0
 	let lastError: Error | null = null
-	while (retries <= settings.maxRetries) {
-		if (retries > 0) {
-			settings.onRetry(retries)
+	while (attempt <= settings.maxRetries) {
+		if (attempt > 0) {
+			settings.onRetry(attempt)
 			await new Promise((resolve) => setTimeout(resolve, 100))
 		}
 
@@ -98,7 +98,7 @@ async function withRetry<T>(
 			if (error instanceof InvokeError && !error.retryable) throw error
 
 			lastError = error as Error
-			retries++
+			attempt++
 
 			await new Promise((resolve) => setTimeout(resolve, 100))
 		}

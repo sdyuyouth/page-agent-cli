@@ -4,7 +4,6 @@
  */
 import { LLM, type Tool } from '@page-agent/llms'
 import { PageController } from '@page-agent/page-controller'
-import { Panel } from '@page-agent/ui'
 import chalk from 'chalk'
 import zod from 'zod'
 
@@ -86,29 +85,68 @@ export interface UserTakeoverEvent {
 }
 
 /**
+ * Error event (retry or error from LLM)
+ */
+export interface ErrorEvent {
+	type: 'error'
+	errorType: 'retry' | 'error'
+	message: string
+	attempt?: number
+	maxAttempts?: number
+}
+
+/**
  * Union type for all history events
  */
-export type HistoryEvent = AgentStep | ObservationEvent | UserTakeoverEvent
+export type HistoricalEvent = AgentStep | ObservationEvent | UserTakeoverEvent | ErrorEvent
+
+/**
+ * Agent execution status
+ */
+export type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
+
+/**
+ * Agent activity - transient state for immediate UI feedback.
+ *
+ * Unlike historical events (which are persisted), activities are ephemeral
+ * and represent "what the agent is doing right now". UI components should
+ * listen to 'activity' events to show real-time feedback.
+ *
+ * Note: There is no 'idle' activity - absence of activity events means idle.
+ */
+export type AgentActivity =
+	| { type: 'thinking' }
+	| { type: 'executing'; tool: string; input: unknown }
+	| { type: 'executed'; tool: string; input: unknown; output: string; duration: number }
+	| { type: 'retrying'; attempt: number; maxAttempts: number }
+	| { type: 'error'; message: string }
 
 export interface ExecutionResult {
 	success: boolean
 	data: string
-	history: HistoryEvent[]
+	history: HistoricalEvent[]
 }
 
 export class PageAgent extends EventTarget {
 	config: PageAgentConfig
 	id = uid()
-	panel: Panel | null = null
 	tools: typeof tools
 	disposed = false
 	task = ''
 	taskId = ''
 
+	/** Agent execution status */
+	#status: AgentStatus = 'idle'
+
+	/**
+	 * Callback for when agent needs user input (ask_user tool)
+	 * If not set, ask_user tool will be disabled
+	 * @example onAskUser: (q) => window.prompt(q) || ''
+	 */
+	onAskUser?: (question: string) => Promise<string>
+
 	#llm: LLM
 	#abortController = new AbortController()
-	#llmRetryListener: ((e: Event) => void) | null = null
-	#llmErrorListener: ((e: Event) => void) | null = null
 	#beforeUnloadListener: ((e: Event) => void) | null = null
 
 	/** PageController for DOM operations */
@@ -123,24 +161,13 @@ export class PageAgent extends EventTarget {
 	}
 
 	/** History events */
-	history: HistoryEvent[] = []
+	history: HistoricalEvent[] = []
 
 	constructor(config: PageAgentConfig) {
 		super()
 
 		this.config = config
 		this.#llm = new LLM(this.config)
-
-		// Conditionally initialize Panel
-		if (this.config.enablePanel !== false) {
-			this.panel = new Panel({
-				language: this.config.language,
-				onExecuteTask: (task) => this.execute(task),
-				onStop: () => this.dispose(),
-				promptForNextTask: this.config.promptForNextTask,
-			})
-		}
-
 		this.tools = new Map(tools)
 
 		// Initialize PageController with config (mask enabled by default)
@@ -149,17 +176,32 @@ export class PageAgent extends EventTarget {
 			enableMask: this.config.enableMask ?? true,
 		})
 
-		// Listen to LLM events
-		this.#llmRetryListener = (e) => {
-			const { current, max } = (e as CustomEvent).detail
-			this.panel?.update({ type: 'retry', current, max })
-		}
-		this.#llmErrorListener = (e) => {
+		// Listen to LLM retry events
+		this.#llm.addEventListener('retry', (e) => {
+			const { attempt, maxAttempts } = (e as CustomEvent).detail
+			this.emitActivity({ type: 'retrying', attempt, maxAttempts })
+			// Also push to history for panel rendering
+			this.history.push({
+				type: 'error',
+				errorType: 'retry',
+				message: `LLM retry attempt ${attempt} of ${maxAttempts}`,
+				attempt,
+				maxAttempts,
+			})
+			this.#emitHistoryChange()
+		})
+		this.#llm.addEventListener('error', (e) => {
 			const { error } = (e as CustomEvent).detail
-			this.panel?.update({ type: 'error', message: `step failed: ${error.message}` })
-		}
-		this.#llm.addEventListener('retry', this.#llmRetryListener)
-		this.#llm.addEventListener('error', this.#llmErrorListener)
+			const message = String(error)
+			this.emitActivity({ type: 'error', message })
+			// Also push to history for panel rendering
+			this.history.push({
+				type: 'error',
+				errorType: 'error',
+				message,
+			})
+			this.#emitHistoryChange()
+		})
 
 		if (this.config.customTools) {
 			for (const [name, tool] of Object.entries(this.config.customTools)) {
@@ -175,15 +217,41 @@ export class PageAgent extends EventTarget {
 			this.tools.delete('execute_javascript')
 		}
 
-		// Disable ask_user tool if enableAskUser is false or if panel is disabled
-		if (this.config.enableAskUser === false || this.config.enablePanel === false) {
-			this.tools.delete('ask_user')
-		}
-
 		this.#beforeUnloadListener = (e) => {
 			if (!this.disposed) this.dispose('PAGE_UNLOADING')
 		}
 		window.addEventListener('beforeunload', this.#beforeUnloadListener)
+	}
+
+	/** Get current agent status */
+	get status(): AgentStatus {
+		return this.#status
+	}
+
+	/** Emit statuschange event */
+	#emitStatusChange(): void {
+		this.dispatchEvent(new Event('statuschange'))
+	}
+
+	/** Emit historychange event */
+	#emitHistoryChange(): void {
+		this.dispatchEvent(new Event('historychange'))
+	}
+
+	/**
+	 * Emit activity event - for transient UI feedback
+	 * @param activity - Current agent activity
+	 */
+	emitActivity(activity: AgentActivity): void {
+		this.dispatchEvent(new CustomEvent('activity', { detail: activity }))
+	}
+
+	/** Update status and emit event */
+	#setStatus(status: AgentStatus): void {
+		if (this.#status !== status) {
+			this.#status = status
+			this.#emitStatusChange()
+		}
 	}
 
 	/**
@@ -192,13 +260,18 @@ export class PageAgent extends EventTarget {
 	 */
 	pushObservation(content: string): void {
 		this.history.push({ type: 'observation', content })
-		this.panel?.update({ type: 'observation', content })
+		this.#emitHistoryChange()
 	}
 
 	async execute(task: string): Promise<ExecutionResult> {
 		if (!task) throw new Error('Task is required')
 		this.task = task
 		this.taskId = uid()
+
+		// Disable ask_user tool if onAskUser is not set
+		if (!this.onAskUser) {
+			this.tools.delete('ask_user')
+		}
 
 		const onBeforeStep = this.config.onBeforeStep || (() => void 0)
 		const onAfterStep = this.config.onAfterStep || (() => void 0)
@@ -207,13 +280,8 @@ export class PageAgent extends EventTarget {
 
 		await onBeforeTask.call(this)
 
-		// Show mask and panel
+		// Show mask
 		this.pageController.showMask()
-
-		this.panel?.show()
-		this.panel?.reset()
-
-		this.panel?.update({ type: 'input', task: this.task })
 
 		if (this.#abortController) {
 			this.#abortController.abort()
@@ -221,6 +289,8 @@ export class PageAgent extends EventTarget {
 		}
 
 		this.history = []
+		this.#setStatus('running')
+		this.#emitHistoryChange()
 
 		// Reset states
 		this.states = {
@@ -241,9 +311,9 @@ export class PageAgent extends EventTarget {
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
 
-				// Update status to thinking
+				// Thinking
 				console.log(chalk.blue('Thinking...'))
-				this.panel?.update({ type: 'thinking' })
+				this.emitActivity({ type: 'thinking' })
 
 				const result = await this.#llm.invoke(
 					[
@@ -285,6 +355,7 @@ export class PageAgent extends EventTarget {
 					action,
 					usage: result.usage,
 				} as AgentStep)
+				this.#emitHistoryChange()
 
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
@@ -318,10 +389,12 @@ export class PageAgent extends EventTarget {
 			}
 		} catch (error: unknown) {
 			console.error('Task failed', error)
-			this.#onDone(String(error), false)
+			const errorMessage = String(error)
+			this.emitActivity({ type: 'error', message: errorMessage })
+			this.#onDone(errorMessage, false)
 			const result: ExecutionResult = {
 				success: false,
-				data: String(error),
+				data: errorMessage,
 				history: this.history,
 			}
 			await onAfterTask.call(this, result)
@@ -381,7 +454,6 @@ export class PageAgent extends EventTarget {
 
 				if (reflectionText) {
 					console.log(reflectionText)
-					this.panel?.update({ type: 'thinking', text: reflectionText })
 				}
 
 				// Find the corresponding tool
@@ -389,7 +461,9 @@ export class PageAgent extends EventTarget {
 				assert(tool, `Tool ${toolName} not found. (@note should have been caught before this!!!)`)
 
 				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
-				this.panel?.update({ type: 'toolExecuting', toolName, args: toolInput })
+
+				// Emit executing activity
+				this.emitActivity({ type: 'executing', tool: toolName, input: toolInput })
 
 				const startTime = Date.now()
 
@@ -399,22 +473,19 @@ export class PageAgent extends EventTarget {
 				const duration = Date.now() - startTime
 				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)
 
+				// Emit executed activity
+				this.emitActivity({
+					type: 'executed',
+					tool: toolName,
+					input: toolInput,
+					output: result,
+					duration,
+				})
+
 				// Reset wait time for non-wait tools
 				if (toolName !== 'wait') {
 					this.states.totalWaitTime = 0
 				}
-
-				// Briefly display execution result
-				this.panel?.update({
-					type: 'toolCompleted',
-					toolName,
-					args: toolInput,
-					result,
-					duration,
-				})
-
-				// Wait a moment to let user see the result
-				await new Promise((resolve) => setTimeout(resolve, 100))
 
 				// Return structured result
 				return {
@@ -551,6 +622,9 @@ export class PageAgent extends EventTarget {
 				prompt += `<sys>${event.content}</sys>\n`
 			} else if (event.type === 'user_takeover') {
 				prompt += `<sys>User took over control and made changes to the page.</sys>\n`
+			} else if (event.type === 'error') {
+				// Error events are mainly for panel rendering, not included in LLM context
+				// to avoid polluting the agent's reasoning with transient errors
 			}
 		}
 
@@ -565,19 +639,8 @@ export class PageAgent extends EventTarget {
 
 	#onDone(text: string, success = true) {
 		this.pageController.cleanUpHighlights()
-
-		// Update panel status
-		if (success) {
-			this.panel?.update({ type: 'output', text })
-		} else {
-			this.panel?.update({ type: 'error', message: text })
-		}
-
-		// Task completed
-		this.panel?.update({ type: 'completed' })
-
 		this.pageController.hideMask()
-
+		this.#setStatus(success ? 'completed' : 'error')
 		this.#abortController.abort()
 	}
 
@@ -604,25 +667,17 @@ export class PageAgent extends EventTarget {
 		console.log('Disposing PageAgent...')
 		this.disposed = true
 		this.pageController.dispose()
-		this.panel?.dispose()
 		this.history = []
 		this.#abortController.abort(reason ?? 'PageAgent disposed')
-
-		// Clean up LLM event listeners
-		if (this.#llmRetryListener) {
-			this.#llm.removeEventListener('retry', this.#llmRetryListener)
-			this.#llmRetryListener = null
-		}
-		if (this.#llmErrorListener) {
-			this.#llm.removeEventListener('error', this.#llmErrorListener)
-			this.#llmErrorListener = null
-		}
 
 		// Clean up window event listeners
 		if (this.#beforeUnloadListener) {
 			window.removeEventListener('beforeunload', this.#beforeUnloadListener)
 			this.#beforeUnloadListener = null
 		}
+
+		// Emit dispose event for UI cleanup
+		this.dispatchEvent(new Event('dispose'))
 
 		this.config.onDispose?.call(this, reason)
 	}

@@ -1,36 +1,17 @@
 import type { LLMConfig } from '@page-agent/llms'
 import type { PageControllerConfig } from '@page-agent/page-controller'
-import type { SupportedLanguage } from '@page-agent/ui'
 
 import type { ExecutionResult, HistoryEvent, PageAgent } from '../PageAgent'
 import type { PageAgentTool } from '../tools'
 
 export type { LLMConfig }
 
+/** Supported UI languages */
+export type SupportedLanguage = 'en-US' | 'zh-CN'
+
 export interface AgentConfig {
 	// theme?: 'light' | 'dark'
 	language?: SupportedLanguage
-
-	/**
-	 * Whether to prompt for next task after task completion
-	 * @default true
-	 */
-	promptForNextTask?: boolean
-
-	/**
-	 * Enable the UI panel for visual feedback and user interaction
-	 * When disabled, the panel will not be created and all UI operations will be skipped.
-	 * Useful for automated testing or when integrating PageAgent as a library.
-	 * @default true
-	 */
-	enablePanel?: boolean
-
-	/**
-	 * Enable the ask_user tool for agent to ask questions
-	 * When disabled, the agent cannot ask user questions during execution.
-	 * @default true
-	 */
-	enableAskUser?: boolean
 
 	/**
 	 * Custom tools to extend PageAgent capabilities

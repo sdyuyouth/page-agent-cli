@@ -1,4 +1,5 @@
 /* eslint-disable react-dom/no-dangerously-set-innerhtml */
+import { Panel } from '@page-agent/ui'
 import { Bot, Box, MessageSquare, PlayCircle, Shield, Sparkles, Users, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -94,6 +95,10 @@ export default function HomePage() {
 				// promptForNextTask: false,
 				// enablePanel: false,
 			})
+
+			// Create and bind Panel
+			const panel = new Panel(win.pageAgent, { language: i18n.language as any })
+			panel.show()
 		}
 
 		const result = await win.pageAgent.execute(task)

@@ -80,11 +80,11 @@ tools.set(
 			question: zod.string(),
 		}),
 		execute: async function (this: PageAgent, input) {
-			if (!this.panel) {
-				throw new Error('ask_user tool requires panel to be enabled')
+			if (!this.onAskUser) {
+				throw new Error('ask_user tool requires onAskUser callback to be set')
 			}
-			const answer = await this.panel.askUser(input.question)
-			return `✅ Received user answer: ${answer}`
+			const answer = await this.onAskUser(input.question)
+			return `User answered: ${answer}`
 		},
 	})
 )
