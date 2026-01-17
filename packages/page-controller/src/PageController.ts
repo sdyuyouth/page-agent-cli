@@ -18,10 +18,7 @@ import { VIEWPORT_EXPANSION } from './constants'
 import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
-import { SimulatorMask } from './mask/SimulatorMask'
 import { patchReact } from './patches/react'
-
-export { SimulatorMask }
 
 /**
  * Configuration for PageController
@@ -84,7 +81,7 @@ export class PageController extends EventTarget {
 	private lastTimeUpdate = 0
 
 	/** Visual mask overlay for blocking user interaction during automation */
-	private mask: SimulatorMask | null = null
+	private mask: InstanceType<typeof import('./mask/SimulatorMask').SimulatorMask> | null = null
 
 	constructor(config: PageControllerConfig = {}) {
 		super()
@@ -94,10 +91,16 @@ export class PageController extends EventTarget {
 		patchReact(this)
 
 		if (config.enableMask) {
-			this.mask = new SimulatorMask()
+			this.initMask()
 		}
 	}
-
+	/**
+	 * Initialize mask asynchronously (dynamic import to avoid CSS loading in Node)
+	 */
+	private async initMask(): Promise<void> {
+		const { SimulatorMask } = await import('./mask/SimulatorMask')
+		this.mask = new SimulatorMask()
+	}
 	// ======= State Queries =======
 
 	/**

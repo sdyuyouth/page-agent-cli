@@ -1,5 +1,5 @@
 import type { LLMConfig } from '@page-agent/llms'
-import type { PageControllerConfig } from '@page-agent/page-controller'
+import type { PageController, PageControllerConfig } from '@page-agent/page-controller'
 
 import type { PageAgent } from '../PageAgent'
 import type { PageAgentTool } from '../tools'
@@ -74,7 +74,6 @@ export interface AgentConfig {
 
 	/**
 	 * @note this hook can block the disposal process
-	 * @note when dispose caused by page unload, reason will be 'PAGE_UNLOADING'. this method CANNOT block unloading. async operations may be cut.
 	 * @todo remove `this` binding, pass agent as explicit parameter instead
 	 */
 	onDispose?: (this: PageAgent, reason?: string) => void
@@ -104,6 +103,13 @@ export interface AgentConfig {
 	 * }
 	 */
 	transformPageContent?: (content: string) => Promise<string> | string
+
+	/**
+	 * @experimental
+	 * Custom PageController instance to control page navigation and actions
+	 * @note If not provided, a default PageController will be created
+	 */
+	pageController?: PageController
 
 	/**
 	 * TODO: @unimplemented

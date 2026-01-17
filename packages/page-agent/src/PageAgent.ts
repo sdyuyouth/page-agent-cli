@@ -68,7 +68,6 @@ export class PageAgent extends EventTarget {
 
 	#llm: LLM
 	#abortController = new AbortController()
-	#beforeUnloadListener: ((e: Event) => void) | null = null
 
 	/** PageController for DOM operations */
 	pageController: PageController
@@ -92,10 +91,12 @@ export class PageAgent extends EventTarget {
 		this.tools = new Map(tools)
 
 		// Initialize PageController with config (mask enabled by default)
-		this.pageController = new PageController({
-			...this.config,
-			enableMask: this.config.enableMask ?? true,
-		})
+		this.pageController =
+			this.config.pageController ??
+			new PageController({
+				...this.config,
+				enableMask: this.config.enableMask ?? true,
+			})
 
 		// Listen to LLM retry events
 		this.#llm.addEventListener('retry', (e) => {
@@ -137,11 +138,6 @@ export class PageAgent extends EventTarget {
 		if (!this.config.experimentalScriptExecutionTool) {
 			this.tools.delete('execute_javascript')
 		}
-
-		this.#beforeUnloadListener = (e) => {
-			if (!this.disposed) this.dispose('PAGE_UNLOADING')
-		}
-		window.addEventListener('beforeunload', this.#beforeUnloadListener)
 	}
 
 	/** Get current agent status */
@@ -590,12 +586,6 @@ export class PageAgent extends EventTarget {
 		this.pageController.dispose()
 		this.history = []
 		this.#abortController.abort(reason ?? 'PageAgent disposed')
-
-		// Clean up window event listeners
-		if (this.#beforeUnloadListener) {
-			window.removeEventListener('beforeunload', this.#beforeUnloadListener)
-			this.#beforeUnloadListener = null
-		}
 
 		// Emit dispose event for UI cleanup
 		this.dispatchEvent(new Event('dispose'))
