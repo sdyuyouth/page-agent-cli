@@ -22,13 +22,6 @@ export default function Overview() {
 
 				{/* Status Badges */}
 				<div className="flex flex-wrap gap-2 items-center">
-					<a
-						href="https://www.npmjs.com/package/page-agent"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<img src="https://badge.fury.io/js/page-agent.svg" alt="npm version" />
-					</a>
 					<a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">
 						<img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" />
 					</a>

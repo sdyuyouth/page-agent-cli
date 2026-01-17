@@ -2,7 +2,7 @@
 
 ![banner](https://img.alicdn.com/imgextra/i1/O1CN01RY0Wvh26ATVeDIX7v_!!6000000007621-0-tps-1672-512.jpg)
 
-[![npm version](https://badge.fury.io/js/page-agent.svg)](https://badge.fury.io/js/page-agent) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
 
 纯 JS 实现的 GUI agent。使用自然语言操作你的 Web 应用。无须后端、客户端、浏览器插件。
 
@@ -10,7 +10,7 @@
 
 👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
-<video id="demo-video" src="https://github.com/user-attachments/assets/141bbb01-8022-4d1f-919d-9efc9a1dc1cf" width="640" crossorigin muted autoplay loop></video>
+<video id="demo-video" src="https://github.com/user-attachments/assets/141bbb01-8022-4d1f-919d-9efc9a1dc1cf" crossorigin muted loop></video>
 
 ---
 
@@ -28,22 +28,25 @@
 
 ## 🚀 快速开始
 
-### 快速体验 (Demo CDN)
+### 快速体验 (With Testing LLM)
 
 最快的体验方式：
 
 ```html
-<script src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js" crossorigin="true"></script>
+<script
+	src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js"
+	crossorigin="true"
+></script>
 ```
 
 > ⚠️ **仅用于技术评估。** Demo 模型有速率限制和使用限制，生产环境请使用 NPM 方式。
 
-| 位置   | URL                                                                                     |
-| ------ | --------------------------------------------------------------------------------------- |
-| 全球   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                    |
-| 中国   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js     |
+| Mirrors | URL                                                                                 |
+| ------- | ----------------------------------------------------------------------------------- |
+| Global  | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                |
+| China   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js |
 
-### NPM 安装（推荐）
+### NPM 安装
 
 ```bash
 npm install page-agent
@@ -62,26 +65,7 @@ const agent = new PageAgent({
 await agent.execute('点击登录按钮')
 ```
 
-### CDN 引入
-
-适用于无法使用 NPM 的环境，用法与 NPM 一致：
-
-```html
-<script src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.js" crossorigin="true"></script>
-<script>
-const agent = new PageAgent({
-	model: 'deepseek-chat',
-	baseURL: 'https://api.deepseek.com',
-	apiKey: 'YOUR_API_KEY',
-})
-await agent.execute('点击登录按钮')
-</script>
-```
-
-| 位置   | URL                                                                                 |
-| ------ | ----------------------------------------------------------------------------------- |
-| 全球   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.js                     |
-| 中国   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.js      |
+适用于无法使用 NPM 的环境，我们也提供了 IIFE 构建的 CDN 方式。[@see CDN Usage](https://alibaba.github.io/page-agent/#/docs/integration/cdn-setup)
 
 ## 🏗️ 架构设计
 
@@ -101,28 +85,19 @@ packages/
 
 欢迎社区贡献！以下是参与方式：
 
-### 开发环境
+1. Fork 并 clone。`git clone https://github.com/alibaba/page-agent.git && cd page-agent`
+2. 安装依赖: `npm install`
+3. 启动开发: `npm start`
 
-1. Fork 项目仓库
-2. Clone or fork: `git clone https://github.com/alibaba/page-agent.git && cd page-agent`
-3. 安装依赖: `npm install`
-4. 启动开发: `npm start`
+更多详情请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-### 贡献指南
-
-请在贡献前阅读我们的[行为准则](CODE_OF_CONDUCT.md)和[贡献指南](CONTRIBUTING.md)。
+请在贡献前阅读我们的[行为准则](CODE_OF_CONDUCT.md)。
 
 ## 👏 致谢
 
-本项目基于以下优秀项目构建：
+本项目基于 **[`browser-use`](https://github.com/browser-use/browser-use)** 的优秀工作构建。
 
-- **[browser-use](https://github.com/browser-use/browser-use)**
-
-PageAgent 专为**客户端网页增强**设计，不是服务端自动化工具。
-
-## 📄 许可证
-
-MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
+`PageAgent` 专为**客户端网页增强**设计，不是服务端自动化工具。
 
 ```
 DOM processing components and prompt are derived from browser-use:
@@ -140,6 +115,10 @@ this project possible.
 Third-party dependencies and their licenses can be found in the package.json
 file and in the node_modules directory after installation.
 ```
+
+## 📄 许可证
+
+[MIT License](LICENSE)
 
 ---
 

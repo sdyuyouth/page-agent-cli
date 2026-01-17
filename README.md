@@ -2,7 +2,7 @@
 
 ![banner](https://img.alicdn.com/imgextra/i3/O1CN01MyVCS21EoKkIHUT1s_!!6000000000398-49-tps-1280-353.webp)
 
-[![npm version](https://badge.fury.io/js/page-agent.svg)](https://badge.fury.io/js/page-agent) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
 
 The GUI Agent Living in Your Webpage. Control web interfaces with natural language.
 
@@ -10,7 +10,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
-<video id="demo-video" src="https://github.com/user-attachments/assets/de8d1964-8bde-494f-a52f-2975469557a5" width="640" crossorigin muted autoplay loop></video>
+<video id="demo-video" src="https://github.com/user-attachments/assets/de8d1964-8bde-494f-a52f-2975469557a5" crossorigin muted loop></video>
 
 ---
 
@@ -28,22 +28,25 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## 🚀 Quick Start
 
-### Quick Try (Demo CDN)
+### Quick Try (With Testing LLM)
 
 Fastest way to try PageAgent:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js" crossorigin="true"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js"
+	crossorigin="true"
+></script>
 ```
 
 > ⚠️ **For technical evaluation only.** Demo model has rate limits and usage restrictions. Use NPM for production.
 
-| Location | URL                                                                                     |
-| -------- | --------------------------------------------------------------------------------------- |
-| Global   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                    |
-| China    | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js     |
+| Mirrors | URL                                                                                 |
+| ------- | ----------------------------------------------------------------------------------- |
+| Global  | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                |
+| China   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js |
 
-### NPM Installation (Recommended)
+### NPM Installation
 
 ```bash
 npm install page-agent
@@ -62,26 +65,7 @@ const agent = new PageAgent({
 await agent.execute('Click the login button')
 ```
 
-### CDN Build
-
-For environments where NPM is not available. Usage is identical to NPM:
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.js" crossorigin="true"></script>
-<script>
-const agent = new PageAgent({
-	model: 'deepseek-chat',
-	baseURL: 'https://api.deepseek.com',
-	apiKey: 'YOUR_API_KEY',
-})
-await agent.execute('Click the login button')
-</script>
-```
-
-| Location | URL                                                                                 |
-| -------- | ----------------------------------------------------------------------------------- |
-| Global   | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.js                     |
-| China    | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.js      |
+For environments where NPM is not available. We do offer a IIFE build via CDN. [@see CDN Usage](https://alibaba.github.io/page-agent/#/docs/integration/cdn-setup)
 
 ## 🏗️ Structure
 
@@ -101,28 +85,19 @@ packages/
 
 We welcome contributions from the community! Here's how to get started:
 
-### Setup
+1. Fork and clone. `git clone https://github.com/alibaba/page-agent.git && cd page-agent`
+2. Install dependencies: `npm install`
+3. Start development: `npm start`
 
-1. Fork the repository
-2. Clone your fork: `git clone https://github.com/alibaba/page-agent.git && cd page-agent`
-3. Install dependencies: `npm install`
-4. Start development: `npm start`
+More details in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-### Contributing Guidelines
-
-Please read our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing Guide](CONTRIBUTING.md) before contributing.
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ## 👏 Acknowledgments
 
-This project builds upon the excellent work of:
+This project builds upon the excellent work of **[`browser-use`](https://github.com/browser-use/browser-use)**.
 
-- **[browser-use](https://github.com/browser-use/browser-use)**
-
-PageAgent is designed for **client-side web enhancement**, not server-side automation.
-
-## 📄 License
-
-MIT License - see the [LICENSE](LICENSE) file for details.
+`PageAgent` is designed for **client-side web enhancement**, not server-side automation.
 
 ```
 DOM processing components and prompt are derived from browser-use:
@@ -140,6 +115,10 @@ this project possible.
 Third-party dependencies and their licenses can be found in the package.json
 file and in the node_modules directory after installation.
 ```
+
+## 📄 License
+
+[MIT License](LICENSE)
 
 ---
 
