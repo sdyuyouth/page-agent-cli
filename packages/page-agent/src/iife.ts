@@ -49,5 +49,5 @@ setTimeout(() => {
 
 	console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)
 
-	window.pageAgent.panel.show() // Show panel
+	window.pageAgent.panel!.show() // Show panel
 })
