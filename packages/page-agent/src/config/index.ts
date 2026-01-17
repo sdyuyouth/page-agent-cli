@@ -12,6 +12,27 @@ export interface AgentConfig {
 	language?: SupportedLanguage
 
 	/**
+	 * Whether to prompt for next task after task completion
+	 * @default true
+	 */
+	promptForNextTask?: boolean
+
+	/**
+	 * Enable the UI panel for visual feedback and user interaction
+	 * When disabled, the panel will not be created and all UI operations will be skipped.
+	 * Useful for automated testing or when integrating PageAgent as a library.
+	 * @default true
+	 */
+	enablePanel?: boolean
+
+	/**
+	 * Enable the ask_user tool for agent to ask questions
+	 * When disabled, the agent cannot ask user questions during execution.
+	 * @default true
+	 */
+	enableAskUser?: boolean
+
+	/**
 	 * Custom tools to extend PageAgent capabilities
 	 * @experimental
 	 * @note You can also override or remove internal tools by using the same name.
