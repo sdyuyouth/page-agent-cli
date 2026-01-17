@@ -281,7 +281,7 @@ export class PageAgent extends EventTarget {
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
 
-				await onAfterStep.call(this, step, this.history)
+				await onAfterStep.call(this, this.history)
 
 				step++
 				if (step > MAX_STEPS) {
