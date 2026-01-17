@@ -1,7 +1,7 @@
 /**
  * Card HTML generation utilities for Panel
  */
-import { escapeHtml } from './utils'
+import { escapeHtml } from '../utils'
 
 import styles from './Panel.module.css'
 

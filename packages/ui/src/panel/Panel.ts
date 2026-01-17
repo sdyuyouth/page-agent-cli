@@ -1,7 +1,7 @@
+import { I18n, type SupportedLanguage } from '../i18n'
+import { truncate } from '../utils'
 import { createCard, createReflectionLines, formatTime } from './cards'
-import { I18n, type SupportedLanguage } from './i18n'
 import type { AgentActivity, PanelAgentAdapter } from './types'
-import { truncate } from './utils'
 
 import styles from './Panel.module.css'
 
