@@ -10,7 +10,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
-<video id="demo-video" src="https://github.com/user-attachments/assets/de8d1964-8bde-494f-a52f-2975469557a5" crossorigin muted loop></video>
+<video id="demo-video" src="https://github.com/user-attachments/assets/b5c8bc44-5111-44b4-9636-d6fb84071e61" controls crossorigin muted></video>
 
 ---
 
