@@ -1,29 +1,29 @@
 {
-	"editor.fontLigatures": true,
-	"cSpell.words": [
-		"deepseek",
-		"HITL",
-		"innerhtml",
-		"llms",
-		"onwarn",
-		"opensource",
-		"qwen",
-		"retryable",
-		"shadcn",
-		"wouter"
-	],
-	"markdownlint.config": {
-		// "comment": "Relaxed rules",
-		"default": true,
-		"whitespace": false,
-		"line_length": false,
-		"ul-indent": false,
-		"no-inline-html": false,
-		"no-bare-urls": false,
-		"fenced-code-language": false,
-		"first-line-h1": false,
-		"block-spacing": false,
-		"blanks-around-lists": false,
-		"ol-prefix": false
-	}
+    "editor.fontLigatures": true,
+    "cSpell.words": [
+        "deepseek",
+        "HITL",
+        "innerhtml",
+        "llms",
+        "onwarn",
+        "opensource",
+        "qwen",
+        "retryable",
+        "shadcn",
+        "wouter"
+    ],
+    "markdownlint.config": {
+        // "comment": "Relaxed rules",
+        "default": true,
+        "whitespace": false,
+        "line_length": false,
+        "ul-indent": false,
+        "no-inline-html": false,
+        "no-bare-urls": false,
+        "fenced-code-language": false,
+        "first-line-h1": false,
+        "block-spacing": false,
+        "blanks-around-lists": false,
+        "ol-prefix": false
+    }
 }

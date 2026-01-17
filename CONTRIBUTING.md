@@ -7,16 +7,16 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 ### Development Setup
 
 1. **Prerequisites**
-   - `node.js >= 20` with `npm >= 10`
-   - An editor that supports `ts/eslint/prettier`
-   - Make sure `eslint`, `prettier` and `commitlint` work well
+    - `node.js >= 20` with `npm >= 10`
+    - An editor that supports `ts/eslint/prettier`
+    - Make sure `eslint`, `prettier` and `commitlint` work well
 
 2. **Setup**
 
-   ```bash
-   npm ci
-   npm start          # Start demo and documentation site
-   ```
+    ```bash
+    npm ci
+    npm start          # Start demo and documentation site
+    ```
 
 ### Project Structure
 
@@ -44,39 +44,39 @@ We use a simplified monorepo solution with `native npm-workspace + ts reference 
 
 1. **Fork and Clone**
 
-   ```bash
-   git clone https://github.com/your-username/page-agent.git
-   cd page-agent
-   ```
+    ```bash
+    git clone https://github.com/your-username/page-agent.git
+    cd page-agent
+    ```
 
 2. **Create Feature Branch**
 
-   ```bash
-   git checkout -b feat/your-feature-name
-   ```
+    ```bash
+    git checkout -b feat/your-feature-name
+    ```
 
 3. **Make Changes**
-   - Follow existing code style and patterns
-   - Add tests for new functionality
-   - Update documentation as needed
+    - Follow existing code style and patterns
+    - Add tests for new functionality
+    - Update documentation as needed
 
 4. **Test Your Changes**
-   - Test in our demo website
-   - Test it on other websites if applicable
-   - `@TODO: test suite`
+    - Test in our demo website
+    - Test it on other websites if applicable
+    - `@TODO: test suite`
 
 5. **Commit and Push**
 
-   ```bash
-   git add .
-   git commit -m "feat: add awesome feature"
-   git push origin feat/your-feature-name
-   ```
+    ```bash
+    git add .
+    git commit -m "feat: add awesome feature"
+    git push origin feat/your-feature-name
+    ```
 
 6. **Create Pull Request**
-   - Provide clear description of changes
-   - Link related issues
-   - Include screenshots for UI changes
+    - Provide clear description of changes
+    - Link related issues
+    - Include screenshots for UI changes
 
 ## 📝 Code Style
 
@@ -101,11 +101,11 @@ We use a simplified monorepo solution with `native npm-workspace + ts reference 
 
 - Create a `.env` file in the repo root with your LLM API config
 
-  ```env
-  LLM_MODEL_NAME=gpt-5.2
-  LLM_API_KEY=your-api-key
-  LLM_BASE_URL=https://api.your-llm-provider.com/v1
-  ```
+    ```env
+    LLM_MODEL_NAME=gpt-5.2
+    LLM_API_KEY=your-api-key
+    LLM_BASE_URL=https://api.your-llm-provider.com/v1
+    ```
 
 - Restart the dev server to load new env vars
 - If not provided, the demo will the free testing proxy by default
@@ -120,15 +120,15 @@ npm start
 
 - Start and serve a local `iife` script
 
-  ```bash
-  npm run dev:iife # Serving IIFE with auto rebuild at http://localhost:5174/page-agent.js
-  ```
+    ```bash
+    npm run dev:iife # Serving IIFE with auto rebuild at http://localhost:5174/page-agent.js
+    ```
 
 - Add a new bookmark
 
-  ```javascript
-  javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5174/page-agent.js?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
-  ```
+    ```javascript
+    javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5174/page-agent.js?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
+    ```
 
 - Click the bookmark on any page to load Page-Agent
 

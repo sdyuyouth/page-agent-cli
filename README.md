@@ -37,8 +37,8 @@ Fastest way to try PageAgent:
 
 ```html
 <script
-	src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js"
-	crossorigin="true"
+    src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js"
+    crossorigin="true"
 ></script>
 ```
 
@@ -59,10 +59,10 @@ npm install page-agent
 import { PageAgent } from 'page-agent'
 
 const agent = new PageAgent({
-	model: 'deepseek-chat',
-	baseURL: 'https://api.deepseek.com',
-	apiKey: 'YOUR_API_KEY',
-	language: 'en-US',
+    model: 'deepseek-chat',
+    baseURL: 'https://api.deepseek.com',
+    apiKey: 'YOUR_API_KEY',
+    language: 'en-US',
 })
 
 await agent.execute('Click the login button')

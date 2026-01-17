@@ -37,8 +37,8 @@
 
 ```html
 <script
-	src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js"
-	crossorigin="true"
+    src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js"
+    crossorigin="true"
 ></script>
 ```
 
@@ -59,10 +59,10 @@ npm install page-agent
 import { PageAgent } from 'page-agent'
 
 const agent = new PageAgent({
-	model: 'deepseek-chat',
-	baseURL: 'https://api.deepseek.com',
-	apiKey: 'YOUR_API_KEY',
-	language: 'zh-CN',
+    model: 'deepseek-chat',
+    baseURL: 'https://api.deepseek.com',
+    apiKey: 'YOUR_API_KEY',
+    language: 'zh-CN',
 })
 
 await agent.execute('点击登录按钮')

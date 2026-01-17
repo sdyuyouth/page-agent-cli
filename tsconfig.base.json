@@ -1,47 +1,47 @@
 {
-	"compilerOptions": {
-		"composite": true,
-		"target": "ES2024",
-		"useDefineForClassFields": true,
-		"lib": ["ES2024", "DOM", "DOM.Iterable"],
-		"module": "ESNext",
-		"skipLibCheck": true,
-		"allowJs": true,
+    "compilerOptions": {
+        "composite": true,
+        "target": "ES2024",
+        "useDefineForClassFields": true,
+        "lib": ["ES2024", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "skipLibCheck": true,
+        "allowJs": true,
 
-		// "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
-		// "baseUrl": "src",
-		"baseUrl": ".",
-		"outDir": "dist",
-		// "incremental": true,
+        // "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+        // "baseUrl": "src",
+        "baseUrl": ".",
+        "outDir": "dist",
+        // "incremental": true,
 
-		/* Bundler mode */
-		"moduleResolution": "bundler",
-		"verbatimModuleSyntax": false,
-		"noEmit": true,
-		"jsx": "react-jsx",
-		"allowImportingTsExtensions": true,
+        /* Bundler mode */
+        "moduleResolution": "bundler",
+        "verbatimModuleSyntax": false,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "allowImportingTsExtensions": true,
 
-		/* Linting */
-		"strict": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"erasableSyntaxOnly": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "erasableSyntaxOnly": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true
 
-		// "paths": {
-		// 	// Simplified monorepo solution (raw npm workspace with hoisting)
-		// 	"@page-agent/page-controller": ["./packages/page-controller/src/PageController.ts"],
-		// 	"page-agent": ["./packages/page-agent/src/PageAgent.ts"]
-		// }
-	}
-	// "references": [
-	// 	{ "path": "./packages/page-controller" },
-	// 	{ "path": "./packages/page-agent" },
-	// 	{ "path": "./packages/website" }
-	// ],
-	// "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
-	// "exclude": ["node_modules", "dist", "packages/*/dist"]
-	// "files": ["env.d.ts"]
-	// "files": []
+        // "paths": {
+        // 	// Simplified monorepo solution (raw npm workspace with hoisting)
+        // 	"@page-agent/page-controller": ["./packages/page-controller/src/PageController.ts"],
+        // 	"page-agent": ["./packages/page-agent/src/PageAgent.ts"]
+        // }
+    }
+    // "references": [
+    // 	{ "path": "./packages/page-controller" },
+    // 	{ "path": "./packages/page-agent" },
+    // 	{ "path": "./packages/website" }
+    // ],
+    // "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    // "exclude": ["node_modules", "dist", "packages/*/dist"]
+    // "files": ["env.d.ts"]
+    // "files": []
 }

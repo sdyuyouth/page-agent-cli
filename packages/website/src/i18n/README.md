@@ -28,9 +28,9 @@ pages/i18n/
 import { useTranslation } from 'react-i18next'
 
 function MyComponent() {
-  const { t } = useTranslation('common') // 指定命名空间
-  
-  return <h1>{t('header.nav_docs')}</h1>
+    const { t } = useTranslation('common') // 指定命名空间
+
+    return <h1>{t('header.nav_docs')}</h1>
 }
 ```
 
@@ -71,4 +71,3 @@ t('common:header.nav_docs')
 - [ ] 文档页翻译（`docs.json`）
 - [ ] DocsLayout 导航结构国际化
 - [ ] 404 页面国际化
-

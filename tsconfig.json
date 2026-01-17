@@ -1,12 +1,12 @@
 {
-	"extends": "./tsconfig.base.json",
-	"references": [
-		{ "path": "./packages/page-controller" },
-		{ "path": "./packages/ui" },
-		{ "path": "./packages/llms" },
-		{ "path": "./packages/page-agent" },
-		{ "path": "./packages/website" }
-	],
-	"include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
-	"exclude": ["node_modules", "dist", "packages/*/dist"]
+    "extends": "./tsconfig.base.json",
+    "references": [
+        { "path": "./packages/page-controller" },
+        { "path": "./packages/ui" },
+        { "path": "./packages/llms" },
+        { "path": "./packages/page-agent" },
+        { "path": "./packages/website" }
+    ],
+    "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    "exclude": ["node_modules", "dist", "packages/*/dist"]
 }
