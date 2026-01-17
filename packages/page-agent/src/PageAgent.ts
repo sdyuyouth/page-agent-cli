@@ -27,6 +27,27 @@ import { assert } from './utils/assert'
 export type { PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
 
+/**
+ * AI agent for browser DOM automation.
+ *
+ * @remarks
+ * ## Event System
+ * - `statuschange` - Agent status transitions (idle → running → completed/error)
+ * - `historychange` - History events updated (persistent, part of agent memory)
+ * - `activity` - Real-time activity feedback (transient, for UI only)
+ * - `dispose` - Agent cleanup triggered
+ *
+ * ## Information Streams
+ * 1. **History Events** (`history` array)
+ *    - Persistent event stream that forms agent's memory
+ *    - Included in LLM context across steps
+ *    - Types: steps, observations, user takeovers, llm errors
+ *
+ * 2. **Activity Events** (via `activity` event)
+ *    - Transient UI feedback during task execution
+ *    - NOT included in LLM context
+ *    - Types: thinking, executing, executed, retrying, error
+ */
 export class PageAgent extends EventTarget {
 	config: PageAgentConfig
 	id = uid()
