@@ -1,6 +1,9 @@
 # PageAgent 🤖🪄
 
-![banner](https://img.alicdn.com/imgextra/i3/O1CN01MyVCS21EoKkIHUT1s_!!6000000000398-49-tps-1280-353.webp)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://img.alicdn.com/imgextra/i3/O1CN01epxUlx1K33YzVWWoY_!!6000000001107-0-tps-1280-256.jpg">
+  <img alt="Page Agent Banner" src="https://img.alicdn.com/imgextra/i4/O1CN0173V03r1luB7xhUFbx_!!6000000004878-0-tps-1280-256.jpg">
+</picture>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
 
