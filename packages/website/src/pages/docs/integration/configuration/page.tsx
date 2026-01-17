@@ -61,6 +61,27 @@ export default function Configuration() {
 					code={`interface AgentConfig {
   language?: 'en-US' | 'zh-CN'
 
+  /**
+   * Whether to prompt for next task after task completion
+   * @default true
+   */
+  promptForNextTask?: boolean
+
+  /**
+   * Enable the UI panel for visual feedback and user interaction
+   * When disabled, the panel will not be created and all UI operations will be skipped.
+   * Useful for automated testing or when integrating PageAgent as a library.
+   * @default true
+   */
+  enablePanel?: boolean
+
+  /**
+   * Enable the ask_user tool for agent to ask questions
+   * When disabled, the agent cannot ask user questions during execution.
+   * @default true
+   */
+  enableAskUser?: boolean
+
   /** Custom tools to extend or override built-in tools */
   customTools?: Record<string, PageAgentTool | null>
 
@@ -138,6 +159,39 @@ interface PageControllerConfig extends DomConfig {
 				<CodeEditor
 					language="typescript"
 					code={`type PageAgentConfig = LLMConfig & AgentConfig & PageControllerConfig`}
+				/>
+			</section>
+
+			{/* Programmatic Usage Example */}
+			<section className="mb-10">
+				<h2 className="text-2xl font-semibold mb-4">
+					{isZh ? '程序化使用配置' : 'Programmatic Usage'}
+				</h2>
+				<p className="text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '对于程序化集成场景，可以禁用 UI。'
+						: 'For programmatic integration, you can disable UI.'}
+				</p>
+				<CodeEditor
+					language="typescript"
+					code={`const agent = new PageAgent({
+  baseURL: 'https://api.openai.com/v1',
+  apiKey: 'your-api-key',
+  model: 'your-model-name',
+
+  // Disable all UI features for pure programmatic usage
+  enablePanel: false,        // Don't create Panel UI
+  enableMask: false,         // Don't show visual overlay (mask and pointer)
+  // enableAskUser is automatically disabled when enablePanel is false
+
+  // Or keep Panel but disable post-task prompts
+  // enablePanel: true,
+  // promptForNextTask: false,
+})
+
+// Pure programmatic execution
+const result = await agent.execute('search for TypeScript documentation')
+console.log(result.success, result.data, result.history)`}
 				/>
 			</section>
 		</div>
