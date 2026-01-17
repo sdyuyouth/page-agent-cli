@@ -89,6 +89,10 @@ export default function HomePage() {
 					import.meta.env.DEV && import.meta.env.LLM_API_KEY
 						? import.meta.env.LLM_API_KEY
 						: DEMO_API_KEY,
+
+				// enableAskUser: false,
+				// promptForNextTask: false,
+				// enablePanel: false,
 			})
 		}
 

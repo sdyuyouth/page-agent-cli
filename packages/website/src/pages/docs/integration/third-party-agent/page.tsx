@@ -36,7 +36,7 @@ const pageAgentTool = {
   },
   execute: async (params) => {
     const result = await pageAgent.execute(params.instruction)
-    return { success: result.success, message: result.message }
+    return { success: result.success, message: result.data }
   }
 }
 

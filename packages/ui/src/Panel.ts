@@ -11,6 +11,11 @@ export interface PanelConfig {
 	language?: SupportedLanguage
 	onExecuteTask: (task: string) => void
 	onStop: () => void
+	/**
+	 * Whether to prompt for next task after task completion
+	 * @default true
+	 */
+	promptForNextTask?: boolean
 }
 
 /**
@@ -358,7 +363,14 @@ export class Panel {
 		}
 
 		const lastStep = steps[steps.length - 1]
-		return lastStep.type === 'completed' || lastStep.type === 'error'
+		const isTaskEnded = lastStep.type === 'completed' || lastStep.type === 'error'
+
+		// Only show input area after task completion if configured to do so
+		if (isTaskEnded) {
+			return this.#config.promptForNextTask ?? true
+		}
+
+		return false
 	}
 
 	#createWrapper(): HTMLElement {

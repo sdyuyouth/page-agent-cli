@@ -99,7 +99,7 @@ export interface ExecutionResult {
 export class PageAgent extends EventTarget {
 	config: PageAgentConfig
 	id = uid()
-	panel: Panel
+	panel: Panel | null = null
 	tools: typeof tools
 	disposed = false
 	task = ''
@@ -130,11 +130,17 @@ export class PageAgent extends EventTarget {
 
 		this.config = config
 		this.#llm = new LLM(this.config)
-		this.panel = new Panel({
-			language: this.config.language,
-			onExecuteTask: (task) => this.execute(task),
-			onStop: () => this.dispose(),
-		})
+
+		// Conditionally initialize Panel
+		if (this.config.enablePanel !== false) {
+			this.panel = new Panel({
+				language: this.config.language,
+				onExecuteTask: (task) => this.execute(task),
+				onStop: () => this.dispose(),
+				promptForNextTask: this.config.promptForNextTask,
+			})
+		}
+
 		this.tools = new Map(tools)
 
 		// Initialize PageController with config (mask enabled by default)
@@ -146,11 +152,11 @@ export class PageAgent extends EventTarget {
 		// Listen to LLM events
 		this.#llmRetryListener = (e) => {
 			const { current, max } = (e as CustomEvent).detail
-			this.panel.update({ type: 'retry', current, max })
+			this.panel?.update({ type: 'retry', current, max })
 		}
 		this.#llmErrorListener = (e) => {
 			const { error } = (e as CustomEvent).detail
-			this.panel.update({ type: 'error', message: `step failed: ${error.message}` })
+			this.panel?.update({ type: 'error', message: `step failed: ${error.message}` })
 		}
 		this.#llm.addEventListener('retry', this.#llmRetryListener)
 		this.#llm.addEventListener('error', this.#llmErrorListener)
@@ -169,6 +175,11 @@ export class PageAgent extends EventTarget {
 			this.tools.delete('execute_javascript')
 		}
 
+		// Disable ask_user tool if enableAskUser is false or if panel is disabled
+		if (this.config.enableAskUser === false || this.config.enablePanel === false) {
+			this.tools.delete('ask_user')
+		}
+
 		this.#beforeUnloadListener = (e) => {
 			if (!this.disposed) this.dispose('PAGE_UNLOADING')
 		}
@@ -181,7 +192,7 @@ export class PageAgent extends EventTarget {
 	 */
 	pushObservation(content: string): void {
 		this.history.push({ type: 'observation', content })
-		this.panel.update({ type: 'observation', content })
+		this.panel?.update({ type: 'observation', content })
 	}
 
 	async execute(task: string): Promise<ExecutionResult> {
@@ -199,10 +210,10 @@ export class PageAgent extends EventTarget {
 		// Show mask and panel
 		this.pageController.showMask()
 
-		this.panel.show()
-		this.panel.reset()
+		this.panel?.show()
+		this.panel?.reset()
 
-		this.panel.update({ type: 'input', task: this.task })
+		this.panel?.update({ type: 'input', task: this.task })
 
 		if (this.#abortController) {
 			this.#abortController.abort()
@@ -232,7 +243,7 @@ export class PageAgent extends EventTarget {
 
 				// Update status to thinking
 				console.log(chalk.blue('Thinking...'))
-				this.panel.update({ type: 'thinking' })
+				this.panel?.update({ type: 'thinking' })
 
 				const result = await this.#llm.invoke(
 					[
@@ -370,7 +381,7 @@ export class PageAgent extends EventTarget {
 
 				if (reflectionText) {
 					console.log(reflectionText)
-					this.panel.update({ type: 'thinking', text: reflectionText })
+					this.panel?.update({ type: 'thinking', text: reflectionText })
 				}
 
 				// Find the corresponding tool
@@ -378,7 +389,7 @@ export class PageAgent extends EventTarget {
 				assert(tool, `Tool ${toolName} not found. (@note should have been caught before this!!!)`)
 
 				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
-				this.panel.update({ type: 'toolExecuting', toolName, args: toolInput })
+				this.panel?.update({ type: 'toolExecuting', toolName, args: toolInput })
 
 				const startTime = Date.now()
 
@@ -394,7 +405,7 @@ export class PageAgent extends EventTarget {
 				}
 
 				// Briefly display execution result
-				this.panel.update({
+				this.panel?.update({
 					type: 'toolCompleted',
 					toolName,
 					args: toolInput,
@@ -557,13 +568,13 @@ export class PageAgent extends EventTarget {
 
 		// Update panel status
 		if (success) {
-			this.panel.update({ type: 'output', text })
+			this.panel?.update({ type: 'output', text })
 		} else {
-			this.panel.update({ type: 'error', message: text })
+			this.panel?.update({ type: 'error', message: text })
 		}
 
 		// Task completed
-		this.panel.update({ type: 'completed' })
+		this.panel?.update({ type: 'completed' })
 
 		this.pageController.hideMask()
 
@@ -593,7 +604,7 @@ export class PageAgent extends EventTarget {
 		console.log('Disposing PageAgent...')
 		this.disposed = true
 		this.pageController.dispose()
-		this.panel.dispose()
+		this.panel?.dispose()
 		this.history = []
 		this.#abortController.abort(reason ?? 'PageAgent disposed')
 
