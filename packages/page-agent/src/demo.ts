@@ -18,7 +18,6 @@ const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm
 const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 
 // in case document.x is not ready yet
-// @todo give a switch to disable auto-init
 setTimeout(() => {
 	const currentScript = document.currentScript as HTMLScriptElement | null
 	let config: PageAgentConfig
