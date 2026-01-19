@@ -105,8 +105,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 							type: 'string',
 							required: true,
 							description: isZh
-								? '模型名称（如 gpt-4o, claude-3.5-sonnet）'
-								: 'Model name (e.g., gpt-4o, claude-3.5-sonnet)',
+								? '模型名称（如 gpt-5.2, anthropic/claude-4.5-haiku）'
+								: 'Model name (e.g., gpt-5.2, anthropic/claude-4.5-haiku)',
 						},
 						{
 							name: 'temperature',
@@ -148,6 +148,12 @@ const result = await agent.execute('Fill in the form with test data')`}
 							type: "'en-US' | 'zh-CN'",
 							defaultValue: "'en-US'",
 							description: isZh ? 'Agent 输出语言' : 'Agent output language',
+						},
+						{
+							name: 'maxSteps',
+							type: 'number',
+							defaultValue: '20',
+							description: isZh ? '每个任务的最大步骤数' : 'Maximum number of steps per task',
 						},
 						{
 							name: 'customTools',

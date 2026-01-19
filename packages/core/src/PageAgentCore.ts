@@ -8,7 +8,7 @@ import chalk from 'chalk'
 import zod from 'zod'
 
 import { type PageAgentConfig } from './config'
-import { MAX_STEPS } from './config/constants'
+import { DEFAULT_MAX_STEPS } from './config/constants'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
 import {
@@ -49,7 +49,7 @@ export { tool, type PageAgentTool } from './tools'
  *    - Types: thinking, executing, executed, retrying, error
  */
 export class PageAgentCore extends EventTarget {
-	config: PageAgentConfig
+	config: PageAgentConfig & { maxSteps: number }
 	id = uid()
 	tools: typeof tools
 	disposed = false
@@ -86,7 +86,8 @@ export class PageAgentCore extends EventTarget {
 	constructor(config: PageAgentConfig & { pageController: PageController }) {
 		super()
 
-		this.config = config
+		this.config = { ...config, maxSteps: config.maxSteps || DEFAULT_MAX_STEPS }
+
 		this.#llm = new LLM(this.config)
 		this.tools = new Map(tools)
 		this.pageController = config.pageController
@@ -273,7 +274,7 @@ export class PageAgentCore extends EventTarget {
 				await onAfterStep.call(this, this.history)
 
 				step++
-				if (step > MAX_STEPS) {
+				if (step > this.config.maxSteps) {
 					this.#onDone('Step count exceeded maximum limit', false)
 					const result: ExecutionResult = {
 						success: false,
@@ -475,7 +476,7 @@ export class PageAgentCore extends EventTarget {
 		}
 
 		// Warn about remaining steps
-		const remaining = MAX_STEPS - stepCount
+		const remaining = this.config.maxSteps - stepCount
 		if (remaining === 5) {
 			this.pushObservation(
 				`⚠️ Only ${remaining} steps remaining. Consider wrapping up or calling done with partial results.`
@@ -505,7 +506,7 @@ export class PageAgentCore extends EventTarget {
 			${this.task}
 			</user_request>
 			<step_info>
-			Step ${stepCount + 1} of ${MAX_STEPS} max possible steps
+			Step ${stepCount + 1} of ${this.config.maxSteps} max possible steps
 			Current date and time: ${new Date().toISOString()}
 			</step_info>
 			</agent_state>

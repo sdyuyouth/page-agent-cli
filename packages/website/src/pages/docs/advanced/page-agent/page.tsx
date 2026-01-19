@@ -53,7 +53,7 @@ const agent = new PageAgent({
   // LLM Configuration (required)
   baseURL: 'https://api.openai.com/v1',
   apiKey: 'your-api-key',
-  model: 'gpt-4o',
+  model: 'gpt-5.2',
   
   // Optional settings
   language: 'en-US',

@@ -1,5 +1,5 @@
 import type { LLMConfig } from '@page-agent/llms'
-import type { PageController, PageControllerConfig } from '@page-agent/page-controller'
+import type { PageControllerConfig } from '@page-agent/page-controller'
 
 import type { PageAgentCore } from '../PageAgentCore'
 import type { PageAgentTool } from '../tools'
@@ -13,6 +13,12 @@ export type SupportedLanguage = 'en-US' | 'zh-CN'
 export interface AgentConfig {
 	// theme?: 'light' | 'dark'
 	language?: SupportedLanguage
+
+	/**
+	 * Maximum number of steps the agent can take per task.
+	 * @default 20
+	 */
+	maxSteps?: number
 
 	/**
 	 * Custom tools to extend PageAgent capabilities
