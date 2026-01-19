@@ -18,7 +18,7 @@ export interface AgentConfig {
 	 * Custom tools to extend PageAgent capabilities
 	 * @experimental
 	 * @note You can also override or remove internal tools by using the same name.
-	 * @see { [tools](../tools/index.ts) }
+	 * @see PageAgentTool
 	 *
 	 * @example
 	 * // override internal tool
