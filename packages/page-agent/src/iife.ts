@@ -1,6 +1,8 @@
 /**
  * Auto-run entry for page-agent.js. Insert this script into your page to get page-agent functionality.
  */
+import { Panel } from '@page-agent/ui'
+
 import { PageAgent, type PageAgentConfig } from './PageAgent'
 
 // Clean up existing instances to prevent multiple injections from bookmarklet
@@ -24,6 +26,8 @@ const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 // @todo give a switch to disable auto-init
 setTimeout(() => {
 	const currentScript = document.currentScript as HTMLScriptElement | null
+	let config: PageAgentConfig
+
 	if (currentScript) {
 		console.log('🚀 page-agent.js detected current script:', currentScript.src)
 		const url = new URL(currentScript.src)
@@ -31,23 +35,18 @@ setTimeout(() => {
 		const baseURL = url.searchParams.get('baseURL') || DEMO_BASE_URL
 		const apiKey = url.searchParams.get('apiKey') || DEMO_API_KEY
 		const language = (url.searchParams.get('lang') as 'zh-CN' | 'en-US') || 'zh-CN'
-		const config: PageAgentConfig = { model, baseURL, apiKey, language }
-		window.pageAgent = new PageAgent(config)
+		config = { model, baseURL, apiKey, language }
 	} else {
 		console.log('🚀 page-agent.js no current script detected, using default demo config')
-		const config: PageAgentConfig = {
-			// model: DEMO_MODEL,
-			// baseURL: DEMO_BASE_URL,
-			// apiKey: DEMO_API_KEY,
-
+		config = {
 			model: import.meta.env.LLM_MODEL_NAME ? import.meta.env.LLM_MODEL_NAME : DEMO_MODEL,
 			baseURL: import.meta.env.LLM_BASE_URL ? import.meta.env.LLM_BASE_URL : DEMO_BASE_URL,
 			apiKey: import.meta.env.LLM_API_KEY ? import.meta.env.LLM_API_KEY : DEMO_API_KEY,
 		}
-		window.pageAgent = new PageAgent(config)
 	}
 
-	console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)
+	// Create agent
+	window.pageAgent = new PageAgent(config)
 
-	window.pageAgent.panel!.show() // Show panel
+	console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)
 })

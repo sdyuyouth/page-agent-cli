@@ -10,11 +10,12 @@
             // Self root
             "@/*": ["src/*"],
 
-            // Simplified monorepo solution (raw npm workspace with hoisting)
-            "page-agent": ["../page-agent/src/PageAgent.ts"],
             "@page-agent/llms": ["../llms/src/index.ts"],
             "@page-agent/page-controller": ["../page-controller/src/PageController.ts"],
-            "@page-agent/ui": ["../ui/src/index.ts"]
+            "@page-agent/core": ["../core/src/PageAgentCore.ts"],
+            "@page-agent/ui": ["../ui/src/index.ts"],
+
+            "page-agent": ["../page-agent/src/PageAgent.ts"]
         }
     },
     "include": ["**/*.ts", "**/*.tsx"],
@@ -22,8 +23,10 @@
     "references": [
         //
         { "path": "../llms" },
-        { "path": "../page-agent" },
         { "path": "../page-controller" },
-        { "path": "../ui" }
+        { "path": "../core" },
+        { "path": "../ui" },
+
+        { "path": "../page-agent" }
     ]
 }

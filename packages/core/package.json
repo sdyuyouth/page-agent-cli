@@ -1,16 +1,16 @@
 {
-    "name": "page-agent",
+    "name": "@page-agent/core",
     "private": false,
     "version": "0.2.5",
     "type": "module",
-    "main": "./dist/esm/page-agent.js",
-    "module": "./dist/esm/page-agent.js",
-    "types": "./dist/esm/PageAgent.d.ts",
+    "main": "./dist/esm/page-agent-core.js",
+    "module": "./dist/esm/page-agent-core.js",
+    "types": "./dist/esm/PageAgentCore.d.ts",
     "exports": {
         ".": {
-            "types": "./dist/esm/PageAgent.d.ts",
-            "import": "./dist/esm/page-agent.js",
-            "default": "./dist/esm/page-agent.js"
+            "types": "./dist/esm/PageAgentCore.d.ts",
+            "import": "./dist/esm/page-agent-core.js",
+            "default": "./dist/esm/page-agent-core.js"
         }
     },
     "files": [
@@ -46,8 +46,6 @@
         "chalk": "^5.6.2",
         "zod": "^4.3.5",
         "@page-agent/llms": "0.2.5",
-        "@page-agent/page-controller": "0.2.5",
-        "@page-agent/core": "0.2.5",
-        "@page-agent/ui": "0.2.5"
+        "@page-agent/page-controller": "0.2.5"
     }
 }

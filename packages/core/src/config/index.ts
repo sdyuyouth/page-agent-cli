@@ -1,42 +1,24 @@
 import type { LLMConfig } from '@page-agent/llms'
-import type { PageControllerConfig } from '@page-agent/page-controller'
-import type { SupportedLanguage } from '@page-agent/ui'
+import type { PageController, PageControllerConfig } from '@page-agent/page-controller'
 
-import type { ExecutionResult, HistoryEvent, PageAgent } from '../PageAgent'
+import type { PageAgentCore } from '../PageAgentCore'
 import type { PageAgentTool } from '../tools'
+import type { ExecutionResult, HistoricalEvent } from '../types'
 
 export type { LLMConfig }
+
+/** Supported UI languages */
+export type SupportedLanguage = 'en-US' | 'zh-CN'
 
 export interface AgentConfig {
 	// theme?: 'light' | 'dark'
 	language?: SupportedLanguage
 
 	/**
-	 * Whether to prompt for next task after task completion
-	 * @default true
-	 */
-	promptForNextTask?: boolean
-
-	/**
-	 * Enable the UI panel for visual feedback and user interaction
-	 * When disabled, the panel will not be created and all UI operations will be skipped.
-	 * Useful for automated testing or when integrating PageAgent as a library.
-	 * @default true
-	 */
-	enablePanel?: boolean
-
-	/**
-	 * Enable the ask_user tool for agent to ask questions
-	 * When disabled, the agent cannot ask user questions during execution.
-	 * @default true
-	 */
-	enableAskUser?: boolean
-
-	/**
 	 * Custom tools to extend PageAgent capabilities
 	 * @experimental
 	 * @note You can also override or remove internal tools by using the same name.
-	 * @see [tools](../tools/index.ts)
+	 * @see PageAgentTool
 	 *
 	 * @example
 	 * // override internal tool
@@ -85,17 +67,16 @@ export interface AgentConfig {
 	// @todo: use event instead of hooks
 	// @todo: remove `this` binding, pass agent as explicit parameter instead
 
-	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
-	onAfterStep?: (this: PageAgent, stepCnt: number, history: HistoryEvent[]) => Promise<void> | void
-	onBeforeTask?: (this: PageAgent) => Promise<void> | void
-	onAfterTask?: (this: PageAgent, result: ExecutionResult) => Promise<void> | void
+	onBeforeStep?: (this: PageAgentCore, stepCnt: number) => Promise<void> | void
+	onAfterStep?: (this: PageAgentCore, history: HistoricalEvent[]) => Promise<void> | void
+	onBeforeTask?: (this: PageAgentCore) => Promise<void> | void
+	onAfterTask?: (this: PageAgentCore, result: ExecutionResult) => Promise<void> | void
 
 	/**
 	 * @note this hook can block the disposal process
-	 * @note when dispose caused by page unload, reason will be 'PAGE_UNLOADING'. this method CANNOT block unloading. async operations may be cut.
 	 * @todo remove `this` binding, pass agent as explicit parameter instead
 	 */
-	onDispose?: (this: PageAgent, reason?: string) => void
+	onDispose?: (this: PageAgentCore, reason?: string) => void
 
 	// page behavior hooks
 

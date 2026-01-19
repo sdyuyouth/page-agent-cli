@@ -1,6 +1,7 @@
-import { type Step, UIState } from './UIState'
-import { I18n, type SupportedLanguage } from './i18n'
-import { escapeHtml, truncate } from './utils'
+import { I18n, type SupportedLanguage } from '../i18n'
+import { truncate } from '../utils'
+import { createCard, createReflectionLines, formatTime } from './cards'
+import type { AgentActivity, PanelAgentAdapter } from './types'
 
 import styles from './Panel.module.css'
 
@@ -9,8 +10,6 @@ import styles from './Panel.module.css'
  */
 export interface PanelConfig {
 	language?: SupportedLanguage
-	onExecuteTask: (task: string) => void
-	onStop: () => void
 	/**
 	 * Whether to prompt for next task after task completion
 	 * @default true
@@ -19,23 +18,14 @@ export interface PanelConfig {
 }
 
 /**
- * Semantic update types - Panel handles i18n internally
- */
-export type PanelUpdate =
-	| { type: 'thinking'; text?: string } // text is optional, defaults to i18n thinking text
-	| { type: 'input'; task: string }
-	| { type: 'question'; question: string }
-	| { type: 'userAnswer'; input: string }
-	| { type: 'retry'; current: number; max: number }
-	| { type: 'error'; message: string }
-	| { type: 'output'; text: string }
-	| { type: 'completed' }
-	| { type: 'toolExecuting'; toolName: string; args: any }
-	| { type: 'toolCompleted'; toolName: string; args: any; result?: string; duration?: number }
-	| { type: 'observation'; content: string }
-
-/**
  * Agent control panel
+ *
+ * Architecture:
+ * - History list: renders directly from agent.history (historical events)
+ * - Header bar: shows activity events (transient state) and agent status
+ *
+ * This separation ensures data consistency - history is the single source of truth
+ * for what has been done, while activity shows what is happening now.
  */
 export class Panel {
 	#wrapper: HTMLElement
@@ -47,9 +37,9 @@ export class Panel {
 	#inputSection: HTMLElement
 	#taskInput: HTMLInputElement
 
-	#state = new UIState()
-	#isExpanded = false
+	#agent: PanelAgentAdapter
 	#config: PanelConfig
+	#isExpanded = false
 	#i18n: I18n
 	#userAnswerResolver: ((input: string) => void) | null = null
 	#isWaitingForUserAnswer: boolean = false
@@ -57,13 +47,30 @@ export class Panel {
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
 
+	// Event handlers (bound for removal)
+	#onStatusChange = () => this.#handleStatusChange()
+	#onHistoryChange = () => this.#handleHistoryChange()
+	#onActivity = (e: Event) => this.#handleActivity((e as CustomEvent<AgentActivity>).detail)
+	#onAgentDispose = () => this.dispose()
+
 	get wrapper(): HTMLElement {
 		return this.#wrapper
 	}
 
-	constructor(config: PanelConfig) {
+	/**
+	 * Create a Panel bound to an agent
+	 * @param agent - Agent instance that implements PanelAgentAdapter
+	 * @param config - Optional panel configuration
+	 */
+	constructor(agent: PanelAgentAdapter, config: PanelConfig = {}) {
+		this.#agent = agent
 		this.#config = config
 		this.#i18n = new I18n(config.language ?? 'en-US')
+
+		// Set up askUser callback on agent
+		this.#agent.onAskUser = (question) => this.#askUser(question)
+
+		// Create UI elements
 		this.#wrapper = this.#createWrapper()
 		this.#indicator = this.#wrapper.querySelector(`.${styles.indicator}`)!
 		this.#statusText = this.#wrapper.querySelector(`.${styles.statusText}`)!
@@ -73,6 +80,12 @@ export class Panel {
 		this.#inputSection = this.#wrapper.querySelector(`.${styles.inputSectionWrapper}`)!
 		this.#taskInput = this.#wrapper.querySelector(`.${styles.taskInput}`)!
 
+		// Listen to agent events
+		this.#agent.addEventListener('statuschange', this.#onStatusChange)
+		this.#agent.addEventListener('historychange', this.#onHistoryChange)
+		this.#agent.addEventListener('activity', this.#onActivity)
+		this.#agent.addEventListener('dispose', this.#onAgentDispose)
+
 		this.#setupEventListeners()
 		this.#startHeaderUpdateLoop()
 
@@ -81,23 +94,97 @@ export class Panel {
 		this.hide() // Start hidden
 	}
 
+	// ========== Agent event handlers ==========
+
+	/** Handle agent status change */
+	#handleStatusChange(): void {
+		const status = this.#agent.status
+
+		// Map agent status to UI indicator type
+		const indicatorType =
+			status === 'running' ? 'thinking' : status === 'idle' ? 'thinking' : status
+		this.#updateStatusIndicator(indicatorType)
+
+		// Show/hide based on status
+		if (status === 'running') {
+			this.show()
+			this.#hideInputArea() // Hide input while running
+		}
+
+		// Handle completion
+		if (status === 'completed' || status === 'error') {
+			if (!this.#isExpanded) {
+				this.#expand()
+			}
+			if (this.#shouldShowInputArea()) {
+				this.#showInputArea()
+			}
+		}
+	}
+
+	/** Handle agent history change - re-render history list from agent.history */
+	#handleHistoryChange(): void {
+		this.#renderHistory()
+	}
+
 	/**
-	 * Ask for user input
+	 * Handle agent activity - transient state for immediate UI feedback
+	 * Activity events are NOT persisted in history, only used for header bar updates
 	 */
-	async askUser(question: string): Promise<string> {
+	#handleActivity(activity: AgentActivity): void {
+		switch (activity.type) {
+			case 'thinking':
+				this.#pendingHeaderText = this.#i18n.t('ui.panel.thinking')
+				this.#updateStatusIndicator('thinking')
+				break
+
+			case 'executing':
+				this.#pendingHeaderText = this.#getToolExecutingText(activity.tool, activity.input)
+				this.#updateStatusIndicator('executing')
+				break
+
+			case 'executed':
+				this.#pendingHeaderText = truncate(activity.output, 50)
+				break
+
+			case 'retrying':
+				this.#pendingHeaderText = `Retrying (${activity.attempt}/${activity.maxAttempts})`
+				this.#updateStatusIndicator('retrying')
+				break
+
+			case 'error':
+				this.#pendingHeaderText = truncate(activity.message, 50)
+				this.#updateStatusIndicator('error')
+				break
+		}
+	}
+
+	/**
+	 * Ask for user input (internal, called by agent via onAskUser)
+	 */
+	#askUser(question: string): Promise<string> {
 		return new Promise((resolve) => {
 			// Set `waiting for user answer` state
 			this.#isWaitingForUserAnswer = true
 			this.#userAnswerResolver = resolve
 
-			// Update state to `running`
-			this.#updateInternal({
-				type: 'output',
-				displayText: this.#i18n.t('ui.panel.question', { question }),
-			}) // Expand history panel
+			// Expand history panel
 			if (!this.#isExpanded) {
 				this.#expand()
 			}
+
+			// Add temporary question card so user can see the full question
+			const tempCard = document.createElement('div')
+			tempCard.innerHTML = createCard({
+				icon: '❓',
+				content: `Question: ${question}`,
+				meta: formatTime(this.#config.language ?? 'en-US'),
+				type: 'question',
+			})
+			const cardElement = tempCard.firstElementChild as HTMLElement
+			cardElement.setAttribute('data-temp-card', 'true')
+			this.#historySection.appendChild(cardElement)
+			this.#scrollToBottom()
 
 			this.#showInputArea(this.#i18n.t('ui.panel.userAnswerPrompt'))
 		})
@@ -119,10 +206,9 @@ export class Panel {
 	}
 
 	reset(): void {
-		this.#state.reset()
 		this.#statusText.textContent = this.#i18n.t('ui.panel.ready')
 		this.#updateStatusIndicator('thinking')
-		this.#updateHistory()
+		this.#renderHistory()
 		this.#collapse()
 		// Reset user input state
 		this.#isWaitingForUserAnswer = false
@@ -140,17 +226,16 @@ export class Panel {
 	}
 
 	/**
-	 * Update panel with semantic data - i18n handled internally
-	 */
-	update(data: PanelUpdate): void {
-		const stepData = this.#toStepData(data)
-		this.#updateInternal(stepData)
-	}
-
-	/**
-	 * Dispose panel
+	 * Dispose panel and clean up event listeners
 	 */
 	dispose(): void {
+		// Remove agent event listeners
+		this.#agent.removeEventListener('statuschange', this.#onStatusChange)
+		this.#agent.removeEventListener('historychange', this.#onHistoryChange)
+		this.#agent.removeEventListener('activity', this.#onActivity)
+		this.#agent.removeEventListener('dispose', this.#onAgentDispose)
+
+		// Clean up UI
 		this.#isWaitingForUserAnswer = false
 		this.#stopHeaderUpdateLoop()
 		this.wrapper.remove()
@@ -158,69 +243,21 @@ export class Panel {
 
 	// ========== Private methods ==========
 
-	/**
-	 * Convert semantic update to step data with i18n
-	 */
-	#toStepData(data: PanelUpdate): Omit<Step, 'id' | 'stepNumber' | 'timestamp'> {
-		switch (data.type) {
-			case 'thinking':
-				return { type: 'thinking', displayText: data.text ?? this.#i18n.t('ui.panel.thinking') }
-			case 'input':
-				return { type: 'input', displayText: data.task }
-			case 'question':
-				return {
-					type: 'output',
-					displayText: this.#i18n.t('ui.panel.question', { question: data.question }),
-				}
-			case 'userAnswer':
-				return {
-					type: 'input',
-					displayText: this.#i18n.t('ui.panel.userAnswer', { input: data.input }),
-				}
-			case 'retry':
-				return { type: 'retry', displayText: `retry-ing (${data.current} / ${data.max})` }
-			case 'error':
-				return { type: 'error', displayText: data.message }
-			case 'output':
-				return { type: 'output', displayText: data.text }
-			case 'completed':
-				return { type: 'completed', displayText: this.#i18n.t('ui.panel.taskCompleted') }
-			case 'toolExecuting':
-				return {
-					type: 'tool_executing',
-					toolName: data.toolName,
-					toolArgs: data.args,
-					displayText: this.#getToolExecutingText(data.toolName, data.args),
-				}
-			case 'toolCompleted': {
-				const displayText = this.#getToolCompletedText(data.toolName, data.args)
-				if (!displayText) return { type: 'tool_executing', displayText: '' } // will be filtered
-				return {
-					type: 'tool_executing',
-					toolName: data.toolName,
-					toolArgs: data.args,
-					toolResult: data.result,
-					displayText,
-					duration: data.duration,
-				}
-			}
-			case 'observation':
-				return { type: 'observation', displayText: data.content }
-		}
-	}
-
-	#getToolExecutingText(toolName: string, args: any): string {
+	#getToolExecutingText(toolName: string, args: unknown): string {
+		const a = args as Record<string, string | number>
 		switch (toolName) {
 			case 'click_element_by_index':
-				return this.#i18n.t('ui.tools.clicking', { index: args.index })
+				return this.#i18n.t('ui.tools.clicking', { index: a.index })
 			case 'input_text':
-				return this.#i18n.t('ui.tools.inputting', { index: args.index })
+				return this.#i18n.t('ui.tools.inputting', { index: a.index })
 			case 'select_dropdown_option':
-				return this.#i18n.t('ui.tools.selecting', { text: args.text })
+				return this.#i18n.t('ui.tools.selecting', { text: a.text })
 			case 'scroll':
 				return this.#i18n.t('ui.tools.scrolling')
 			case 'wait':
-				return this.#i18n.t('ui.tools.waiting', { seconds: args.seconds })
+				return this.#i18n.t('ui.tools.waiting', { seconds: a.seconds })
+			case 'ask_user':
+				return this.#i18n.t('ui.tools.askingUser')
 			case 'done':
 				return this.#i18n.t('ui.tools.done')
 			default:
@@ -228,67 +265,11 @@ export class Panel {
 		}
 	}
 
-	#getToolCompletedText(toolName: string, args: any): string | null {
-		switch (toolName) {
-			case 'click_element_by_index':
-				return this.#i18n.t('ui.tools.clicked', { index: args.index })
-			case 'input_text':
-				return this.#i18n.t('ui.tools.inputted', { text: args.text })
-			case 'select_dropdown_option':
-				return this.#i18n.t('ui.tools.selected', { text: args.text })
-			case 'scroll':
-				return this.#i18n.t('ui.tools.scrolled')
-			case 'wait':
-				return this.#i18n.t('ui.tools.waited')
-			case 'done':
-				return null
-			default:
-				return null
-		}
-	}
-
-	/**
-	 * Update status (internal)
-	 */
-	#updateInternal(stepData: Omit<Step, 'id' | 'stepNumber' | 'timestamp'>): void {
-		// Skip empty displayText (filtered toolCompleted for 'done')
-		if (!stepData.displayText) return
-
-		const step = this.#state.addStep(stepData)
-
-		// Queue header text update (will be processed by periodic check)
-		const headerText = truncate(step.displayText, 20)
-		this.#pendingHeaderText = headerText
-
-		this.#updateStatusIndicator(step.type)
-		this.#updateHistory()
-
-		// Auto-expand history after task completion
-		if (step.type === 'completed' || step.type === 'error') {
-			if (!this.#isExpanded) {
-				this.#expand()
-			}
-		}
-
-		// Control input area display based on status
-		if (this.#shouldShowInputArea()) {
-			this.#showInputArea()
-		} else {
-			this.#hideInputArea()
-		}
-	}
-
 	/**
 	 * Stop Agent
 	 */
 	#stopAgent(): void {
-		// Update status display
-		this.#updateInternal({
-			type: 'error',
-			displayText: this.#i18n.t('ui.panel.taskTerminated'),
-		})
-
-		this.#config.onStop()
+		this.#agent.dispose()
 	}
 
 	/**
@@ -305,7 +286,8 @@ export class Panel {
 			// Handle user input mode
 			this.#handleUserAnswer(input)
 		} else {
-			this.#config.onExecuteTask(input)
+			// Execute task via agent
+			this.#agent.execute(input)
 		}
 	}
 
@@ -313,10 +295,11 @@ export class Panel {
 	 * Handle user answer
 	 */
 	#handleUserAnswer(input: string): void {
-		// Add user input to history
-		this.#updateInternal({
-			type: 'input',
-			displayText: this.#i18n.t('ui.panel.userAnswer', { input }),
+		// Remove temporary question cards (only direct children for safety)
+		Array.from(this.#historySection.children).forEach((child) => {
+			if (child.getAttribute('data-temp-card') === 'true') {
+				child.remove()
+			}
 		})
 
 		// Reset state
@@ -357,13 +340,13 @@ export class Panel {
 		// Always show input area if waiting for user input
 		if (this.#isWaitingForUserAnswer) return true
 
-		const steps = this.#state.getAllSteps()
-		if (steps.length === 0) {
+		const history = this.#agent.history
+		if (history.length === 0) {
 			return true // Initial state
 		}
 
-		const lastStep = steps[steps.length - 1]
-		const isTaskEnded = lastStep.type === 'completed' || lastStep.type === 'error'
+		const status = this.#agent.status
+		const isTaskEnded = status === 'completed' || status === 'error'
 
 		// Only show input area after task completion if configured to do so
 		if (isTaskEnded) {
@@ -383,13 +366,12 @@ export class Panel {
 			<div class="${styles.background}"></div>
 			<div class="${styles.historySectionWrapper}">
 				<div class="${styles.historySection}">
-					${this.#createHistoryItem({
-						id: 'placeholder',
-						stepNumber: 0,
-						timestamp: new Date(),
-						type: 'thinking',
-						displayText: this.#i18n.t('ui.panel.waitingPlaceholder'),
-					})}
+					<div class="${styles.historyItem}">
+						<div class="${styles.historyContent}">
+							<span class="${styles.statusIcon}">🧠</span>
+							<span>${this.#i18n.t('ui.panel.waitingPlaceholder')}</span>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="${styles.header}">
@@ -544,18 +526,14 @@ export class Panel {
 		}, 150) // Half the duration of fade out animation
 	}
 
-	#updateStatusIndicator(type: Step['type']): void {
+	#updateStatusIndicator(
+		type: 'thinking' | 'executing' | 'executed' | 'retrying' | 'completed' | 'error'
+	): void {
 		// Clear all status classes
 		this.#indicator.className = styles.indicator
 
 		// Add corresponding status class
 		this.#indicator.classList.add(styles[type])
-	}
-
-	#updateHistory(): void {
-		const steps = this.#state.getAllSteps()
-		this.#historySection.innerHTML = steps.map((step) => this.#createHistoryItem(step)).join('')
-		this.#scrollToBottom()
 	}
 
 	#scrollToBottom(): void {
@@ -565,71 +543,107 @@ export class Panel {
 		}, 0)
 	}
 
-	#createHistoryItem(step: Step): string {
-		const time = step.timestamp.toLocaleTimeString('zh-CN', {
-			hour12: false,
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit',
-		})
+	/**
+	 * Render history directly from agent.history
+	 *
+	 * Renders:
+	 * 1. Task (first item, from agent.task)
+	 * 2. Reflection cards (evaluation, memory, next_goal)
+	 * 3. Tool execution with output
+	 * 4. Observations
+	 */
+	#renderHistory(): void {
+		const items: string[] = []
 
-		let typeClass = ''
-		let statusIcon = ''
-
-		// Set styles and icons based on step type
-		if (step.type === 'completed') {
-			// Check if this is a result from done tool
-			if (step.toolName === 'done') {
-				// Judge success or failure based on result
-				const failureKeyword = this.#i18n.t('ui.tools.resultFailure')
-				const errorKeyword = this.#i18n.t('ui.tools.resultError')
-				const isSuccess =
-					!step.toolResult ||
-					(!step.toolResult.includes(failureKeyword) && !step.toolResult.includes(errorKeyword))
-				typeClass = isSuccess ? styles.doneSuccess : styles.doneError
-				statusIcon = isSuccess ? '🎉' : '❌'
-			} else {
-				typeClass = styles.completed
-				statusIcon = '✅'
-			}
-		} else if (step.type === 'error') {
-			typeClass = styles.error
-			statusIcon = '❌'
-		} else if (step.type === 'tool_executing') {
-			statusIcon = '🔨'
-		} else if (step.type === 'output') {
-			typeClass = styles.output
-			statusIcon = '🤖'
-		} else if (step.type === 'input') {
-			typeClass = styles.input
-			statusIcon = '🎯'
-		} else if (step.type === 'retry') {
-			typeClass = styles.retry
-			statusIcon = '🔄'
-		} else if (step.type === 'observation') {
-			typeClass = styles.observation
-			statusIcon = '👁️'
-		} else {
-			statusIcon = '🧠'
+		// 1. Task card (always first)
+		const task = this.#agent.task
+		if (task) {
+			items.push(this.#createTaskCard(task))
 		}
 
-		const durationText = step.duration ? ` · ${step.duration}ms` : ''
-		const stepLabel = this.#i18n.t('ui.panel.step', {
-			number: step.stepNumber.toString(),
+		// 2. Render each history event
+		const history = this.#agent.history
+		for (let i = 0; i < history.length; i++) {
+			const event = history[i]
+			items.push(...this.#createHistoryCards(event, i + 1))
+		}
+
+		this.#historySection.innerHTML = items.join('')
+		this.#scrollToBottom()
+	}
+
+	#createTaskCard(task: string): string {
+		return createCard({ icon: '🎯', content: task, type: 'input' })
+	}
+
+	/** Create cards for a history event */
+	#createHistoryCards(event: PanelAgentAdapter['history'][number], stepNumber: number): string[] {
+		const cards: string[] = []
+		const time = formatTime(this.#config.language ?? 'en-US')
+		const meta = this.#i18n.t('ui.panel.step', {
+			number: stepNumber.toString(),
 			time,
-			duration: durationText || '', // Explicitly pass empty string to replace template
+			duration: '',
 		})
 
-		return `
-			<div class="${styles.historyItem} ${typeClass}">
-				<div class="${styles.historyContent}">
-					<span class="${styles.statusIcon}">${statusIcon}</span>
-					<span>${escapeHtml(step.displayText)}</span>
-				</div>
-				<div class="${styles.historyMeta}">
-					${stepLabel}
-				</div>
-			</div>
-		`
+		if (event.type === 'step') {
+			// Reflection card
+			if (event.reflection) {
+				const lines = createReflectionLines(event.reflection)
+				if (lines.length > 0) {
+					cards.push(createCard({ icon: '🧠', content: lines, meta }))
+				}
+			}
+
+			// Action card
+			const action = event.action
+			if (action) {
+				cards.push(...this.#createActionCards(action, meta))
+			}
+		} else if (event.type === 'observation') {
+			cards.push(
+				createCard({ icon: '👁️', content: event.content || '', meta, type: 'observation' })
+			)
+		} else if (event.type === 'user_takeover') {
+			cards.push(createCard({ icon: '👤', content: 'User takeover', meta, type: 'input' }))
+		}
+
+		return cards
+	}
+
+	/** Create cards for an action */
+	#createActionCards(
+		action: { name: string; input: unknown; output: string },
+		meta: string
+	): string[] {
+		const cards: string[] = []
+
+		if (action.name === 'done') {
+			const input = action.input as { text?: string }
+			const text = input.text || action.output || ''
+			if (text) {
+				cards.push(createCard({ icon: '🤖', content: text, meta, type: 'output' }))
+			}
+		} else if (action.name === 'ask_user') {
+			const input = action.input as { question?: string }
+			const answer = action.output.replace(/^User answered:\s*/i, '')
+			cards.push(
+				createCard({
+					icon: '❓',
+					content: `Question: ${input.question || ''}`,
+					meta,
+					type: 'question',
+				})
+			)
+			cards.push(createCard({ icon: '💬', content: `Answer: ${answer}`, meta, type: 'input' }))
+		} else {
+			const toolText = this.#getToolExecutingText(action.name, action.input)
+			cards.push(createCard({ icon: '🔨', content: toolText, meta }))
+			if (action.output?.length > 0) {
+				cards.push(createCard({ icon: '🔨', content: action.output, meta, type: 'output' }))
+			}
+		}
+
+		return cards
 	}
 }

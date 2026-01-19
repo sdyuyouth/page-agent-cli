@@ -357,6 +357,11 @@
 				background: linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(147, 51, 234, 0.05));
 			}
 
+			&.question {
+				border-left-color: rgb(255, 159, 67);
+				background: linear-gradient(135deg, rgba(255, 159, 67, 0.15), rgba(255, 159, 67, 0.08));
+			}
+
 			/* 突出显示 done 成功结果 */
 			&.doneSuccess {
 				background: linear-gradient(
@@ -439,7 +444,7 @@
 
 			.historyContent {
 				display: flex;
-				align-items: center;
+				align-items: flex-start;
 				gap: 8px;
 
 				word-break: break-all;
@@ -452,6 +457,12 @@
 					flex-shrink: 0;
 					line-height: 1;
 					transition: all 0.3s ease;
+				}
+
+				.reflectionLines {
+					display: flex;
+					flex-direction: column;
+					gap: 4px;
 				}
 			}
 

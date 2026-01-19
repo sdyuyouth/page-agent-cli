@@ -41,7 +41,6 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 		{
 			title: t('nav.integration'),
 			items: [
-				{ title: t('nav.configuration'), path: '/integration/configuration' },
 				{ title: t('nav.third_party_agent'), path: '/integration/third-party-agent' },
 				{ title: t('nav.cdn_setup'), path: '/integration/cdn-setup' },
 				{
@@ -49,6 +48,13 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 					path: '/integration/security-permissions',
 				},
 				{ title: '🚧 ' + t('nav.best_practices'), path: '/integration/best-practices' },
+			],
+		},
+		{
+			title: t('nav.advanced'),
+			items: [
+				{ title: t('nav.page_agent'), path: '/advanced/page-agent' },
+				{ title: t('nav.page_agent_core'), path: '/advanced/page-agent-core' },
 			],
 		},
 	]

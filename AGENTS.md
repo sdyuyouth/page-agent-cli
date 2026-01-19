@@ -4,11 +4,12 @@
 
 This is a **monorepo** with npm workspaces:
 
-- **Core Library** (`packages/page-agent/`) - AI agent for browser DOM automation, published as `page-agent` on npm
+- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
 - **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
 
 Internal packages:
 
+- **Core** (`packages/core/`) - PageAgentCore without UI (npm: `@page-agent/core`)
 - **CDN** (`packages/cdn/`) - IIFE builds for script tag usage (npm: `@page-agent/cdn`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
@@ -31,7 +32,8 @@ Simple monorepo solution: TypeScript references + Vite aliases. Update tsconfig 
 
 ```
 packages/
-├── page-agent/              # npm: "page-agent" ⭐ MAIN
+├── page-agent/              # npm: "page-agent" ⭐ MAIN (with Panel UI)
+├── core/                    # npm: "@page-agent/core" (headless, no UI)
 ├── cdn/                     # npm: "@page-agent/cdn" (IIFE builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
@@ -43,9 +45,10 @@ packages/
 
 ### Module Boundaries
 
-- **Page Agent**: Core lib. Imports from `@page-agent/llms`, `@page-agent/page-controller`, `@page-agent/ui`
+- **Page Agent**: Main entry with UI. Extends PageAgentCore and adds Panel. Imports from `@page-agent/core`, `@page-agent/ui`
+- **Core**: PageAgentCore without UI. Imports from `@page-agent/llms`, `@page-agent/page-controller`
 - **LLMs**: LLM client with MacroToolInput contract. No dependency on page-agent
-- **UI**: Panel and i18n. No dependency on page-agent
+- **UI**: Panel and i18n. Decoupled from PageAgent via PanelAgentAdapter interface
 - **Page Controller**: DOM operations with optional visual feedback (SimulatorMask). No LLM dependency. Enable mask via `enableMask: true` config
 
 ### PageController ↔ PageAgent Communication
@@ -86,11 +89,19 @@ Demo build supports query params (e.g., `?model=gpt-4&lang=en-US`).
 
 ### Page Agent (`packages/page-agent/`)
 
-| File               | Description                             |
-| ------------------ | --------------------------------------- |
-| `src/PageAgent.ts` | ⭐ Main AI agent class                  |
-| `src/umd.ts`       | CDN/UMD entry with auto-init            |
-| `src/tools/`       | Tool definitions calling PageController |
+| File               | Description                                    |
+| ------------------ | ---------------------------------------------- |
+| `src/PageAgent.ts` | ⭐ Main class with UI, extends PageAgentCore   |
+| `src/iife.ts`      | IIFE/CDN entry                                 |
+
+### Core (`packages/core/`)
+
+| File                    | Description                                 |
+| ----------------------- | ------------------------------------------- |
+| `src/PageAgentCore.ts`  | ⭐ Core agent class without UI              |
+| `src/tools/`            | Tool definitions calling PageController     |
+| `src/config/`           | Configuration types and constants           |
+| `src/prompts/`          | System prompt templates                     |
 
 ### LLMs (`packages/llms/`)
 
@@ -113,7 +124,7 @@ Demo build supports query params (e.g., `?model=gpt-4&lang=en-US`).
 
 ### New Agent Tool
 
-1. Implement in `packages/page-agent/src/tools/index.ts`
+1. Implement in `packages/core/src/tools/index.ts`
 2. If tool needs DOM ops, add method to PageController first
 3. Tool calls `this.pageController.methodName()` for DOM interactions
 

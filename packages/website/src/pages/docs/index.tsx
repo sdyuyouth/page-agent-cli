@@ -3,6 +3,9 @@ import { Route, Switch } from 'wouter'
 
 import Header from '../../components/Header'
 import DocsLayout from './Layout'
+import PageAgentCoreDocs from './advanced/page-agent-core/page'
+// Advanced
+import PageAgentDocs from './advanced/page-agent/page'
 import Instructions from './features/custom-instructions/page'
 // Features
 import CustomTools from './features/custom-tools/page'
@@ -11,7 +14,6 @@ import Models from './features/models/page'
 import BestPractices from './integration/best-practices/page'
 // Integration
 import CdnSetup from './integration/cdn-setup/page'
-import Configuration from './integration/configuration/page'
 import SecurityPermissions from './integration/security-permissions/page'
 import ThirdPartyAgent from './integration/third-party-agent/page'
 import Limitations from './introduction/limitations/page'
@@ -83,11 +85,6 @@ export default function DocsRouter() {
 					<SecurityPermissions />
 				</DocsPage>
 			</Route>
-			<Route path="/integration/configuration">
-				<DocsPage>
-					<Configuration />
-				</DocsPage>
-			</Route>
 			<Route path="/integration/best-practices">
 				<DocsPage>
 					<BestPractices />
@@ -96,6 +93,18 @@ export default function DocsRouter() {
 			<Route path="/integration/third-party-agent">
 				<DocsPage>
 					<ThirdPartyAgent />
+				</DocsPage>
+			</Route>
+
+			{/* Advanced */}
+			<Route path="/advanced/page-agent">
+				<DocsPage>
+					<PageAgentDocs />
+				</DocsPage>
+			</Route>
+			<Route path="/advanced/page-agent-core">
+				<DocsPage>
+					<PageAgentCoreDocs />
 				</DocsPage>
 			</Route>
 
