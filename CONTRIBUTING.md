@@ -20,10 +20,11 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 
 ### Project Structure
 
-This is a **monorepo** with npm workspaces containing **two main packages**:
+This is a **monorepo** with npm workspaces containing **3 main packages**:
 
-1. **Core Library** (`packages/page-agent/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation, published as `page-agent` on npm
-2. **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
+- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
+- **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-agent/core`)
+- **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
 We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required.
 
