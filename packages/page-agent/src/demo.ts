@@ -1,7 +1,7 @@
 /**
  * IIFE demo entry - auto-initializes with built-in demo API for testing
  */
-import { PageAgent, type PageAgentConfig } from '../PageAgent'
+import { PageAgent, type PageAgentConfig } from './PageAgent'
 
 // Clean up existing instances to prevent multiple injections from bookmarklet
 if (window.pageAgent) {
