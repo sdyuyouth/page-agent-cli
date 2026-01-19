@@ -21,7 +21,7 @@ import {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { normalizeResponse, trimLines, uid } from './utils'
+import { normalizeResponse, trimLines, uid, waitFor } from './utils'
 import { assert } from './utils/assert'
 
 export { type PageAgentConfig }
@@ -184,12 +184,12 @@ export class PageAgentCore extends EventTarget {
 			this.tools.delete('ask_user')
 		}
 
-		const onBeforeStep = this.config.onBeforeStep || (() => void 0)
-		const onAfterStep = this.config.onAfterStep || (() => void 0)
-		const onBeforeTask = this.config.onBeforeTask || (() => void 0)
-		const onAfterTask = this.config.onAfterTask || (() => void 0)
+		const onBeforeStep = this.config.onBeforeStep
+		const onAfterStep = this.config.onAfterStep
+		const onBeforeTask = this.config.onBeforeTask
+		const onAfterTask = this.config.onAfterTask
 
-		await onBeforeTask.call(this)
+		await onBeforeTask?.(this)
 
 		// Show mask
 		await this.pageController.showMask()
@@ -215,7 +215,7 @@ export class PageAgentCore extends EventTarget {
 			while (true) {
 				await this.#generateObservations(step)
 
-				await onBeforeStep.call(this, step)
+				await onBeforeStep?.(this, step)
 
 				console.group(`step: ${step}`)
 
@@ -271,7 +271,7 @@ export class PageAgentCore extends EventTarget {
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
 
-				await onAfterStep.call(this, this.history)
+				await onAfterStep?.(this, this.history)
 
 				step++
 				if (step > this.config.maxSteps) {
@@ -281,7 +281,7 @@ export class PageAgentCore extends EventTarget {
 						data: 'Step count exceeded maximum limit',
 						history: this.history,
 					}
-					await onAfterTask.call(this, result)
+					await onAfterTask?.(this, result)
 					return result
 				}
 				if (actionName === 'done') {
@@ -294,7 +294,7 @@ export class PageAgentCore extends EventTarget {
 						data: text,
 						history: this.history,
 					}
-					await onAfterTask.call(this, result)
+					await onAfterTask?.(this, result)
 					return result
 				}
 			}
@@ -308,7 +308,7 @@ export class PageAgentCore extends EventTarget {
 				data: errorMessage,
 				history: this.history,
 			}
-			await onAfterTask.call(this, result)
+			await onAfterTask?.(this, result)
 			return result
 		}
 	}
@@ -473,6 +473,7 @@ export class PageAgentCore extends EventTarget {
 		if (currentURL !== this.states.lastURL) {
 			this.pushObservation(`Page navigated to → ${currentURL}`)
 			this.states.lastURL = currentURL
+			await waitFor(500) // wait for page to stabilize
 		}
 
 		// Warn about remaining steps
@@ -584,6 +585,6 @@ export class PageAgentCore extends EventTarget {
 		// Emit dispose event for UI cleanup
 		this.dispatchEvent(new Event('dispose'))
 
-		this.config.onDispose?.call(this, reason)
+		this.config.onDispose?.(this, reason)
 	}
 }

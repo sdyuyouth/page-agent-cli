@@ -213,35 +213,48 @@ const result = await agent.execute('Fill in the form with test data')`}
 			{/* Lifecycle Hooks */}
 			<section className="mb-10">
 				<h2 className="text-2xl font-semibold mb-4">{isZh ? '生命周期钩子' : 'Lifecycle Hooks'}</h2>
+				<div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
+					<p className="text-amber-800 dark:text-amber-200 text-sm">
+						<strong>⚠️ {isZh ? '警告' : 'Warning'}:</strong>{' '}
+						{isZh
+							? '这些接口高度实验性，可能在未来版本中发生变化。建议优先使用事件系统（Events）来监听 Agent 状态。'
+							: 'These APIs are highly experimental and may change in future versions. Prefer using the Events system for monitoring agent state.'}
+					</p>
+				</div>
+				<p className="text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '所有生命周期钩子都接收 agent 实例作为第一个参数，便于在回调中访问 Agent 状态和方法。'
+						: 'All lifecycle hooks receive the agent instance as first parameter, making it easy to access agent state and methods in callbacks.'}
+				</p>
 				<APIReference
 					properties={[
 						{
 							name: 'onBeforeStep',
-							type: '(stepCnt: number) => void | Promise<void>',
+							type: '(agent: PageAgentCore, stepCount: number) => void | Promise<void>',
 							description: isZh ? '每个步骤执行前调用' : 'Called before each step execution',
 							status: 'experimental',
 						},
 						{
 							name: 'onAfterStep',
-							type: '(history: HistoricalEvent[]) => void | Promise<void>',
+							type: '(agent: PageAgentCore, history: HistoricalEvent[]) => void | Promise<void>',
 							description: isZh ? '每个步骤执行后调用' : 'Called after each step execution',
 							status: 'experimental',
 						},
 						{
 							name: 'onBeforeTask',
-							type: '() => void | Promise<void>',
+							type: '(agent: PageAgentCore) => void | Promise<void>',
 							description: isZh ? '任务开始前调用' : 'Called before task starts',
 							status: 'experimental',
 						},
 						{
 							name: 'onAfterTask',
-							type: '(result: ExecutionResult) => void | Promise<void>',
+							type: '(agent: PageAgentCore, result: ExecutionResult) => void | Promise<void>',
 							description: isZh ? '任务结束后调用' : 'Called after task ends',
 							status: 'experimental',
 						},
 						{
 							name: 'onDispose',
-							type: '(reason?: string) => void',
+							type: '(agent: PageAgentCore, reason?: string) => void',
 							description: isZh ? 'Agent 销毁时调用' : 'Called when agent is disposed',
 							status: 'experimental',
 						},

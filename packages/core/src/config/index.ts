@@ -69,20 +69,52 @@ export interface AgentConfig {
 		getPageInstructions?: (url: string) => string | undefined | null
 	}
 
-	// lifecycle hooks
-	// @todo: use event instead of hooks
-	// @todo: remove `this` binding, pass agent as explicit parameter instead
-
-	onBeforeStep?: (this: PageAgentCore, stepCnt: number) => Promise<void> | void
-	onAfterStep?: (this: PageAgentCore, history: HistoricalEvent[]) => Promise<void> | void
-	onBeforeTask?: (this: PageAgentCore) => Promise<void> | void
-	onAfterTask?: (this: PageAgentCore, result: ExecutionResult) => Promise<void> | void
+	/**
+	 * Lifecycle hooks for task execution.
+	 * @experimental API may change in future versions.
+	 *
+	 * All hooks receive the agent instance as first parameter.
+	 */
 
 	/**
-	 * @note this hook can block the disposal process
-	 * @todo remove `this` binding, pass agent as explicit parameter instead
+	 * Called before each step execution.
+	 * @experimental
+	 * @param agent - The PageAgentCore instance
+	 * @param stepCount - Current step number (0-indexed)
 	 */
-	onDispose?: (this: PageAgentCore, reason?: string) => void
+	onBeforeStep?: (agent: PageAgentCore, stepCount: number) => Promise<void> | void
+
+	/**
+	 * Called after each step execution.
+	 * @experimental
+	 * @param agent - The PageAgentCore instance
+	 * @param history - Current history of events
+	 */
+	onAfterStep?: (agent: PageAgentCore, history: HistoricalEvent[]) => Promise<void> | void
+
+	/**
+	 * Called before task execution starts.
+	 * @experimental
+	 * @param agent - The PageAgentCore instance
+	 */
+	onBeforeTask?: (agent: PageAgentCore) => Promise<void> | void
+
+	/**
+	 * Called after task execution completes (success or failure).
+	 * @experimental
+	 * @param agent - The PageAgentCore instance
+	 * @param result - The execution result
+	 */
+	onAfterTask?: (agent: PageAgentCore, result: ExecutionResult) => Promise<void> | void
+
+	/**
+	 * Called when the agent is disposed.
+	 * @experimental
+	 * @note This hook can block the disposal process if it's async.
+	 * @param agent - The PageAgentCore instance
+	 * @param reason - Optional reason for disposal
+	 */
+	onDispose?: (agent: PageAgentCore, reason?: string) => void
 
 	// page behavior hooks
 
@@ -109,21 +141,6 @@ export interface AgentConfig {
 	 * }
 	 */
 	transformPageContent?: (content: string) => Promise<string> | string
-
-	/**
-	 * TODO: @unimplemented
-	 * hook when action causes a new page to be opened
-	 * @note PageAgent will try to detect new pages and decide if it's caused by an action. But not very reliable.
-	 * @todo remove `this` binding, pass agent as explicit parameter instead
-	 */
-	// onNewPageOpen?: (this: PageAgent, url: string) => Promise<void> | void
-
-	/**
-	 * TODO: @unimplemented
-	 * try to navigate to a new page instead of opening a new tab/window.
-	 * @note will unload the current page when a action tries to open a new page. so that things keep in the same tab/window.
-	 */
-	// experimentalPreventNewPage?: boolean
 }
 
 export type PageAgentConfig = LLMConfig & AgentConfig & PageControllerConfig
