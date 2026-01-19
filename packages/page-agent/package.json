@@ -37,8 +37,10 @@
     },
     "homepage": "https://alibaba.github.io/page-agent/",
     "scripts": {
-        "build": "vite build",
-        "dev:iife": "concurrently \"vite build --config vite.iife.config.js --watch\" \"npx serve dist/iife -p 5174\"",
+        "build": "vite build && npm run build:iife && npm run build:demo",
+        "build:iife": "vite build --config vite.iife.config.js",
+        "build:demo": "vite build --config vite.iife.config.js --mode demo",
+        "dev:iife": "concurrently \"vite build --config vite.iife.config.js --watch --mode demo\" \"npx serve dist/iife -p 5174\"",
         "prepublishOnly": "node -e \"const fs=require('fs');['README.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
         "postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
     },

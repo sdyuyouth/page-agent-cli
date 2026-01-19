@@ -1,9 +1,10 @@
 import { Suspense, lazy } from 'react'
 import { Route, Switch } from 'wouter'
 
-// Lazy load pages
-const HomePage = lazy(() => import('./pages/Home'))
-const DocsPages = lazy(() => import('./pages/docs/index'))
+import HomePage from './pages/Home'
+import DocsPages from './pages/docs/index'
+
+// const DocsPages = lazy(() => import('./pages/docs/index'))
 
 export default function Router() {
 	return (

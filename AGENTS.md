@@ -10,7 +10,6 @@ This is a **monorepo** with npm workspaces:
 Internal packages:
 
 - **Core** (`packages/core/`) - PageAgentCore without UI (npm: `@page-agent/core`)
-- **CDN** (`packages/cdn/`) - IIFE builds for script tag usage (npm: `@page-agent/cdn`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
 - **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageAgent
@@ -32,9 +31,8 @@ Simple monorepo solution: TypeScript references + Vite aliases. Update tsconfig 
 
 ```
 packages/
-├── page-agent/              # npm: "page-agent" ⭐ MAIN (with Panel UI)
+├── page-agent/              # npm: "page-agent" ⭐ MAIN (with Panel UI + IIFE builds)
 ├── core/                    # npm: "@page-agent/core" (headless, no UI)
-├── cdn/                     # npm: "@page-agent/cdn" (IIFE builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
 ├── page-controller/         # @page-agent/page-controller
@@ -74,7 +72,7 @@ const pageInfo = await this.pageController.getPageInfo()
 3. **LLM Processing**: AI returns action plans (page-agent)
 4. **Indexed Operations**: PageAgent calls PageController by element index
 
-### CDN Builds (`packages/cdn/`)
+### IIFE Builds (`packages/page-agent/dist/iife/`)
 
 Two IIFE builds for script tag usage:
 
@@ -85,14 +83,17 @@ Two IIFE builds for script tag usage:
 
 Demo build supports query params (e.g., `?model=gpt-4&lang=en-US`).
 
+Build with `npm run build:iife --workspace=page-agent`.
+
 ## Key Files Reference
 
 ### Page Agent (`packages/page-agent/`)
 
-| File               | Description                                    |
-| ------------------ | ---------------------------------------------- |
-| `src/PageAgent.ts` | ⭐ Main class with UI, extends PageAgentCore   |
-| `src/iife.ts`      | IIFE/CDN entry                                 |
+| File                    | Description                                  |
+| ----------------------- | -------------------------------------------- |
+| `src/PageAgent.ts`      | ⭐ Main class with UI, extends PageAgentCore |
+| `src/entry-iife.ts`     | IIFE entry (exposes PageAgent class)         |
+| `src/entry-iife-demo.ts`| IIFE demo entry (auto-init with demo API)    |
 
 ### Core (`packages/core/`)
 

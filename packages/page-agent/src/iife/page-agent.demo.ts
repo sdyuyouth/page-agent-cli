@@ -1,9 +1,7 @@
 /**
- * Auto-run entry for page-agent.js. Insert this script into your page to get page-agent functionality.
+ * IIFE demo entry - auto-initializes with built-in demo API for testing
  */
-import { Panel } from '@page-agent/ui'
-
-import { PageAgent, type PageAgentConfig } from './PageAgent'
+import { PageAgent, type PageAgentConfig } from '../PageAgent'
 
 // Clean up existing instances to prevent multiple injections from bookmarklet
 if (window.pageAgent) {
@@ -12,9 +10,6 @@ if (window.pageAgent) {
 
 // Mount to global window object
 window.PageAgent = PageAgent
-
-// Export for ES module usage
-// export { PageAgent }
 
 console.log('🚀 page-agent.js loaded!')
 
