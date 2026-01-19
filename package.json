@@ -1,123 +1,123 @@
 {
-    "name": "root",
-    "private": true,
-    "version": "0.2.5",
-    "type": "module",
-    "workspaces": [
-        "packages/page-controller",
-        "packages/ui",
-        "packages/llms",
-        "packages/core",
-        "packages/page-agent",
-        "packages/website"
-    ],
-    "description": "AI-powered UI agent for web applications",
-    "author": "Simon<gaomeng1900>",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git"
-    },
-    "homepage": "https://alibaba.github.io/page-agent/",
-    "engines": {
-        "node": ">=20.0.0",
-        "npm": ">=10.0.0"
-    },
-    "scripts": {
-        "cleanup": "rm -rf packages/*/dist",
-        "start": "npm run dev --workspace=@page-agent/website",
-        "build:website": "npm run build:website --workspace=@page-agent/website",
-        "build:libs": "npm run build --workspaces --if-present",
-        "build": "npm run build:libs && npm run build:website",
-        "dev:iife": "npm run dev:iife --workspace=page-agent",
-        "version": "node scripts/sync-version.js",
-        "lint": "eslint .",
-        "prepare": "husky"
-    },
-    "devDependencies": {
-        "@commitlint/cli": "^20.3.1",
-        "@commitlint/config-conventional": "^20.3.1",
-        "@eslint/js": "^9.39.2",
-        "@microsoft/api-extractor": "^7.55.2",
-        "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-        "@types/node": "^25.0.7",
-        "concurrently": "^9.2.1",
-        "dotenv": "^17.2.3",
-        "eslint": "^9.39.2",
-        "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-react-dom": "^2.5.7",
-        "eslint-plugin-react-hooks": "^7.0.1",
-        "eslint-plugin-react-refresh": "^0.4.26",
-        "eslint-plugin-react-x": "^2.5.7",
-        "globals": "^17.0.0",
-        "husky": "^9.1.7",
-        "lint-staged": "^16.2.4",
-        "prettier": "^3.7.4",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.53.0",
-        "unplugin-dts": "^1.0.0-beta.6",
-        "vite": "^7.3.1",
-        "vite-plugin-css-injected-by-js": "^3.5.2"
-    },
-    "overrides": {
-        "typescript": "^5.9.3"
-    },
-    "lint-staged": {
-        "*.{js,ts,cjs,cts,mjs,mts}": [
-            "npx prettier --write --ignore-unknown",
-            "npx eslint --quiet"
-        ],
-        "*.{jsx,tsx}": [
-            "npx prettier --write --ignore-unknown",
-            "npx eslint --quiet"
-        ],
-        "*.css": [
-            "npx prettier --write --ignore-unknown"
-        ]
-    },
-    "commitlint": {
-        "extends": [
-            "@commitlint/config-conventional"
-        ],
-        "rules": {
-            "subject-case": [
-                0,
-                "never"
-            ]
-        }
-    },
-    "prettier": {
-        "singleQuote": true,
-        "semi": false,
-        "useTabs": true,
-        "printWidth": 100,
-        "trailingComma": "es5",
-        "plugins": [
-            "@trivago/prettier-plugin-sort-imports"
-        ],
-        "importOrder": [
-            "<THIRD_PARTY_MODULES>",
-            "^(@/).*(?<!css)$",
-            "^[./].*(?<!css)$",
-            ".css$"
-        ],
-        "importOrderSeparation": true,
-        "importOrderSortSpecifiers": true,
-        "overrides": [
-            {
-                "files": "*.md",
-                "options": {
-                    "useTabs": false,
-                    "tabWidth": 4
-                }
-            },
-            {
-                "files": "*.json",
-                "options": {
-                    "useTabs": false,
-                    "tabWidth": 4
-                }
-            }
-        ]
-    }
+	"name": "root",
+	"private": true,
+	"version": "0.3.0-beta",
+	"type": "module",
+	"workspaces": [
+		"packages/page-controller",
+		"packages/ui",
+		"packages/llms",
+		"packages/core",
+		"packages/page-agent",
+		"packages/website"
+	],
+	"description": "AI-powered UI agent for web applications",
+	"author": "Simon<gaomeng1900>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/alibaba/page-agent.git"
+	},
+	"homepage": "https://alibaba.github.io/page-agent/",
+	"engines": {
+		"node": ">=20.0.0",
+		"npm": ">=10.0.0"
+	},
+	"scripts": {
+		"cleanup": "rm -rf packages/*/dist",
+		"start": "npm run dev --workspace=@page-agent/website",
+		"build:website": "npm run build:website --workspace=@page-agent/website",
+		"build:libs": "npm run build --workspaces --if-present",
+		"build": "npm run build:libs && npm run build:website",
+		"dev:iife": "npm run dev:iife --workspace=page-agent",
+		"version": "node scripts/sync-version.js",
+		"lint": "eslint .",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^20.3.1",
+		"@commitlint/config-conventional": "^20.3.1",
+		"@eslint/js": "^9.39.2",
+		"@microsoft/api-extractor": "^7.55.2",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
+		"@types/node": "^25.0.7",
+		"concurrently": "^9.2.1",
+		"dotenv": "^17.2.3",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-react-dom": "^2.5.7",
+		"eslint-plugin-react-hooks": "^7.0.1",
+		"eslint-plugin-react-refresh": "^0.4.26",
+		"eslint-plugin-react-x": "^2.5.7",
+		"globals": "^17.0.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.4",
+		"prettier": "^3.7.4",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.53.0",
+		"unplugin-dts": "^1.0.0-beta.6",
+		"vite": "^7.3.1",
+		"vite-plugin-css-injected-by-js": "^3.5.2"
+	},
+	"overrides": {
+		"typescript": "^5.9.3"
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,cts,mjs,mts}": [
+			"npx prettier --write --ignore-unknown",
+			"npx eslint --quiet"
+		],
+		"*.{jsx,tsx}": [
+			"npx prettier --write --ignore-unknown",
+			"npx eslint --quiet"
+		],
+		"*.css": [
+			"npx prettier --write --ignore-unknown"
+		]
+	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		],
+		"rules": {
+			"subject-case": [
+				0,
+				"never"
+			]
+		}
+	},
+	"prettier": {
+		"singleQuote": true,
+		"semi": false,
+		"useTabs": true,
+		"printWidth": 100,
+		"trailingComma": "es5",
+		"plugins": [
+			"@trivago/prettier-plugin-sort-imports"
+		],
+		"importOrder": [
+			"<THIRD_PARTY_MODULES>",
+			"^(@/).*(?<!css)$",
+			"^[./].*(?<!css)$",
+			".css$"
+		],
+		"importOrderSeparation": true,
+		"importOrderSortSpecifiers": true,
+		"overrides": [
+			{
+				"files": "*.md",
+				"options": {
+					"useTabs": false,
+					"tabWidth": 4
+				}
+			},
+			{
+				"files": "*.json",
+				"options": {
+					"useTabs": false,
+					"tabWidth": 4
+				}
+			}
+		]
+	}
 }
