@@ -105,13 +105,6 @@ export interface AgentConfig {
 	transformPageContent?: (content: string) => Promise<string> | string
 
 	/**
-	 * @experimental
-	 * Custom PageController instance to control page navigation and actions
-	 * @note If not provided, a default PageController will be created
-	 */
-	pageController?: PageController
-
-	/**
 	 * TODO: @unimplemented
 	 * hook when action causes a new page to be opened
 	 * @note PageAgent will try to detect new pages and decide if it's caused by an action. But not very reliable.

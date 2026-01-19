@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 import { LLM, type Tool } from '@page-agent/llms'
-import { PageController } from '@page-agent/page-controller'
+import type { PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import zod from 'zod'
 
@@ -83,20 +83,13 @@ export class PageAgentCore extends EventTarget {
 	/** History events */
 	history: HistoricalEvent[] = []
 
-	constructor(config: PageAgentConfig) {
+	constructor(config: PageAgentConfig & { pageController: PageController }) {
 		super()
 
 		this.config = config
 		this.#llm = new LLM(this.config)
 		this.tools = new Map(tools)
-
-		// Initialize PageController with config (mask enabled by default)
-		this.pageController =
-			this.config.pageController ??
-			new PageController({
-				...this.config,
-				enableMask: this.config.enableMask ?? true,
-			})
+		this.pageController = config.pageController
 
 		// Listen to LLM retry events
 		this.#llm.addEventListener('retry', (e) => {
