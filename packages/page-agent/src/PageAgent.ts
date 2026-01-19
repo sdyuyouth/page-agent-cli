@@ -198,7 +198,7 @@ export class PageAgent extends EventTarget {
 		await onBeforeTask.call(this)
 
 		// Show mask
-		this.pageController.showMask()
+		await this.pageController.showMask()
 
 		if (this.#abortController) {
 			this.#abortController.abort()
@@ -556,7 +556,7 @@ export class PageAgent extends EventTarget {
 
 	#onDone(text: string, success = true) {
 		this.pageController.cleanUpHighlights()
-		this.pageController.hideMask()
+		this.pageController.hideMask() // No await - fire and forget
 		this.#setStatus(success ? 'completed' : 'error')
 		this.#abortController.abort()
 	}
