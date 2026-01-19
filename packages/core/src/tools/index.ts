@@ -4,7 +4,7 @@
  */
 import zod, { type z } from 'zod'
 
-import type { PageAgent } from '../PageAgent'
+import type { PageAgentCore } from '../PageAgentCore'
 import { waitFor } from '../utils'
 
 /**
@@ -14,7 +14,7 @@ export interface PageAgentTool<TParams = any> {
 	// name: string
 	description: string
 	inputSchema: z.ZodType<TParams>
-	execute: (this: PageAgent, args: TParams) => Promise<string>
+	execute: (this: PageAgentCore, args: TParams) => Promise<string>
 }
 
 export function tool<TParams>(options: PageAgentTool<TParams>): PageAgentTool<TParams> {
@@ -36,7 +36,7 @@ tools.set(
 			text: zod.string(),
 			success: zod.boolean().default(true),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			// @note main loop will handle this one
 			// this.onDone(input.text, input.success)
 			return Promise.resolve('Task completed')
@@ -52,7 +52,7 @@ tools.set(
 		inputSchema: zod.object({
 			seconds: zod.number().min(1).max(10).default(1),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
 			const actualWaitTime = Math.max(0, input.seconds - (Date.now() - lastTimeUpdate) / 1000)
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
@@ -79,7 +79,7 @@ tools.set(
 		inputSchema: zod.object({
 			question: zod.string(),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			if (!this.onAskUser) {
 				throw new Error('ask_user tool requires onAskUser callback to be set')
 			}
@@ -96,7 +96,7 @@ tools.set(
 		inputSchema: zod.object({
 			index: zod.int().min(0),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.clickElement(input.index)
 			return result.message
 		},
@@ -111,7 +111,7 @@ tools.set(
 			index: zod.int().min(0),
 			text: zod.string(),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.inputText(input.index, input.text)
 			return result.message
 		},
@@ -127,7 +127,7 @@ tools.set(
 			index: zod.int().min(0),
 			text: zod.string(),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.selectOption(input.index, input.text)
 			return result.message
 		},
@@ -148,7 +148,7 @@ tools.set(
 			pixels: zod.number().int().min(0).optional(),
 			index: zod.number().int().min(0).optional(),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.scroll({
 				...input,
 				numPages: input.num_pages,
@@ -168,7 +168,7 @@ tools.set(
 			pixels: zod.number().int().min(0),
 			index: zod.number().int().min(0).optional(),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.scrollHorizontally(input)
 			return result.message
 		},
@@ -183,7 +183,7 @@ tools.set(
 		inputSchema: zod.object({
 			script: zod.string(),
 		}),
-		execute: async function (this: PageAgent, input) {
+		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.executeJavascript(input.script)
 			return result.message
 		},

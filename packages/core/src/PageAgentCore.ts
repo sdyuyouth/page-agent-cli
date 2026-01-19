@@ -7,7 +7,7 @@ import { PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import zod from 'zod'
 
-import type { PageAgentConfig } from './config'
+import { type PageAgentConfig } from './config'
 import { MAX_STEPS } from './config/constants'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
@@ -24,7 +24,7 @@ import {
 import { normalizeResponse, trimLines, uid } from './utils'
 import { assert } from './utils/assert'
 
-export type { PageAgentConfig }
+export { type PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
 
 /**
@@ -48,7 +48,7 @@ export { tool, type PageAgentTool } from './tools'
  *    - NOT included in LLM context
  *    - Types: thinking, executing, executed, retrying, error
  */
-export class PageAgent extends EventTarget {
+export class PageAgentCore extends EventTarget {
 	config: PageAgentConfig
 	id = uid()
 	tools: typeof tools

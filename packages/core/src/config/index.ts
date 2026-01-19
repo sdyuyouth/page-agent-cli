@@ -1,7 +1,7 @@
 import type { LLMConfig } from '@page-agent/llms'
 import type { PageController, PageControllerConfig } from '@page-agent/page-controller'
 
-import type { PageAgent } from '../PageAgent'
+import type { PageAgentCore } from '../PageAgentCore'
 import type { PageAgentTool } from '../tools'
 import type { ExecutionResult, HistoricalEvent } from '../types'
 
@@ -67,16 +67,16 @@ export interface AgentConfig {
 	// @todo: use event instead of hooks
 	// @todo: remove `this` binding, pass agent as explicit parameter instead
 
-	onBeforeStep?: (this: PageAgent, stepCnt: number) => Promise<void> | void
-	onAfterStep?: (this: PageAgent, history: HistoricalEvent[]) => Promise<void> | void
-	onBeforeTask?: (this: PageAgent) => Promise<void> | void
-	onAfterTask?: (this: PageAgent, result: ExecutionResult) => Promise<void> | void
+	onBeforeStep?: (this: PageAgentCore, stepCnt: number) => Promise<void> | void
+	onAfterStep?: (this: PageAgentCore, history: HistoricalEvent[]) => Promise<void> | void
+	onBeforeTask?: (this: PageAgentCore) => Promise<void> | void
+	onAfterTask?: (this: PageAgentCore, result: ExecutionResult) => Promise<void> | void
 
 	/**
 	 * @note this hook can block the disposal process
 	 * @todo remove `this` binding, pass agent as explicit parameter instead
 	 */
-	onDispose?: (this: PageAgent, reason?: string) => void
+	onDispose?: (this: PageAgentCore, reason?: string) => void
 
 	// page behavior hooks
 

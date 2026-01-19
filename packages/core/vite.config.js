@@ -20,9 +20,9 @@ export default defineConfig({
 	},
 	build: {
 		lib: {
-			entry: resolve(__dirname, 'src/PageAgent.ts'),
-			name: 'PageAgent',
-			fileName: 'page-agent',
+			entry: resolve(__dirname, 'src/PageAgentCore.ts'),
+			name: 'PageAgentCore',
+			fileName: 'page-agent-core',
 			formats: ['es'],
 		},
 		outDir: resolve(__dirname, 'dist', 'esm'),
