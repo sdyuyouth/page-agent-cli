@@ -178,7 +178,7 @@ export class Panel {
 			tempCard.innerHTML = createCard({
 				icon: '❓',
 				content: `Question: ${question}`,
-				meta: formatTime(),
+				meta: formatTime(this.#config.language ?? 'en-US'),
 				type: 'question',
 			})
 			const cardElement = tempCard.firstElementChild as HTMLElement
@@ -579,7 +579,7 @@ export class Panel {
 	/** Create cards for a history event */
 	#createHistoryCards(event: PanelAgentAdapter['history'][number], stepNumber: number): string[] {
 		const cards: string[] = []
-		const time = formatTime()
+		const time = formatTime(this.#config.language ?? 'en-US')
 		const meta = this.#i18n.t('ui.panel.step', {
 			number: stepNumber.toString(),
 			time,

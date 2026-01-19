@@ -33,8 +33,8 @@ export function createCard({ icon, content, meta, type }: CardOptions): string {
 }
 
 /** Format timestamp for cards */
-export function formatTime(): string {
-	return new Date().toLocaleTimeString('zh-CN', {
+export function formatTime(locale: string = 'en-US'): string {
+	return new Date().toLocaleTimeString(locale, {
 		hour12: false,
 		hour: '2-digit',
 		minute: '2-digit',
