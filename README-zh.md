@@ -44,10 +44,10 @@
 
 > ⚠️ **仅用于技术评估。** Demo 模型有速率限制和使用限制，生产环境请使用 NPM 方式。
 
-| Mirrors | URL                                                                                 |
-| ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                |
-| China   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js |
+| 镜像   | URL                                                                                 |
+| ------ | ----------------------------------------------------------------------------------- |
+| Global | https://cdn.jsdelivr.net/npm/page-agent/dist/iife/page-agent.demo.js                |
+| China  | https://registry.npmmirror.com/page-agent/latest/files/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 
@@ -76,12 +76,11 @@ PageAgent adopts a simplified monorepo structure:
 
 ```
 packages/
-├── page-agent/          # AI agent with UI Panel(npm: page-agent)
+├── page-agent/          # AI agent and demo(npm: page-agent)
 ├── core/                # Agent core logic without UI(npm: @page-agent/core)
 ├── llms/                # LLM 客户端 (npm: @page-agent/llms)
 ├── page-controller/     # DOM 操作 & 蒙层 & 模拟鼠标 (npm: @page-agent/page-controller)
 ├── ui/                  # 面板 & i18n (npm: @page-agent/ui)
-├── cdn/                 # CDN IIFE builds (npm: @page-agent/cdn)
 └── website/             # 文档站点
 ```
 
