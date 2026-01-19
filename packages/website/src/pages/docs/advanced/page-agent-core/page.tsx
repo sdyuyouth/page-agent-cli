@@ -44,14 +44,18 @@ export default function PageAgentCoreDocs() {
 				<CodeEditor
 					language="typescript"
 					code={`import { PageAgentCore } from '@page-agent/core'
+import { PageController } from '@page-agent/page-controller'
 
 const agent = new PageAgentCore({
+  pageController: new PageController({ enableMask: true }),
   baseURL: 'https://api.openai.com/v1',
   apiKey: 'your-api-key',
-  model: 'gpt-4o',
+  model: 'gpt-5.2',
+  language: 'en-US',
 })
 
-// Listen to events
+// Listen to events for UI display
+
 agent.addEventListener('statuschange', () => {
   console.log('Status:', agent.status)
 })
@@ -459,7 +463,52 @@ const result = await agent.execute('Fill in the form with test data')`}
 				/>
 			</section>
 
-			{/* <APIDivider title={isZh ? '无头模式' : 'Headless Mode'} /> */}
+			<APIDivider title={isZh ? '无头模式' : 'Headless Mode'} />
+
+			{/* Headless Usage */}
+			<section className="mb-10">
+				<h2 className="text-2xl font-semibold mb-4">{isZh ? '无头模式' : 'Headless Mode'}</h2>
+				<p className="text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '在非 DOM 环境中，你必须实现自定义的 PageController（例如远程操作页面或 Puppeteer）。'
+						: 'In non-DOM environments, you must implement a custom PageController (e.g., remote page control or Puppeteer).'}
+				</p>
+				<CodeEditor
+					language="typescript"
+					code={`import { PageAgentCore } from '@page-agent/core'
+import type { PageController } from '@page-agent/page-controller'
+
+class MyRemotePageController implements PageController {
+  // Implement required methods for DOM extraction and interaction
+}
+
+const agent = new PageAgentCore({
+  pageController: new MyRemotePageController(),
+  baseURL: 'https://api.openai.com/v1',
+  apiKey: 'your-api-key',
+  model: 'gpt-5.2',
+  language: 'en-US',
+})
+
+// Listen to events for UI display
+
+agent.addEventListener('statuschange', () => {
+  console.log('Status:', agent.status)
+})
+
+agent.addEventListener('historychange', () => {
+  console.log('History:', agent.history)
+})
+
+agent.addEventListener('activity', (e) => {
+  const activity = (e as CustomEvent).detail
+  console.log('Activity:', activity.type)
+})
+
+// Execute task
+const result = await agent.execute('Fill in the form with test data')`}
+				/>
+			</section>
 		</div>
 	)
 }
