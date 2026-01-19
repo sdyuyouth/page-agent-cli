@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 
-import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
 import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '@/constants'
 
@@ -28,11 +27,29 @@ export default function QuickStart() {
 						</span>
 					</div>
 					<CodeEditor
-						code={`// Global: ${CDN_DEMO_URL}
-// China:  ${CDN_DEMO_CN_URL}
-<script src="${isZh ? CDN_DEMO_CN_URL : CDN_DEMO_URL}" crossorigin="true"></script>`}
+						code={`<script src="${isZh ? CDN_DEMO_CN_URL : CDN_DEMO_URL}" crossorigin="true"></script>`}
 						language="html"
 					/>
+					<table className="w-full border-collapse text-sm">
+						<thead>
+							<tr className="border-b border-gray-200 dark:border-gray-700">
+								<th className="text-left py-2 px-3 font-semibold w-28">
+									{isZh ? '镜像' : 'Mirrors'}
+								</th>
+								<th className="text-left py-2 px-3 font-semibold">URL</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr className="border-b border-gray-100 dark:border-gray-800">
+								<td className="py-2 px-3">{isZh ? '全球' : 'Global'}</td>
+								<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_URL}</td>
+							</tr>
+							<tr>
+								<td className="py-2 px-3">{isZh ? '中国' : 'China'}</td>
+								<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_CN_URL}</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 
 				{/* NPM - Recommended */}
@@ -41,7 +58,7 @@ export default function QuickStart() {
 						{isZh ? '📦 NPM 安装（推荐）' : '📦 NPM Install (Recommended)'}
 					</h3>
 					<CodeEditor
-						code={`npm install page-agent
+						code={`// npm install page-agent
 
 import { PageAgent } from 'page-agent'`}
 						language="bash"
@@ -71,7 +88,8 @@ import { PageAgent } from 'page-agent'`}
 						code={`// ${isZh ? '程序化执行自然语言指令' : 'Execute natural language instructions programmatically'}
 await agent.execute('${isZh ? '点击提交按钮，然后填写用户名为张三' : 'Click submit button, then fill username as John'}');
 
-// ${isZh ? '或者显示对话框让用户输入指令' : 'Or show panel for user to input instructions'}
+// ${isZh ? '或者' : 'Or:'}
+// ${isZh ? '显示对话框让用户输入指令' : 'Show panel for user to input instructions'}
 agent.panel.show()
 `}
 						language="javascript"

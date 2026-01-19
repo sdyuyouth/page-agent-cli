@@ -37,7 +37,7 @@ Fastest way to try PageAgent:
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/page-agent/dist/iife/page-agent.demo.js"
     crossorigin="true"
 ></script>
 ```
@@ -46,8 +46,8 @@ Fastest way to try PageAgent:
 
 | Mirrors | URL                                                                                 |
 | ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/@page-agent/cdn/dist/page-agent.demo.js                |
-| China   | https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent/dist/iife/page-agent.demo.js                |
+| China   | https://registry.npmmirror.com/page-agent/latest/files/dist/iife/page-agent.demo.js |
 
 ### NPM Installation
 
@@ -67,8 +67,6 @@ const agent = new PageAgent({
 
 await agent.execute('Click the login button')
 ```
-
-For environments where NPM is not available. We do offer a IIFE build via CDN. [@see CDN Usage](https://alibaba.github.io/page-agent/#/docs/integration/cdn-setup)
 
 ## 🏗️ Structure
 

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import CodeEditor from '@/components/CodeEditor'
-import { CDN_DEMO_CN_URL, CDN_DEMO_URL, CDN_FULL_CN_URL, CDN_FULL_URL } from '@/constants'
+import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '@/constants'
 
 export default function CdnSetup() {
 	const { i18n } = useTranslation()
@@ -62,63 +62,6 @@ export default function CdnSetup() {
 						</tr>
 					</tbody>
 				</table>
-			</section>
-
-			{/* CDN Build Section */}
-			<section>
-				<h2 className="text-2xl font-bold mb-3">{isZh ? '📦 标准版' : '📦 Standard Build'}</h2>
-
-				<p className="text-gray-600 dark:text-gray-300 mb-3">
-					{isZh
-						? '将 PageAgent 类暴露到 globalThis，用法与 NPM 一致：'
-						: 'Exposes PageAgent class to globalThis, usage identical to NPM:'}
-				</p>
-
-				<CodeEditor
-					className="mb-4"
-					code={`<script src="${CDN_FULL_URL}" crossorigin="true"></script>
-<script>
-const agent = new PageAgent({
-  model: 'deepseek-chat',
-  baseURL: 'https://api.deepseek.com',
-  apiKey: 'YOUR_API_KEY',
-})
-await agent.execute('Click the submit button')
-</script>`}
-				/>
-
-				<table className="w-full border-collapse text-sm">
-					<thead>
-						<tr className="border-b border-gray-200 dark:border-gray-700">
-							<th className="text-left py-2 px-3 font-semibold w-28">
-								{isZh ? '位置' : 'Location'}
-							</th>
-							<th className="text-left py-2 px-3 font-semibold">URL</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr className="border-b border-gray-100 dark:border-gray-800">
-							<td className="py-2 px-3">{isZh ? '全球' : 'Global'}</td>
-							<td className="py-2 px-3 font-mono text-xs break-all">{CDN_FULL_URL}</td>
-						</tr>
-						<tr>
-							<td className="py-2 px-3">{isZh ? '中国' : 'China'}</td>
-							<td className="py-2 px-3 font-mono text-xs break-all">{CDN_FULL_CN_URL}</td>
-						</tr>
-					</tbody>
-				</table>
-			</section>
-
-			{/* Tips */}
-			<section className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-				<h3 className="text-base font-semibold mb-2 text-blue-900 dark:text-blue-300">
-					💡 {isZh ? '提示' : 'Tips'}
-				</h3>
-				<ul className="text-gray-600 dark:text-gray-300 text-sm space-y-1">
-					<li>• {isZh ? '生产环境推荐使用 NPM' : 'NPM is recommended for production'}</li>
-					<li>• {isZh ? '生产环境建议锁定版本号' : 'Lock version number in production'}</li>
-					<li>• {isZh ? '确保 HTTPS 环境' : 'Ensure HTTPS environment'}</li>
-				</ul>
 			</section>
 		</div>
 	)
