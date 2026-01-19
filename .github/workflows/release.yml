@@ -32,4 +32,12 @@ jobs:
         run: npm run build:libs
 
       - name: Publish all public packages
-        run: npm publish --workspaces --access public
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          if [[ "$VERSION" == *"-"* ]]; then
+            # Prerelease version (e.g., 0.3.0-beta.1) -> extract tag name before the dot
+            TAG=$(echo "$VERSION" | sed 's/.*-\([a-zA-Z]*\).*/\1/')
+            npm publish --workspaces --access public --tag "$TAG"
+          else
+            npm publish --workspaces --access public
+          fi
