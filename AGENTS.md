@@ -31,8 +31,8 @@ Simple monorepo solution: TypeScript references + Vite aliases. Update tsconfig 
 
 ```
 packages/
-├── page-agent/              # npm: "page-agent" ⭐ MAIN (with Panel UI + IIFE builds)
-├── core/                    # npm: "@page-agent/core" (headless, no UI)
+├── core/                    # npm: "@page-agent/core" ⭐ Core agent logic (headless)
+├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
 ├── page-controller/         # @page-agent/page-controller
@@ -89,28 +89,28 @@ Build with `npm run build:iife --workspace=page-agent`.
 
 ### Page Agent (`packages/page-agent/`)
 
-| File                    | Description                                  |
-| ----------------------- | -------------------------------------------- |
-| `src/PageAgent.ts`      | ⭐ Main class with UI, extends PageAgentCore |
-| `src/entry-iife.ts`     | IIFE entry (exposes PageAgent class)         |
-| `src/entry-iife-demo.ts`| IIFE demo entry (auto-init with demo API)    |
+| File                     | Description                                  |
+| ------------------------ | -------------------------------------------- |
+| `src/PageAgent.ts`       | ⭐ Main class with UI, extends PageAgentCore |
+| `src/entry-iife.ts`      | IIFE entry (exposes PageAgent class)         |
+| `src/entry-iife-demo.ts` | IIFE demo entry (auto-init with demo API)    |
 
 ### Core (`packages/core/`)
 
-| File                    | Description                                 |
-| ----------------------- | ------------------------------------------- |
-| `src/PageAgentCore.ts`  | ⭐ Core agent class without UI              |
-| `src/tools/`            | Tool definitions calling PageController     |
-| `src/config/`           | Configuration types and constants           |
-| `src/prompts/`          | System prompt templates                     |
+| File                   | Description                             |
+| ---------------------- | --------------------------------------- |
+| `src/PageAgentCore.ts` | ⭐ Core agent class without UI          |
+| `src/tools/`           | Tool definitions calling PageController |
+| `src/config/`          | Configuration types and constants       |
+| `src/prompts/`         | System prompt templates                 |
 
 ### LLMs (`packages/llms/`)
 
-| File                         | Description                           |
-| ---------------------------- | ------------------------------------- |
-| `src/index.ts`               | ⭐ LLM class with retry logic         |
-| `src/types.ts`               | MacroToolInput, AgentBrain, LLMConfig |
-| `src/OpenAILenientClient.ts` | OpenAI-compatible client              |
+| File                  | Description                           |
+| --------------------- | ------------------------------------- |
+| `src/index.ts`        | ⭐ LLM class with retry logic         |
+| `src/types.ts`        | MacroToolInput, AgentBrain, LLMConfig |
+| `src/OpenAIClient.ts` | OpenAI-compatible client              |
 
 ### Page Controller (`packages/page-controller/`)
 
