@@ -473,7 +473,7 @@ export class PageAgentCore extends EventTarget {
 		if (currentURL !== this.states.lastURL) {
 			this.pushObservation(`Page navigated to → ${currentURL}`)
 			this.states.lastURL = currentURL
-			await waitFor(500) // wait for page to stabilize
+			await waitFor(0.5) // wait for page to stabilize
 		}
 
 		// Warn about remaining steps
