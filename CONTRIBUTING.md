@@ -122,13 +122,13 @@ npm start
 - Start and serve a local `iife` script
 
     ```bash
-    npm run dev:iife # Serving IIFE with auto rebuild at http://localhost:5174/page-agent.js
+    npm run dev:demo # Serving IIFE with auto rebuild at http://localhost:5174/page-agent.demo.js
     ```
 
 - Add a new bookmark
 
     ```javascript
-    javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5174/page-agent.js?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
+    javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5174/page-agent.demo.js?t=${Math.random()}`;s.onload=()=>console.log(%27PageAgent ready!%27);document.head.appendChild(s);})();
     ```
 
 - Click the bookmark on any page to load Page-Agent
