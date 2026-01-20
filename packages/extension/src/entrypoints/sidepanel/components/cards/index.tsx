@@ -48,7 +48,7 @@ function ResultCard({
 					Result: {success ? 'Success' : 'Failed'}
 				</span>
 			</div>
-			<p className="text-xs text-muted-foreground pl-5 whitespace-pre-wrap">{text}</p>
+			<p className="text-xs text-[11px] text-muted-foreground pl-5 whitespace-pre-wrap">{text}</p>
 			{children}
 		</div>
 	)
@@ -63,7 +63,7 @@ function ReflectionItem({ icon, value }: { icon: string; value: string }) {
 			<span className="text-xs">{icon}</span>
 			<span
 				className={cn(
-					'text-xs text-muted-foreground cursor-pointer hover:text-muted-foreground/80',
+					'text-[11px] text-muted-foreground cursor-pointer hover:text-muted-foreground/70',
 					!expanded && 'line-clamp-2'
 				)}
 				onClick={() => setExpanded(!expanded)}
@@ -180,11 +180,11 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 							<div className="flex-1 min-w-0">
 								<p className="text-xs text-foreground/80 mb-0.5">
 									<span className="font-medium">{event.action.name}</span>
-									<span className="text-muted-foreground ml-1.5">
+									<span className="text-muted-foreground/70 ml-1.5">
 										{JSON.stringify(event.action.input)}
 									</span>
 								</p>
-								<p className="text-[11px] text-muted-foreground/70">→ {event.action.output}</p>
+								<p className="text-[11px] text-muted-foreground/70">└ {event.action.output}</p>
 							</div>
 						</div>
 					</div>
@@ -204,7 +204,7 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 				</div>
 				<div className="flex items-start gap-2">
 					<Eye className="size-3.5 text-green-500 shrink-0 mt-0.5" />
-					<span className="text-xs text-muted-foreground">{event.content}</span>
+					<span className="text-[11px] text-muted-foreground">{event.content}</span>
 				</div>
 			</div>
 		)

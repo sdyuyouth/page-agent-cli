@@ -149,7 +149,7 @@ export default function App() {
 
 			{/* Input */}
 			<div className="border-t p-3">
-				<InputGroup className="relative">
+				<InputGroup className="relative rounded-lg">
 					<InputGroupTextarea
 						ref={textareaRef}
 						placeholder="Describe your task... (Enter to send)"
@@ -157,10 +157,10 @@ export default function App() {
 						onChange={(e) => setTask(e.target.value)}
 						onKeyDown={handleKeyDown}
 						disabled={isRunning}
-						rows={2}
-						className="text-xs pr-12 min-h-[60px]"
+						// rows={2}
+						className="text-xs pr-12 min-h-10"
 					/>
-					<InputGroupAddon align="inline-end" className="absolute bottom-2 right-2">
+					<InputGroupAddon align="inline-end" className="absolute bottom-0 right-0">
 						{isRunning ? (
 							<InputGroupButton
 								size="icon-sm"
