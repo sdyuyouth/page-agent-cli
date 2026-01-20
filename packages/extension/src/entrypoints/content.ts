@@ -3,6 +3,9 @@
  *
  * This script runs in the context of web pages and hosts the real PageController.
  * It listens for RPC messages from Background and dispatches them to PageController.
+ *
+ * PageController is created lazily on first RPC call and can be disposed/recreated
+ * between tasks. This supports multi-page workflows and ensures clean state.
  */
 import { PageController } from '@page-agent/page-controller'
 
@@ -15,17 +18,32 @@ export default defineContentScript({
 	main() {
 		console.log('[PageAgentExt] Content script loaded')
 
-		// Create PageController instance with mask enabled
-		const controller = new PageController({
-			enableMask: true,
-		})
+		// Lazy-initialized controller - created on demand, disposed between tasks
+		let controller: PageController | null = null
 
-		// Register RPC handlers
-		registerRPCHandlers(controller)
+		function getController(): PageController {
+			if (!controller) {
+				controller = new PageController({ enableMask: true })
+				console.log('[PageAgentExt] PageController created')
+			}
+			return controller
+		}
+
+		// Register RPC handlers with lazy controller access
+		registerRPCHandlers(
+			getController,
+			() => controller,
+			() => {
+				controller?.dispose()
+				controller = null
+				console.log('[PageAgentExt] PageController disposed')
+			}
+		)
 
 		// Cleanup on page unload
 		window.addEventListener('beforeunload', () => {
-			controller.dispose()
+			controller?.dispose()
+			controller = null
 		})
 	},
 })
@@ -33,66 +51,70 @@ export default defineContentScript({
 /**
  * Register all RPC message handlers for PageController methods
  */
-function registerRPCHandlers(controller: PageController): void {
+function registerRPCHandlers(
+	getController: () => PageController,
+	getControllerIfExists: () => PageController | null,
+	disposeController: () => void
+): void {
 	// State queries
 	pageControllerRPC.onMessage('rpc:getCurrentUrl', async () => {
-		return controller.getCurrentUrl()
+		return getController().getCurrentUrl()
 	})
 
 	pageControllerRPC.onMessage('rpc:getLastUpdateTime', async () => {
-		return controller.getLastUpdateTime()
+		return getController().getLastUpdateTime()
 	})
 
 	pageControllerRPC.onMessage('rpc:getBrowserState', async () => {
-		return controller.getBrowserState()
+		return getController().getBrowserState()
 	})
 
 	// DOM operations
 	pageControllerRPC.onMessage('rpc:updateTree', async () => {
-		return controller.updateTree()
+		return getController().updateTree()
 	})
 
 	pageControllerRPC.onMessage('rpc:cleanUpHighlights', async () => {
-		await controller.cleanUpHighlights()
+		await getControllerIfExists()?.cleanUpHighlights()
 	})
 
 	// Element actions
 	pageControllerRPC.onMessage('rpc:clickElement', async ({ data: index }) => {
-		return controller.clickElement(index)
+		return getController().clickElement(index)
 	})
 
 	pageControllerRPC.onMessage('rpc:inputText', async ({ data }) => {
-		return controller.inputText(data.index, data.text)
+		return getController().inputText(data.index, data.text)
 	})
 
 	pageControllerRPC.onMessage('rpc:selectOption', async ({ data }) => {
-		return controller.selectOption(data.index, data.optionText)
+		return getController().selectOption(data.index, data.optionText)
 	})
 
 	pageControllerRPC.onMessage('rpc:scroll', async ({ data: options }) => {
-		return controller.scroll(options)
+		return getController().scroll(options)
 	})
 
 	pageControllerRPC.onMessage('rpc:scrollHorizontally', async ({ data: options }) => {
-		return controller.scrollHorizontally(options)
+		return getController().scrollHorizontally(options)
 	})
 
 	pageControllerRPC.onMessage('rpc:executeJavascript', async ({ data: script }) => {
-		return controller.executeJavascript(script)
+		return getController().executeJavascript(script)
 	})
 
 	// Mask operations
 	pageControllerRPC.onMessage('rpc:showMask', async () => {
-		await controller.showMask()
+		await getController().showMask()
 	})
 
 	pageControllerRPC.onMessage('rpc:hideMask', async () => {
-		await controller.hideMask()
+		await getControllerIfExists()?.hideMask()
 	})
 
-	// Lifecycle
+	// Lifecycle - dispose clears the controller, next call will create fresh one
 	pageControllerRPC.onMessage('rpc:dispose', async () => {
-		controller.dispose()
+		disposeController()
 	})
 
 	console.log('[PageAgentExt] RPC handlers registered')
