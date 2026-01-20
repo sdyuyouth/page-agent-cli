@@ -5,6 +5,7 @@
 This is a **monorepo** with npm workspaces:
 
 - **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
+- **Extension** (`packages/extension/`) - Browser extension (WXT + React) 🚧 WIP
 - **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
 
 Internal packages:
@@ -35,6 +36,7 @@ packages/
 ├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
+├── extension/               # 🚧 WIP: Browser extension (WXT + React)
 ├── page-controller/         # @page-agent/page-controller
 └── ui/                      # @page-agent/ui
 ```
