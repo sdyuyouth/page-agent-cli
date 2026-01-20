@@ -265,6 +265,7 @@ export class PageAgentCore extends EventTarget {
 					reflection,
 					action,
 					usage: result.usage,
+					rawResponse: result.rawResponse,
 				} as AgentStep)
 				this.#emitHistoryChange()
 
