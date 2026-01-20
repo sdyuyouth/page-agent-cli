@@ -9,6 +9,7 @@
         "packages/llms",
         "packages/core",
         "packages/page-agent",
+        "packages/extension",
         "packages/website"
     ],
     "description": "AI-powered UI agent for web applications",
