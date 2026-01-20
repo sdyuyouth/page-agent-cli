@@ -34,7 +34,7 @@ console.log(chalk.cyan.bold('\n📦 Syncing version\n'))
 // Update root package.json if new version specified
 if (versionArg) {
 	rootPkg.version = newVersion
-	writeFileSync(rootPkgPath, JSON.stringify(rootPkg, null, '\t') + '\n')
+	writeFileSync(rootPkgPath, JSON.stringify(rootPkg, null, '    ') + '\n')
 	console.log(chalk.green('✓') + ` ${chalk.bold('root')} → ${chalk.yellow(newVersion)}`)
 } else {
 	console.log(chalk.dim('  root:') + ` ${chalk.yellow(newVersion)} ${chalk.dim('(source)')}`)
@@ -94,7 +94,7 @@ for (const pkg of packages) {
 		continue
 	}
 
-	writeFileSync(pkgPath, JSON.stringify(pkgJson, null, '\t') + '\n')
+	writeFileSync(pkgPath, JSON.stringify(pkgJson, null, '    ') + '\n')
 	console.log(
 		chalk.green('✓') +
 			` ${chalk.bold(pkgJson.name)}: ${chalk.dim(oldVersion)} → ${chalk.yellow(newVersion)}`
