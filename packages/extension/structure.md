@@ -32,7 +32,7 @@ The extension operates across three isolated JavaScript contexts:
 **Responsibilities:**
 
 - Runs in the context of web pages
-- Hosts the real `PageController` instance
+- Hosts the real `PageController` instance (lazy-initialized)
 - Performs actual DOM operations (click, input, scroll, etc.)
 - Responds to RPC messages from Background
 - Manages visual mask overlay during automation
@@ -41,6 +41,8 @@ The extension operates across three isolated JavaScript contexts:
 
 - `PageController` - DOM controller (from `@page-agent/page-controller`)
 - RPC handlers for all PageController methods
+
+**Lifecycle:** PageController is created lazily on first RPC call and disposed between tasks. This ensures clean state for each task and enables future multi-page support.
 
 ### 3. Side Panel (React UI)
 
@@ -74,22 +76,22 @@ The extension operates across three isolated JavaScript contexts:
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Background                               │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    PageAgentCore                          │   │
+│  │                    PageAgentCore                         │   │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐  │   │
 │  │  │     LLM     │  │    Tools    │  │ RemotePageCtrl   │  │   │
 │  │  └─────────────┘  └─────────────┘  └────────┬─────────┘  │   │
-│  └───────────────────────────────────────────────┼───────────┘   │
-└───────────────────────────────────────────────────┼──────────────┘
-                                                    │ RPC
-                                                    ▼
+│  └─────────────────────────────────────────────┼────────────┘   │
+└────────────────────────────────────────────────┼────────────────┘
+                                                 │ RPC
+                                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Content Script                             │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    PageController                         │   │
+│  │                    PageController                        │   │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐  │   │
 │  │  │  DOM Tree   │  │   Actions   │  │      Mask        │  │   │
 │  │  └─────────────┘  └─────────────┘  └──────────────────┘  │   │
-│  └───────────────────────────────────────────────────────────┘   │
+│  └──────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -113,29 +115,29 @@ Used by `RemotePageController` to call `PageController` methods.
 
 ```typescript
 interface PageControllerRPCProtocol {
-  // State queries
-  'rpc:getCurrentUrl': () => string
-  'rpc:getLastUpdateTime': () => number
-  'rpc:getBrowserState': () => BrowserState
+    // State queries
+    'rpc:getCurrentUrl': () => string
+    'rpc:getLastUpdateTime': () => number
+    'rpc:getBrowserState': () => BrowserState
 
-  // DOM operations
-  'rpc:updateTree': () => string
-  'rpc:cleanUpHighlights': () => void
+    // DOM operations
+    'rpc:updateTree': () => string
+    'rpc:cleanUpHighlights': () => void
 
-  // Element actions
-  'rpc:clickElement': (index: number) => ActionResult
-  'rpc:inputText': (data: { index: number; text: string }) => ActionResult
-  'rpc:selectOption': (data: { index: number; optionText: string }) => ActionResult
-  'rpc:scroll': (options: ScrollOptions) => ActionResult
-  'rpc:scrollHorizontally': (options: ScrollHorizontallyOptions) => ActionResult
-  'rpc:executeJavascript': (script: string) => ActionResult
+    // Element actions
+    'rpc:clickElement': (index: number) => ActionResult
+    'rpc:inputText': (data: { index: number; text: string }) => ActionResult
+    'rpc:selectOption': (data: { index: number; optionText: string }) => ActionResult
+    'rpc:scroll': (options: ScrollOptions) => ActionResult
+    'rpc:scrollHorizontally': (options: ScrollHorizontallyOptions) => ActionResult
+    'rpc:executeJavascript': (script: string) => ActionResult
 
-  // Mask operations
-  'rpc:showMask': () => void
-  'rpc:hideMask': () => void
+    // Mask operations
+    'rpc:showMask': () => void
+    'rpc:hideMask': () => void
 
-  // Lifecycle
-  'rpc:dispose': () => void
+    // Lifecycle
+    'rpc:dispose': () => void
 }
 ```
 
@@ -145,10 +147,10 @@ Used by SidePanel UI to control the agent.
 
 ```typescript
 interface AgentCommandProtocol {
-  'agent:execute': (task: string) => void
-  'agent:stop': () => void
-  'agent:getState': () => AgentState
-  'agent:configure': (config: LLMConfig) => void
+    'agent:execute': (task: string) => void
+    'agent:stop': () => void
+    'agent:getState': () => AgentState
+    'agent:configure': (config: LLMConfig) => void
 }
 ```
 
@@ -158,10 +160,10 @@ Used by Background to push updates to SidePanel.
 
 ```typescript
 interface AgentEventProtocol {
-  'event:status': (status: AgentStatus) => void
-  'event:history': (history: HistoricalEvent[]) => void
-  'event:activity': (activity: AgentActivity) => void
-  'event:stateSnapshot': (state: AgentState) => void
+    'event:status': (status: AgentStatus) => void
+    'event:history': (history: HistoricalEvent[]) => void
+    'event:activity': (activity: AgentActivity) => void
+    'event:stateSnapshot': (state: AgentState) => void
 }
 ```
 
@@ -225,6 +227,33 @@ packages/extension/src/
 ├── lib/utils.ts                   # Utility functions
 └── assets/index.css               # Tailwind styles
 ```
+
+## Design Decisions
+
+### Tab ID Binding
+
+**Problem:** When a task completes while the page is not focused (user switched tabs), RPC messages like `hideMask` or `dispose` would be sent to the wrong tab because `chrome.tabs.query({ active: true })` returns the currently active tab, not the original target tab.
+
+**Solution:** `RemotePageController` captures the target tab ID at construction time and binds it to its RPC client. All subsequent RPC calls use this fixed tab ID regardless of which tab is currently active.
+
+```
+Task starts → RemotePageController created → tabId captured (e.g., 123)
+User switches to another tab (456 is now active)
+Task completes → hideMask RPC sent to tab 123 (correct!)
+```
+
+### Lazy PageController Lifecycle
+
+**Problem:** PageController was created once when content script loaded and persisted until page unload. If the mask was disposed mid-task, subsequent tasks couldn't show it again.
+
+**Solution:** PageController is now lazy-initialized on first RPC call and fully disposed between tasks. Each task gets a fresh PageController instance with its own mask.
+
+```
+Task 1: showMask → creates PageController + Mask → execute → hideMask → dispose → null
+Task 2: showMask → creates new PageController + Mask → ...
+```
+
+This also prepares for future multi-page workflows where PageController may need to be recreated when navigating between pages.
 
 ## Extension Considerations
 
