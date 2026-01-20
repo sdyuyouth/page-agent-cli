@@ -2,7 +2,7 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
-import { LLM, type Tool } from '@page-agent/llms'
+import { InvokeError, LLM, type Tool } from '@page-agent/llms'
 import type { PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import zod from 'zod'
@@ -107,7 +107,7 @@ export class PageAgentCore extends EventTarget {
 			this.#emitHistoryChange()
 		})
 		this.#llm.addEventListener('error', (e) => {
-			const { error } = (e as CustomEvent).detail
+			const error = (e as CustomEvent).detail.error as Error | InvokeError
 			const message = String(error)
 			this.emitActivity({ type: 'error', message })
 			// Also push to history for panel rendering
@@ -115,6 +115,7 @@ export class PageAgentCore extends EventTarget {
 				type: 'error',
 				errorType: 'error',
 				message,
+				rawResponse: (error as InvokeError).rawResponse,
 			})
 			this.#emitHistoryChange()
 		})

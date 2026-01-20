@@ -76,6 +76,7 @@ export interface ErrorEvent {
 	message: string
 	attempt?: number
 	maxAttempts?: number
+	rawResponse?: unknown
 }
 
 /**
