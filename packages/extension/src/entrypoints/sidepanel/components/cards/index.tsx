@@ -11,7 +11,7 @@ import {
 	XCircle,
 	Zap,
 } from 'lucide-react'
-import { Fragment } from 'react/jsx-runtime'
+import { Fragment, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 import { AgentActivity, HistoricalEvent } from '@/messaging'
@@ -54,6 +54,26 @@ function ResultCard({
 	)
 }
 
+// Single reflection item with truncation
+function ReflectionItem({ icon, value }: { icon: string; value: string }) {
+	const [expanded, setExpanded] = useState(false)
+
+	return (
+		<Fragment>
+			<span className="text-xs">{icon}</span>
+			<span
+				className={cn(
+					'text-xs text-muted-foreground cursor-pointer hover:text-muted-foreground/80',
+					!expanded && 'line-clamp-2'
+				)}
+				onClick={() => setExpanded(!expanded)}
+			>
+				{value}
+			</span>
+		</Fragment>
+	)
+}
+
 // Reflection section in step card
 function ReflectionSection({
 	reflection,
@@ -79,10 +99,7 @@ function ReflectionSection({
 			</div>
 			<div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
 				{items.map((item) => (
-					<Fragment key={item.label}>
-						<span className="text-xs">{item.icon}</span>
-						<span className="text-xs text-muted-foreground">{item.value}</span>
-					</Fragment>
+					<ReflectionItem key={item.label} icon={item.icon} value={item.value!} />
 				))}
 			</div>
 		</div>
