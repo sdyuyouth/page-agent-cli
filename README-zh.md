@@ -37,7 +37,7 @@
 
 ```html
 <script
-    src="https://registry.npmmirror.com/page-agent/1.0.0-beta.1/files/dist/iife/page-agent.demo.js"
+    src="https://registry.npmmirror.com/page-agent/1.0.0-beta.2/files/dist/iife/page-agent.demo.js"
     crossorigin="true"
 ></script>
 ```
@@ -46,8 +46,8 @@
 
 | 镜像   | URL                                                                                       |
 | ------ | ----------------------------------------------------------------------------------------- |
-| Global | https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.1/dist/iife/page-agent.demo.js         |
-| China  | https://registry.npmmirror.com/page-agent/1.0.0-beta.1/files/dist/iife/page-agent.demo.js |
+| Global | https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.2/dist/iife/page-agent.demo.js         |
+| China  | https://registry.npmmirror.com/page-agent/1.0.0-beta.2/files/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 
