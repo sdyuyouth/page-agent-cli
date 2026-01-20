@@ -1,7 +1,7 @@
 {
     "name": "root",
     "private": true,
-    "version": "1.0.0-beta.1",
+    "version": "1.0.0-beta.2",
     "type": "module",
     "workspaces": [
         "packages/page-controller",
@@ -30,7 +30,7 @@
         "build:website": "npm run build:website --workspace=@page-agent/website",
         "build:libs": "npm run build --workspaces --if-present",
         "build": "npm run build:libs && npm run build:website",
-        "dev:iife": "npm run dev:iife --workspace=page-agent",
+        "dev:demo": "npm run dev:demo --workspace=page-agent",
         "version": "node scripts/sync-version.js",
         "lint": "eslint .",
         "prepare": "husky"

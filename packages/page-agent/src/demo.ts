@@ -41,6 +41,7 @@ setTimeout(() => {
 
 	// Create agent
 	window.pageAgent = new PageAgent(config)
+	window.pageAgent.panel.show()
 
 	console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)
 })

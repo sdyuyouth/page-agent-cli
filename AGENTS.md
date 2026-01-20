@@ -74,28 +74,14 @@ const pageInfo = await this.pageController.getPageInfo()
 3. **LLM Processing**: AI returns action plans (page-agent)
 4. **Indexed Operations**: PageAgent calls PageController by element index
 
-### IIFE Builds (`packages/page-agent/dist/iife/`)
-
-Two IIFE builds for script tag usage:
-
-| Build | File                 | Description                      |
-| ----- | -------------------- | -------------------------------- |
-| Demo  | `page-agent.demo.js` | Auto-init with built-in test API |
-| Full  | `page-agent.js`      | Exposes `PageAgent` class only   |
-
-Demo build supports query params (e.g., `?model=gpt-4&lang=en-US`).
-
-Build with `npm run build:iife --workspace=page-agent`.
-
 ## Key Files Reference
 
 ### Page Agent (`packages/page-agent/`)
 
-| File                     | Description                                  |
-| ------------------------ | -------------------------------------------- |
-| `src/PageAgent.ts`       | ⭐ Main class with UI, extends PageAgentCore |
-| `src/entry-iife.ts`      | IIFE entry (exposes PageAgent class)         |
-| `src/entry-iife-demo.ts` | IIFE demo entry (auto-init with demo API)    |
+| File               | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `src/PageAgent.ts` | ⭐ Main class with UI, extends PageAgentCore |
+| `src/demo.ts`      | IIFE demo entry (auto-init with demo API)    |
 
 ### Core (`packages/core/`)
 
