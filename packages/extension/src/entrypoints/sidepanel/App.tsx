@@ -1,6 +1,8 @@
 import {
 	ArrowRight,
 	CheckCircle,
+	ChevronDown,
+	ChevronRight,
 	Loader2,
 	MessageSquare,
 	Send,
@@ -103,7 +105,15 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
 }
 
 // Result card for done action
-function ResultCard({ success, text }: { success: boolean; text: string }) {
+function ResultCard({
+	success,
+	text,
+	children,
+}: {
+	success: boolean
+	text: string
+	children?: React.ReactNode
+}) {
 	return (
 		<div
 			className={cn(
@@ -127,6 +137,7 @@ function ResultCard({ success, text }: { success: boolean; text: string }) {
 				</span>
 			</div>
 			<p className="text-xs text-muted-foreground pl-5 whitespace-pre-wrap">{text}</p>
+			{children}
 		</div>
 	)
 }
@@ -166,16 +177,46 @@ function ReflectionSection({
 	)
 }
 
+// Raw response section (collapsible, for debugging)
+function RawResponseSection({ rawResponse }: { rawResponse: unknown }) {
+	const [expanded, setExpanded] = useState(false)
+
+	return (
+		<div className="mt-2 border-t border-dashed pt-2">
+			<button
+				type="button"
+				onClick={() => setExpanded(!expanded)}
+				className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+			>
+				{expanded ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+				<span>Raw Response</span>
+			</button>
+			{expanded && (
+				<pre
+					className="mt-1.5 p-2 text-[10px] bg-muted/50 rounded overflow-x-auto max-h-60 overflow-y-auto select-all"
+					style={{ userSelect: 'all' }}
+				>
+					{JSON.stringify(rawResponse, null, 4)}
+				</pre>
+			)}
+		</div>
+	)
+}
+
 // History event card component
 function EventCard({ event }: { event: HistoricalEvent }) {
 	// Done action - show as result card
 	if (event.type === 'step' && event.action?.name === 'done') {
 		const input = event.action.input as { text?: string; success?: boolean }
 		return (
-			<ResultCard
-				success={input?.success ?? true}
-				text={input?.text || event.action.output || ''}
-			/>
+			<div>
+				<ResultCard
+					success={input?.success ?? true}
+					text={input?.text || event.action.output || ''}
+				>
+					{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
+				</ResultCard>
+			</div>
 		)
 	}
 
@@ -202,6 +243,9 @@ function EventCard({ event }: { event: HistoricalEvent }) {
 						</div>
 					</div>
 				)}
+
+				{/* Raw Response */}
+				{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
 			</div>
 		)
 	}
@@ -217,9 +261,12 @@ function EventCard({ event }: { event: HistoricalEvent }) {
 
 	if (event.type === 'error') {
 		return (
-			<div className="flex items-start gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5">
-				<XCircle className="size-3 text-destructive shrink-0 mt-0.5" />
-				<span className="text-xs text-destructive">{event.message}</span>
+			<div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5">
+				<div className="flex items-start gap-1.5">
+					<XCircle className="size-3 text-destructive shrink-0 mt-0.5" />
+					<span className="text-xs text-destructive">{event.message}</span>
+				</div>
+				{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
 			</div>
 		)
 	}

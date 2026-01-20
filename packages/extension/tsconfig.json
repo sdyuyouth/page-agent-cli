@@ -5,6 +5,7 @@
         "useDefineForClassFields": true,
         "noEmit": false,
         "allowImportingTsExtensions": false,
+        "strictNullChecks": true,
         "jsx": "react-jsx",
         "baseUrl": ".",
         "paths": {

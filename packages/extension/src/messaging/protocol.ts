@@ -72,6 +72,8 @@ export interface HistoricalEvent {
 	// For 'error' type
 	errorType?: 'retry' | 'error'
 	message?: string
+	// Raw LLM response for debugging (step and error types)
+	rawResponse?: unknown
 }
 
 /** Agent state snapshot */
