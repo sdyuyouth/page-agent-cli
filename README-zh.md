@@ -37,17 +37,17 @@
 
 ```html
 <script
-    src="https://registry.npmmirror.com/@page-agent/cdn/latest/files/dist/page-agent.demo.js"
+    src="https://registry.npmmirror.com/page-agent/1.0.0-beta.1/files/dist/iife/page-agent.demo.js"
     crossorigin="true"
 ></script>
 ```
 
 > ⚠️ **仅用于技术评估。** Demo 模型有速率限制和使用限制，生产环境请使用 NPM 方式。
 
-| 镜像   | URL                                                                                 |
-| ------ | ----------------------------------------------------------------------------------- |
-| Global | https://cdn.jsdelivr.net/npm/page-agent/dist/iife/page-agent.demo.js                |
-| China  | https://registry.npmmirror.com/page-agent/latest/files/dist/iife/page-agent.demo.js |
+| 镜像   | URL                                                                                       |
+| ------ | ----------------------------------------------------------------------------------------- |
+| Global | https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.1/dist/iife/page-agent.demo.js         |
+| China  | https://registry.npmmirror.com/page-agent/1.0.0-beta.1/files/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 

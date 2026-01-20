@@ -96,6 +96,32 @@ for (const pkg of packages) {
 	hasChanges = true
 }
 
+// Update CDN URLs in documentation and source files
+const oldVersion = rootPkg.version === newVersion ? newVersion : rootPkg.version
+const CDN_DEMO_URL_OLD = `https://cdn.jsdelivr.net/npm/page-agent@${oldVersion}/dist/iife/page-agent.demo.js`
+const CDN_DEMO_URL_NEW = `https://cdn.jsdelivr.net/npm/page-agent@${newVersion}/dist/iife/page-agent.demo.js`
+const CDN_DEMO_CN_URL_OLD = `https://registry.npmmirror.com/page-agent/${oldVersion}/files/dist/iife/page-agent.demo.js`
+const CDN_DEMO_CN_URL_NEW = `https://registry.npmmirror.com/page-agent/${newVersion}/files/dist/iife/page-agent.demo.js`
+
+const filesToUpdateCdn = ['README.md', 'README-zh.md', 'packages/website/src/constants.ts']
+
+for (const relPath of filesToUpdateCdn) {
+	const filePath = join(rootDir, relPath)
+	if (!existsSync(filePath)) continue
+
+	let content = readFileSync(filePath, 'utf-8')
+	const original = content
+
+	content = content.replaceAll(CDN_DEMO_URL_OLD, CDN_DEMO_URL_NEW)
+	content = content.replaceAll(CDN_DEMO_CN_URL_OLD, CDN_DEMO_CN_URL_NEW)
+
+	if (content !== original) {
+		writeFileSync(filePath, content)
+		console.log(chalk.green('✓') + ` ${chalk.bold(relPath)}: CDN URLs updated`)
+		hasChanges = true
+	}
+}
+
 console.log(chalk.green.bold(`\n✓ Version synced: ${newVersion}\n`))
 
 // Show git commands hint

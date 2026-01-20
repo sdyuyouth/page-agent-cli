@@ -37,17 +37,17 @@ Fastest way to try PageAgent:
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/page-agent/dist/iife/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.1/dist/iife/page-agent.demo.js"
     crossorigin="true"
 ></script>
 ```
 
 > ⚠️ **For technical evaluation only.** Demo model has rate limits and usage restrictions. Use NPM for production.
 
-| Mirrors | URL                                                                                 |
-| ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent/dist/iife/page-agent.demo.js                |
-| China   | https://registry.npmmirror.com/page-agent/latest/files/dist/iife/page-agent.demo.js |
+| Mirrors | URL                                                                                       |
+| ------- | ----------------------------------------------------------------------------------------- |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.1/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.0.0-beta.1/files/dist/iife/page-agent.demo.js |
 
 ### NPM Installation
 
