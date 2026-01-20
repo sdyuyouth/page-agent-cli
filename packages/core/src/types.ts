@@ -48,6 +48,8 @@ export interface AgentStep {
 		cachedTokens?: number
 		reasoningTokens?: number
 	}
+	/** Raw LLM response for debugging */
+	rawResponse?: unknown
 }
 
 /**
