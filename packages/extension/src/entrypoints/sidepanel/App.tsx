@@ -1,6 +1,5 @@
 import {
 	ArrowRight,
-	Bot,
 	CheckCircle,
 	Loader2,
 	MessageSquare,
@@ -300,9 +299,8 @@ function StatusDot({ status }: { status: AgentStatus }) {
 	)
 }
 
-// Logo component (Bot icon as placeholder until real logo is added)
 function Logo({ className }: { className?: string }) {
-	return <Bot className={cn('text-primary', className)} />
+	return <img src="/assets/page-agent-256.webp" alt="Page Agent" className={cn('', className)} />
 }
 
 // Empty state with logo
