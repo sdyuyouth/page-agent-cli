@@ -107,14 +107,23 @@ export class OpenAIClient implements LLMClient {
 			case 'length':
 				throw new InvokeError(
 					InvokeErrorType.CONTEXT_LENGTH,
-					'Response truncated: max tokens reached'
+					'Response truncated: max tokens reached',
+					undefined,
+					data
 				)
 			case 'content_filter':
-				throw new InvokeError(InvokeErrorType.CONTENT_FILTER, 'Content filtered by safety system')
+				throw new InvokeError(
+					InvokeErrorType.CONTENT_FILTER,
+					'Content filtered by safety system',
+					undefined,
+					data
+				)
 			default:
 				throw new InvokeError(
 					InvokeErrorType.UNKNOWN,
-					`Unexpected finish_reason: ${choice.finish_reason}`
+					`Unexpected finish_reason: ${choice.finish_reason}`,
+					undefined,
+					data
 				)
 		}
 
@@ -128,7 +137,8 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(
 				InvokeErrorType.NO_TOOL_CALL,
 				'No tool call found in response',
-				normalizedData
+				undefined,
+				data
 			)
 		}
 
@@ -137,7 +147,8 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(
 				InvokeErrorType.UNKNOWN,
 				`Tool "${toolCallName}" not found in tools`,
-				normalizedData
+				undefined,
+				data
 			)
 		}
 
@@ -147,7 +158,8 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(
 				InvokeErrorType.INVALID_TOOL_ARGS,
 				'No tool call arguments found',
-				normalizedData
+				undefined,
+				data
 			)
 		}
 
@@ -158,7 +170,8 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(
 				InvokeErrorType.INVALID_TOOL_ARGS,
 				'Failed to parse tool arguments as JSON',
-				error
+				error,
+				data
 			)
 		}
 
@@ -169,7 +182,8 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(
 				InvokeErrorType.INVALID_TOOL_ARGS,
 				'Tool arguments validation failed',
-				validation.error
+				validation.error,
+				data
 			)
 		}
 		const toolInput = validation.data
@@ -182,7 +196,8 @@ export class OpenAIClient implements LLMClient {
 			throw new InvokeError(
 				InvokeErrorType.TOOL_EXECUTION_ERROR,
 				`Tool execution failed: ${(e as Error).message}`,
-				e
+				e,
+				data
 			)
 		}
 
