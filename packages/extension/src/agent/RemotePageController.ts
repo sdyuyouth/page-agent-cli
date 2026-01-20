@@ -11,7 +11,7 @@ import type {
 	ScrollHorizontallyOptions,
 	ScrollOptions,
 } from '../messaging/protocol'
-import { rpcClient } from '../messaging/rpc'
+import { type RPCClient, createRPCClient } from '../messaging/rpc'
 
 /**
  * RemotePageController is a proxy that implements the PageController interface.
@@ -21,27 +21,39 @@ import { rpcClient } from '../messaging/rpc'
  * though events in the remote context are not currently bridged.
  */
 export class RemotePageController extends EventTarget {
+	private rpc: RPCClient
+
+	constructor() {
+		super()
+		// Capture the active tab ID at construction time to avoid issues when tab loses focus
+		const tabIdPromise = chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+			if (!tab?.id) throw new Error('No active tab found')
+			return tab.id
+		})
+		this.rpc = createRPCClient(tabIdPromise)
+	}
+
 	// ======= State Queries =======
 
 	/**
 	 * Get current page URL
 	 */
 	async getCurrentUrl(): Promise<string> {
-		return rpcClient.getCurrentUrl()
+		return this.rpc.getCurrentUrl()
 	}
 
 	/**
 	 * Get last tree update timestamp
 	 */
 	async getLastUpdateTime(): Promise<number> {
-		return rpcClient.getLastUpdateTime()
+		return this.rpc.getLastUpdateTime()
 	}
 
 	/**
 	 * Get structured browser state for LLM consumption.
 	 */
 	async getBrowserState(): Promise<BrowserState> {
-		return rpcClient.getBrowserState()
+		return this.rpc.getBrowserState()
 	}
 
 	// ======= DOM Tree Operations =======
@@ -50,14 +62,14 @@ export class RemotePageController extends EventTarget {
 	 * Update DOM tree, returns simplified HTML for LLM.
 	 */
 	async updateTree(): Promise<string> {
-		return rpcClient.updateTree()
+		return this.rpc.updateTree()
 	}
 
 	/**
 	 * Clean up all element highlights
 	 */
 	async cleanUpHighlights(): Promise<void> {
-		return rpcClient.cleanUpHighlights()
+		return this.rpc.cleanUpHighlights()
 	}
 
 	// ======= Element Actions =======
@@ -66,42 +78,42 @@ export class RemotePageController extends EventTarget {
 	 * Click element by index
 	 */
 	async clickElement(index: number): Promise<ActionResult> {
-		return rpcClient.clickElement(index)
+		return this.rpc.clickElement(index)
 	}
 
 	/**
 	 * Input text into element by index
 	 */
 	async inputText(index: number, text: string): Promise<ActionResult> {
-		return rpcClient.inputText(index, text)
+		return this.rpc.inputText(index, text)
 	}
 
 	/**
 	 * Select dropdown option by index and option text
 	 */
 	async selectOption(index: number, optionText: string): Promise<ActionResult> {
-		return rpcClient.selectOption(index, optionText)
+		return this.rpc.selectOption(index, optionText)
 	}
 
 	/**
 	 * Scroll vertically
 	 */
 	async scroll(options: ScrollOptions): Promise<ActionResult> {
-		return rpcClient.scroll(options)
+		return this.rpc.scroll(options)
 	}
 
 	/**
 	 * Scroll horizontally
 	 */
 	async scrollHorizontally(options: ScrollHorizontallyOptions): Promise<ActionResult> {
-		return rpcClient.scrollHorizontally(options)
+		return this.rpc.scrollHorizontally(options)
 	}
 
 	/**
 	 * Execute arbitrary JavaScript on the page
 	 */
 	async executeJavascript(script: string): Promise<ActionResult> {
-		return rpcClient.executeJavascript(script)
+		return this.rpc.executeJavascript(script)
 	}
 
 	// ======= Mask Operations =======
@@ -110,21 +122,21 @@ export class RemotePageController extends EventTarget {
 	 * Show the visual mask overlay.
 	 */
 	async showMask(): Promise<void> {
-		return rpcClient.showMask()
+		return this.rpc.showMask()
 	}
 
 	/**
 	 * Hide the visual mask overlay.
 	 */
 	async hideMask(): Promise<void> {
-		return rpcClient.hideMask()
+		return this.rpc.hideMask()
 	}
 
 	/**
 	 * Dispose and clean up resources
 	 */
 	dispose(): void {
-		rpcClient.dispose().catch(() => {
+		this.rpc.dispose().catch(() => {
 			// Ignore errors on dispose
 		})
 	}
