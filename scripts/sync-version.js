@@ -9,6 +9,7 @@
 import chalk from 'chalk'
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
+import { exit } from 'process'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -17,10 +18,16 @@ const rootDir = join(__dirname, '..')
 // Parse arguments
 const versionArg = process.argv[2]
 
+if (!versionArg) {
+	console.log(chalk.yellow('⚠️  No version specified.\n'))
+	exit(1)
+}
+
 // Read root package.json
 const rootPkgPath = join(rootDir, 'package.json')
 const rootPkg = JSON.parse(readFileSync(rootPkgPath, 'utf-8'))
-const newVersion = versionArg || rootPkg.version
+const oldVersion = rootPkg.version
+const newVersion = versionArg
 
 console.log(chalk.cyan.bold('\n📦 Syncing version\n'))
 
@@ -69,7 +76,6 @@ for (const pkg of packages) {
 	if (!existsSync(pkgPath)) continue
 
 	const pkgJson = JSON.parse(readFileSync(pkgPath, 'utf-8'))
-	const oldVersion = pkgJson.version
 	let pkgChanged = false
 
 	// Update package version
@@ -97,7 +103,6 @@ for (const pkg of packages) {
 }
 
 // Update CDN URLs in documentation and source files
-const oldVersion = rootPkg.version === newVersion ? newVersion : rootPkg.version
 const CDN_DEMO_URL_OLD = `https://cdn.jsdelivr.net/npm/page-agent@${oldVersion}/dist/iife/page-agent.demo.js`
 const CDN_DEMO_URL_NEW = `https://cdn.jsdelivr.net/npm/page-agent@${newVersion}/dist/iife/page-agent.demo.js`
 const CDN_DEMO_CN_URL_OLD = `https://registry.npmmirror.com/page-agent/${oldVersion}/files/dist/iife/page-agent.demo.js`
