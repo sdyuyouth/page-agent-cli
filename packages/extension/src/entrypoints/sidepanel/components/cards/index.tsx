@@ -1,3 +1,4 @@
+import { type AgentStep, type ErrorEvent, type ObservationEvent } from '@page-agent/core'
 import {
 	CheckCircle,
 	ChevronDown,
@@ -143,87 +144,102 @@ function RawResponseSection({ rawResponse }: { rawResponse: unknown }) {
 	)
 }
 
+function StepCard({ event }: { event: AgentStep }) {
+	return (
+		<div className="rounded-lg border-l-2 border-l-blue-500/50 border bg-muted/40 p-2.5">
+			<div className="text-[11px] font-semibold text-foreground tracking-wide mb-2">
+				Step #{event.stepIndex! + 1}
+			</div>
+
+			{/* Reflection */}
+			{event.reflection && <ReflectionSection reflection={event.reflection} />}
+
+			{/* Action */}
+			{event.action && (
+				<div>
+					<div className="text-[11px] font-semibold text-foreground tracking-wide mb-1">
+						Actions
+					</div>
+					<div className="flex items-start gap-2">
+						<ActionIcon
+							name={event.action.name}
+							className="size-3.5 text-blue-500 shrink-0 mt-0.5"
+						/>
+						<div className="flex-1 min-w-0">
+							<p className="text-xs text-foreground/80 mb-0.5">
+								<span className="font-medium text-foreground/70">{event.action.name}</span>
+								{event.action.name !== 'done' && (
+									<span className="text-muted-foreground/70 ml-1.5">
+										{JSON.stringify(event.action.input)}
+									</span>
+								)}
+							</p>
+							<p className="text-[11px] text-muted-foreground/70">└ {event.action.output}</p>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Raw Response */}
+			{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
+		</div>
+	)
+}
+
+function ObservationCard({ event }: { event: ObservationEvent }) {
+	return (
+		<div className="rounded-lg border-l-2 border-l-green-500/50 border bg-muted/40 p-2.5">
+			{/* <div className="text-[11px] font-semibold text-foreground uppercase tracking-wide mb-2">
+				Observation
+			</div> */}
+			<div className="flex items-start gap-2">
+				<Eye className="size-3.5 text-green-500 shrink-0 mt-0.5" />
+				<span className="text-[11px] text-muted-foreground">{event.content}</span>
+			</div>
+		</div>
+	)
+}
+
+function ErrorCard({ event }: { event: ErrorEvent }) {
+	return (
+		<div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5">
+			<div className="flex items-start gap-1.5">
+				<XCircle className="size-3 text-destructive shrink-0 mt-0.5" />
+				<span className="text-xs text-destructive">{event.message}</span>
+			</div>
+			{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
+		</div>
+	)
+}
+
 // History event card component
 export function EventCard({ event }: { event: HistoricalEvent }) {
 	// Done action - show as result card
 	if (event.type === 'step' && event.action?.name === 'done') {
 		const input = event.action.input as { text?: string; success?: boolean }
 		return (
-			<div>
+			<>
+				<StepCard event={event as AgentStep} />
 				<ResultCard
 					success={input?.success ?? true}
 					text={input?.text || event.action.output || ''}
 				>
 					{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
 				</ResultCard>
-			</div>
+			</>
 		)
 	}
 
 	if (event.type === 'step') {
-		return (
-			<div className="rounded-lg border-l-2 border-l-blue-500/50 border bg-muted/40 p-2.5">
-				<div className="text-[11px] font-semibold text-foreground tracking-wide mb-2">
-					Step #{event.stepIndex! + 1}
-				</div>
-
-				{/* Reflection */}
-				{event.reflection && <ReflectionSection reflection={event.reflection} />}
-
-				{/* Action */}
-				{event.action && (
-					<div>
-						<div className="text-[11px] font-semibold text-foreground tracking-wide mb-1">
-							Actions
-						</div>
-						<div className="flex items-start gap-2">
-							<ActionIcon
-								name={event.action.name}
-								className="size-3.5 text-blue-500 shrink-0 mt-0.5"
-							/>
-							<div className="flex-1 min-w-0">
-								<p className="text-xs text-foreground/80 mb-0.5">
-									<span className="font-medium text-foreground/70">{event.action.name}</span>
-									<span className="text-muted-foreground/70 ml-1.5">
-										{JSON.stringify(event.action.input)}
-									</span>
-								</p>
-								<p className="text-[11px] text-muted-foreground/70">└ {event.action.output}</p>
-							</div>
-						</div>
-					</div>
-				)}
-
-				{/* Raw Response */}
-				{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
-			</div>
-		)
+		return <StepCard event={event as AgentStep} />
 	}
 
 	if (event.type === 'observation') {
-		return (
-			<div className="rounded-lg border-l-2 border-l-green-500/50 border bg-muted/40 p-2.5">
-				{/* <div className="text-[11px] font-semibold text-foreground uppercase tracking-wide mb-2">
-					Observation
-				</div> */}
-				<div className="flex items-start gap-2">
-					<Eye className="size-3.5 text-green-500 shrink-0 mt-0.5" />
-					<span className="text-[11px] text-muted-foreground">{event.content}</span>
-				</div>
-			</div>
-		)
+		return <ObservationCard event={event as ObservationEvent} />
 	}
 
 	if (event.type === 'error') {
-		return (
-			<div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5">
-				<div className="flex items-start gap-1.5">
-					<XCircle className="size-3 text-destructive shrink-0 mt-0.5" />
-					<span className="text-xs text-destructive">{event.message}</span>
-				</div>
-				{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
-			</div>
-		)
+		return <ErrorCard event={event as ErrorEvent} />
 	}
 
 	return null
