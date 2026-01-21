@@ -80,6 +80,9 @@ export class PageController extends EventTarget {
 	/** last time the tree was updated */
 	private lastTimeUpdate = 0
 
+	/** Whether the tree has been indexed at least once */
+	private isIndexed = false
+
 	/** Visual mask overlay for blocking user interaction during automation */
 	private mask: InstanceType<typeof import('./mask/SimulatorMask').SimulatorMask> | null = null
 	private maskReady: Promise<void> | null = null
@@ -196,6 +199,9 @@ export class PageController extends EventTarget {
 		this.elementTextMap.clear()
 		this.elementTextMap = dom.getElementTextMap(this.simplifiedHTML)
 
+		// Mark as indexed - now element actions are allowed
+		this.isIndexed = true
+
 		// Restore mask blocking
 		if (this.mask) {
 			this.mask.wrapper.style.pointerEvents = 'auto'
@@ -216,10 +222,21 @@ export class PageController extends EventTarget {
 	// ======= Element Actions =======
 
 	/**
+	 * Ensure the tree has been indexed before any index-based operation.
+	 * Throws if updateTree() hasn't been called yet.
+	 */
+	private assertIndexed(): void {
+		if (!this.isIndexed) {
+			throw new Error('DOM tree not indexed. Can not perform actions on elements.')
+		}
+	}
+
+	/**
 	 * Click element by index
 	 */
 	async clickElement(index: number): Promise<ActionResult> {
 		try {
+			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
 			await clickElement(element)
@@ -249,6 +266,7 @@ export class PageController extends EventTarget {
 	 */
 	async inputText(index: number, text: string): Promise<ActionResult> {
 		try {
+			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
 			await inputTextElement(element, text)
@@ -270,6 +288,7 @@ export class PageController extends EventTarget {
 	 */
 	async selectOption(index: number, optionText: string): Promise<ActionResult> {
 		try {
+			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
 			await selectOptionElement(element as HTMLSelectElement, optionText)
@@ -297,6 +316,8 @@ export class PageController extends EventTarget {
 	}): Promise<ActionResult> {
 		try {
 			const { down, numPages, pixels, index } = options
+
+			this.assertIndexed()
 
 			const scrollAmount = pixels ?? numPages * (down ? 1 : -1) * window.innerHeight
 
@@ -326,6 +347,8 @@ export class PageController extends EventTarget {
 	}): Promise<ActionResult> {
 		try {
 			const { right, pixels, index } = options
+
+			this.assertIndexed()
 
 			const scrollAmount = pixels * (right ? 1 : -1)
 
@@ -394,6 +417,7 @@ export class PageController extends EventTarget {
 		this.selectorMap.clear()
 		this.elementTextMap.clear()
 		this.simplifiedHTML = '<EMPTY>'
+		this.isIndexed = false
 		this.mask?.dispose()
 		this.mask = null
 	}
