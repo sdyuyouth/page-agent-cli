@@ -57,6 +57,7 @@ export type AgentActivity =
 export interface HistoricalEvent {
 	type: 'step' | 'observation' | 'user_takeover' | 'error'
 	// For 'step' type
+	stepIndex?: number
 	reflection?: {
 		evaluation_previous_goal?: string
 		memory?: string

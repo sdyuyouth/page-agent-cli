@@ -163,7 +163,9 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 	if (event.type === 'step') {
 		return (
 			<div className="rounded-lg border-l-2 border-l-blue-500/50 border bg-muted/40 p-2.5">
-				<div className="text-[11px] font-semibold text-foreground tracking-wide mb-2">Step</div>
+				<div className="text-[11px] font-semibold text-foreground tracking-wide mb-2">
+					Step #{event.stepIndex! + 1}
+				</div>
 
 				{/* Reflection */}
 				{event.reflection && <ReflectionSection reflection={event.reflection} />}
