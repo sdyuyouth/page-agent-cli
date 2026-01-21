@@ -20,20 +20,23 @@
 ## ✨ Features
 
 - **🎯 轻松集成**
+    - 无需 Python，无需无头浏览器，无需浏览器插件。纯页面内脚本。
 - **🔐 端侧运行**
 - **🧠 HTML 脱水**
 - **💬 自然语言接口**
 - **🎨 HITL 交互界面**
 
-## 🗺️ Roadmap
+以及 😉
 
-👉 [**Roadmap**](https://github.com/alibaba/page-agent/issues/96)
+- **🧪 实验性的 Chrome 扩展，支持跨页面控制** - `-b feat/ext`
+
+👉 [**🗺️ Roadmap**](https://github.com/alibaba/page-agent/issues/96)
 
 ## 🚀 快速开始
 
-### 快速体验 (With Testing LLM)
+### 一行代码集成
 
-最快的体验方式：
+通过我们免费的 Demo LLM 快速体验 PageAgent：
 
 ```html
 <script
@@ -42,7 +45,8 @@
 ></script>
 ```
 
-> ⚠️ **仅用于技术评估。** Demo 模型有速率限制和使用限制，生产环境请使用 NPM 方式。
+> - **⚠️ 仅用于技术评估。** Demo LLM 有速率和使用限制，可能随时变更。
+> - **🌷 建议使用自己的 LLM API。**
 
 | 镜像   | URL                                                                                       |
 | ------ | ----------------------------------------------------------------------------------------- |
@@ -86,15 +90,9 @@ packages/
 
 ## 🤝 贡献
 
-欢迎社区贡献！以下是参与方式：
+欢迎社区贡献！请参阅 [CONTRIBUTING.md](CONTRIBUTING.md) 了解环境配置和本地开发说明。
 
-1. Fork 并 clone。`git clone https://github.com/alibaba/page-agent.git && cd page-agent`
-2. 安装依赖: `npm install`
-3. 启动开发: `npm start`
-
-更多详情请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-请在贡献前阅读我们的[行为准则](CODE_OF_CONDUCT.md)。
+请在贡献前阅读[行为准则](CODE_OF_CONDUCT.md)。
 
 ## 👏 致谢
 

@@ -19,21 +19,24 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## ✨ Features
 
-- **🎯 Easy Integration** - Transform your webpage into an agent with a single script tag.
+- **🎯 Easy Integration**
+    - No python. No headless browser. No browser extension. Just in-page scripts.
 - **🔐 Client-Side Processing**
 - **🧠 DOM Extraction**
 - **💬 Natural Language Interface**
 - **🎨 UI with Human in the loop**
 
-## 🗺️ Roadmap
+And 😉
 
-👉 [**Roadmap**](https://github.com/alibaba/page-agent/issues/96)
+- **🧪 `cross-page` control with an experimental chrome extension** - `-b feat/ext`
+
+👉 [**🗺️ Roadmap**](https://github.com/alibaba/page-agent/issues/96)
 
 ## 🚀 Quick Start
 
-### Quick Try (With Testing LLM)
+### One-line integration
 
-Fastest way to try PageAgent:
+Fastest way to try PageAgent with our free Demo LLM:
 
 ```html
 <script
@@ -42,7 +45,8 @@ Fastest way to try PageAgent:
 ></script>
 ```
 
-> ⚠️ **For technical evaluation only.** Demo model has rate limits and usage restrictions. Use NPM for production.
+> - **⚠️ For technical evaluation only.** Demo LLM has rate limits and usage restrictions. May change without notice.
+> - **🌷 Bring your own LLM API.**
 
 | Mirrors | URL                                                                                       |
 | ------- | ----------------------------------------------------------------------------------------- |
@@ -84,15 +88,9 @@ packages/
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Here's how to get started:
+We welcome contributions from the community! Follow our instructions in [CONTRIBUTING.md](CONTRIBUTING.md) for environment setup and local development.
 
-1. Fork and clone. `git clone https://github.com/alibaba/page-agent.git && cd page-agent`
-2. Install dependencies: `npm install`
-3. Start development: `npm start`
-
-More details in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+Please read [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ## 👏 Acknowledgments
 
