@@ -244,5 +244,16 @@ function registerContentScriptHandlers(): void {
 		return shouldShow
 	})
 
+	// Handle content script errors - broadcast to sidepanel for user visibility
+	contentScriptQuery.onMessage('content:error', async ({ data }) => {
+		console.error('[PageAgentExt] Content script error:', data.message, 'on', data.url)
+		// Broadcast error to sidepanel
+		const errorEvent: HistoricalEvent = {
+			type: 'error',
+			message: `Content script error on ${data.url}: ${data.message}`,
+		}
+		eventBroadcaster.history([errorEvent])
+	})
+
 	console.log('[PageAgentExt] Content script handlers registered')
 }

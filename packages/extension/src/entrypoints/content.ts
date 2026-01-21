@@ -16,15 +16,28 @@ export default defineContentScript({
 	runAt: 'document_idle',
 
 	async main() {
-		console.log('[PageAgentExt] Content script loaded')
+		console.log('[PageAgentExt] Content script loaded on', window.location.href)
 
 		// Lazy-initialized controller - created on demand, disposed between tasks
 		let controller: PageController | null = null
+		let initError: Error | null = null
 
 		function getController(): PageController {
+			// Re-throw init error if controller creation previously failed
+			if (initError) {
+				throw initError
+			}
 			if (!controller) {
-				controller = new PageController({ enableMask: true })
-				console.log('[PageAgentExt] PageController created')
+				try {
+					controller = new PageController({ enableMask: true })
+					console.log('[PageAgentExt] PageController created')
+				} catch (error) {
+					initError = error instanceof Error ? error : new Error(String(error))
+					console.error('[PageAgentExt] Failed to create PageController:', initError)
+					// Report error to background
+					reportError(initError.message)
+					throw initError
+				}
 			}
 			return controller
 		}
@@ -36,6 +49,7 @@ export default defineContentScript({
 			() => {
 				controller?.dispose()
 				controller = null
+				initError = null // Clear error on dispose to allow retry
 				console.log('[PageAgentExt] PageController disposed')
 			}
 		)
@@ -65,6 +79,17 @@ export default defineContentScript({
 		})
 	},
 })
+
+/**
+ * Report content script error to background for user visibility
+ */
+function reportError(message: string): void {
+	contentScriptQuery
+		.sendMessage('content:error', { message, url: window.location.href })
+		.catch(() => {
+			// Silently ignore if background is not available
+		})
+}
 
 /**
  * Register all RPC message handlers for PageController methods

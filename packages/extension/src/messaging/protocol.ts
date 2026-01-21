@@ -140,6 +140,8 @@ export interface AgentCommandProtocol {
 export interface ContentScriptQueryProtocol {
 	/** Check if there's an active task for this tab, returns true if mask should be shown */
 	'content:shouldShowMask': () => boolean
+	/** Report content script initialization error to background */
+	'content:error': (error: { message: string; url: string }) => void
 }
 
 // ============================================================================
