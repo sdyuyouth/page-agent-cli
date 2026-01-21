@@ -9,13 +9,13 @@
  */
 import { PageController } from '@page-agent/page-controller'
 
-import { pageControllerRPC } from '../messaging/protocol'
+import { contentScriptQuery, pageControllerRPC } from '../messaging/protocol'
 
 export default defineContentScript({
 	matches: ['<all_urls>'],
 	runAt: 'document_idle',
 
-	main() {
+	async main() {
 		console.log('[PageAgentExt] Content script loaded')
 
 		// Lazy-initialized controller - created on demand, disposed between tasks
@@ -39,6 +39,24 @@ export default defineContentScript({
 				console.log('[PageAgentExt] PageController disposed')
 			}
 		)
+
+		// Check if there's an active task that needs mask to be shown
+		// This handles page reload/navigation during task execution
+		setTimeout(async () => {
+			try {
+				const shouldShowMask = await contentScriptQuery.sendMessage(
+					'content:shouldShowMask',
+					undefined
+				)
+				if (shouldShowMask) {
+					console.log('[PageAgentExt] Restoring mask after page reload')
+					await getController().showMask()
+				}
+			} catch (error) {
+				// Ignore errors - background may not be ready
+				console.log('[PageAgentExt] shouldShowMask check skipped:', error)
+			}
+		}, 100)
 
 		// Cleanup on page unload
 		window.addEventListener('beforeunload', () => {

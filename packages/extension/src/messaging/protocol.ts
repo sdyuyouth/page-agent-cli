@@ -133,6 +133,16 @@ export interface AgentCommandProtocol {
 }
 
 // ============================================================================
+// Content Script Query Protocol: ContentScript -> Background
+// Used by ContentScript to query Background state
+// ============================================================================
+
+export interface ContentScriptQueryProtocol {
+	/** Check if there's an active task for this tab, returns true if mask should be shown */
+	'content:shouldShowMask': () => boolean
+}
+
+// ============================================================================
 // Event Protocol: Background -> SidePanel
 // Used by Background to push updates to SidePanel
 // ============================================================================
@@ -165,3 +175,9 @@ export const agentCommands = defineExtensionMessaging<AgentCommandProtocol>()
  * Background sends, SidePanel receives
  */
 export const agentEvents = defineExtensionMessaging<AgentEventProtocol>()
+
+/**
+ * Content script query messaging
+ * ContentScript sends, Background receives
+ */
+export const contentScriptQuery = defineExtensionMessaging<ContentScriptQueryProtocol>()

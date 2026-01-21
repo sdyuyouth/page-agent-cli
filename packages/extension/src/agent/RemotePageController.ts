@@ -22,15 +22,28 @@ import { type RPCClient, createRPCClient } from '../messaging/rpc'
  */
 export class RemotePageController extends EventTarget {
 	private rpc: RPCClient
+	private _tabId: number | null = null
+	private _tabIdPromise: Promise<number>
+
+	/** Get the target tab ID (null if not yet resolved) */
+	get tabId(): number | null {
+		return this._tabId
+	}
+
+	/** Get the promise that resolves to the target tab ID */
+	get tabIdPromise(): Promise<number> {
+		return this._tabIdPromise
+	}
 
 	constructor() {
 		super()
 		// Capture the active tab ID at construction time to avoid issues when tab loses focus
-		const tabIdPromise = chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+		this._tabIdPromise = chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
 			if (!tab?.id) throw new Error('No active tab found')
+			this._tabId = tab.id
 			return tab.id
 		})
-		this.rpc = createRPCClient(tabIdPromise)
+		this.rpc = createRPCClient(this._tabIdPromise)
 	}
 
 	// ======= State Queries =======

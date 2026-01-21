@@ -17,11 +17,14 @@ import {
 	type AgentStatus,
 	type HistoricalEvent,
 	agentCommands,
+	contentScriptQuery,
 } from '../messaging/protocol'
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '../utils/constants'
 
 // Agent instance (singleton for now - single page control)
 let agent: PageAgentCore | null = null
+// Track the target tab ID for event filtering
+let targetTabId: number | null = null
 
 // LLM configuration (persisted in storage)
 interface LLMConfig {
@@ -45,6 +48,12 @@ export default defineBackground(() => {
 
 	// Register command handlers
 	registerCommandHandlers()
+
+	// Register tab event listeners for page reload/close detection
+	registerTabEventListeners()
+
+	// Register content script notification handlers
+	registerContentScriptHandlers()
 
 	// Open sidepanel on action click
 	chrome.sidePanel
@@ -99,6 +108,12 @@ function getAgentState(): AgentState {
 function createAgent(): PageAgentCore {
 	const pageController = new RemotePageController()
 
+	// Track the target tab ID for event filtering
+	pageController.tabIdPromise.then((tabId) => {
+		targetTabId = tabId
+		console.log('[PageAgentExt] Tracking tab:', tabId)
+	})
+
 	const newAgent = new PageAgentCore({
 		...llmConfig,
 		pageController: pageController as any, // Type assertion for interface compatibility
@@ -122,6 +137,7 @@ function createAgent(): PageAgentCore {
 	newAgent.addEventListener('dispose', () => {
 		if (agent === newAgent) {
 			agent = null
+			targetTabId = null
 		}
 		eventBroadcaster.status('idle')
 	})
@@ -179,4 +195,54 @@ function registerCommandHandlers(): void {
 	})
 
 	console.log('[PageAgentExt] Command handlers registered')
+}
+
+/**
+ * Register tab event listeners for detecting page reload/navigation/close
+ */
+function registerTabEventListeners(): void {
+	// Listen for tab updates (page reload, navigation)
+	chrome.tabs.onUpdated.addListener((tabId, changeInfo, _tab) => {
+		// Only handle events for the target tab when agent is running
+		if (!agent || agent.disposed || tabId !== targetTabId) return
+
+		if (changeInfo.status === 'loading') {
+			// Page is reloading or navigating
+			console.log('[PageAgentExt] Target page is reloading/navigating')
+			agent.pushObservation(
+				'⚠️ Page is reloading. DOM state will change - wait for page to stabilize before next action.'
+			)
+		}
+	})
+
+	// Listen for tab close
+	chrome.tabs.onRemoved.addListener((tabId, _removeInfo) => {
+		// Only handle events for the target tab when agent is running
+		if (!agent || agent.disposed || tabId !== targetTabId) return
+
+		console.log('[PageAgentExt] Target page was closed')
+		agent.pushObservation(
+			'⚠️ Target page was closed by user. If this page is required for the task, consider marking the task as failed.'
+		)
+		// Clear target tab ID since it no longer exists
+		targetTabId = null
+	})
+
+	console.log('[PageAgentExt] Tab event listeners registered')
+}
+
+/**
+ * Register handlers for content script queries
+ */
+function registerContentScriptHandlers(): void {
+	// Handle shouldShowMask query - content script asks if mask should be shown
+	contentScriptQuery.onMessage('content:shouldShowMask', async ({ sender }) => {
+		const tabId = sender.tab?.id
+		// Check if there's an active task for this tab
+		const shouldShow = Boolean(tabId && agent && !agent.disposed && tabId === targetTabId)
+		console.log('[PageAgentExt] shouldShowMask query:', { tabId, targetTabId, shouldShow })
+		return shouldShow
+	})
+
+	console.log('[PageAgentExt] Content script handlers registered')
 }
