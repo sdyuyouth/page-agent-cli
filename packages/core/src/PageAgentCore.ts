@@ -26,6 +26,7 @@ import { assert } from './utils/assert'
 
 export { type PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
+export type * from './types'
 
 /**
  * AI agent for browser DOM automation.
