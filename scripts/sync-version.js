@@ -79,7 +79,7 @@ for (const pkg of packages) {
 	let pkgChanged = false
 
 	// Update package version
-	if (oldVersion !== newVersion) {
+	if (pkgJson.version !== newVersion) {
 		pkgJson.version = newVersion
 		pkgChanged = true
 	}
