@@ -9,12 +9,22 @@ mkdirSync(chromeProfile, { recursive: true })
 export default defineConfig({
 	srcDir: 'src',
 	modules: ['@wxt-dev/module-react'],
-	runner: {
+	webExt: {
 		chromiumProfile: chromeProfile,
 		keepProfileChanges: true,
 	},
 	vite: () => ({
 		plugins: [tailwindcss()],
+		build: {
+			chunkSizeWarningLimit: 2000,
+			cssCodeSplit: true,
+			rollupOptions: {
+				onwarn: function (message, handler) {
+					if (message.code === 'EVAL') return
+					handler(message)
+				},
+			},
+		},
 	}),
 	manifest: {
 		name: 'Page Agent Ext',
