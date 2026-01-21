@@ -145,6 +145,10 @@ function registerCommandHandlers(): void {
 		// Execute task (don't await - runs in background)
 		agent.execute(task).catch((error) => {
 			console.error('[PageAgentExt] Task execution error:', error)
+			const message = error instanceof Error ? error.message : String(error)
+			// Broadcast error as a history event so it persists in UI
+			const errorEvent: HistoricalEvent = { type: 'error', message }
+			eventBroadcaster.history([errorEvent])
 			eventBroadcaster.status('error')
 		})
 	})

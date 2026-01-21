@@ -60,11 +60,11 @@ function ReflectionItem({ icon, value }: { icon: string; value: string }) {
 
 	return (
 		<Fragment>
-			<span className="text-xs">{icon}</span>
+			<span className="text-xs flex justify-center">{icon}</span>
 			<span
 				className={cn(
 					'text-[11px] text-muted-foreground cursor-pointer hover:text-muted-foreground/70',
-					!expanded && 'line-clamp-2'
+					!expanded && 'line-clamp-1'
 				)}
 				onClick={() => setExpanded(!expanded)}
 			>
@@ -93,11 +93,11 @@ function ReflectionSection({
 	if (items.length === 0) return null
 
 	return (
-		<div className="mb-3">
-			<div className="text-[11px] font-semibold text-foreground uppercase tracking-wide mb-2">
+		<div className="mb-2">
+			{/* <div className="text-[11px] font-semibold text-foreground uppercase tracking-wide mb-2">
 				Reflection
-			</div>
-			<div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-2">
+			</div> */}
+			<div className="grid grid-cols-[14px_1fr] gap-x-2 gap-y-2">
 				{items.map((item) => (
 					<ReflectionItem key={item.label} icon={item.icon} value={item.value!} />
 				))}
@@ -162,15 +162,17 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 
 	if (event.type === 'step') {
 		return (
-			<div className="rounded-lg border bg-card p-2.5">
+			<div className="rounded-lg border-l-2 border-l-blue-500/50 border bg-muted/40 p-2.5">
+				<div className="text-[11px] font-semibold text-foreground tracking-wide mb-2">Step</div>
+
 				{/* Reflection */}
 				{event.reflection && <ReflectionSection reflection={event.reflection} />}
 
 				{/* Action */}
 				{event.action && (
 					<div>
-						<div className="text-[11px] font-semibold text-foreground uppercase tracking-wide mb-2">
-							Action
+						<div className="text-[11px] font-semibold text-foreground tracking-wide mb-1">
+							Actions
 						</div>
 						<div className="flex items-start gap-2">
 							<ActionIcon
@@ -179,7 +181,7 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 							/>
 							<div className="flex-1 min-w-0">
 								<p className="text-xs text-foreground/80 mb-0.5">
-									<span className="font-medium">{event.action.name}</span>
+									<span className="font-medium text-foreground/70">{event.action.name}</span>
 									<span className="text-muted-foreground/70 ml-1.5">
 										{JSON.stringify(event.action.input)}
 									</span>
@@ -198,10 +200,10 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 
 	if (event.type === 'observation') {
 		return (
-			<div className="rounded-lg border bg-card p-2.5">
-				<div className="text-[11px] font-semibold text-foreground uppercase tracking-wide mb-2">
+			<div className="rounded-lg border-l-2 border-l-green-500/50 border bg-muted/40 p-2.5">
+				{/* <div className="text-[11px] font-semibold text-foreground uppercase tracking-wide mb-2">
 					Observation
-				</div>
+				</div> */}
 				<div className="flex items-start gap-2">
 					<Eye className="size-3.5 text-green-500 shrink-0 mt-0.5" />
 					<span className="text-[11px] text-muted-foreground">{event.content}</span>
@@ -248,7 +250,7 @@ export function ActivityCard({ activity }: { activity: AgentActivity }) {
 	const info = getActivityInfo()
 
 	return (
-		<div className="flex items-center gap-2 rounded-lg border bg-card/50 p-2.5 animate-pulse">
+		<div className="flex items-center gap-2 rounded-lg border bg-muted/40 p-2.5 animate-pulse">
 			<div className="relative">
 				<Sparkles className={cn('size-3.5', info.color)} />
 				<span

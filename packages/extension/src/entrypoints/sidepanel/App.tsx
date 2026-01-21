@@ -109,7 +109,7 @@ export default function App() {
 	return (
 		<div className="flex flex-col h-screen bg-background">
 			{/* Header */}
-			<div className="flex items-center justify-between border-b px-3 py-2">
+			<header className="flex items-center justify-between border-b px-3 py-2">
 				<div className="flex items-center gap-2">
 					<Logo className="size-5" />
 					<span className="text-sm font-medium">Page Agent Ext</span>
@@ -120,10 +120,10 @@ export default function App() {
 						<Settings className="size-3.5" />
 					</Button>
 				</div>
-			</div>
+			</header>
 
 			{/* Content */}
-			<div className="flex-1 overflow-hidden flex flex-col">
+			<main className="flex-1 overflow-hidden flex flex-col">
 				{/* Current task */}
 				{currentTask && (
 					<div className="border-b px-3 py-2 bg-muted/30">
@@ -145,10 +145,10 @@ export default function App() {
 					{/* Activity indicator at bottom */}
 					{activity && <ActivityCard activity={activity} />}
 				</div>
-			</div>
+			</main>
 
 			{/* Input */}
-			<div className="border-t p-3">
+			<footer className="border-t p-3">
 				<InputGroup className="relative rounded-lg">
 					<InputGroupTextarea
 						ref={textareaRef}
@@ -183,7 +183,7 @@ export default function App() {
 						)}
 					</InputGroupAddon>
 				</InputGroup>
-			</div>
+			</footer>
 		</div>
 	)
 }
