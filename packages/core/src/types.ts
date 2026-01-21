@@ -35,6 +35,7 @@ export interface MacroToolResult {
  */
 export interface AgentStep {
 	type: 'step'
+	stepIndex: number
 	reflection: Partial<AgentReflection>
 	action: {
 		name: string

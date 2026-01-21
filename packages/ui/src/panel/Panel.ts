@@ -563,9 +563,8 @@ export class Panel {
 
 		// 2. Render each history event
 		const history = this.#agent.history
-		for (let i = 0; i < history.length; i++) {
-			const event = history[i]
-			items.push(...this.#createHistoryCards(event, i + 1))
+		for (const event of history) {
+			items.push(...this.#createHistoryCards(event))
 		}
 
 		this.#historySection.innerHTML = items.join('')
@@ -577,14 +576,17 @@ export class Panel {
 	}
 
 	/** Create cards for a history event */
-	#createHistoryCards(event: PanelAgentAdapter['history'][number], stepNumber: number): string[] {
+	#createHistoryCards(event: PanelAgentAdapter['history'][number]): string[] {
 		const cards: string[] = []
 		const time = formatTime(this.#config.language ?? 'en-US')
-		const meta = this.#i18n.t('ui.panel.step', {
-			number: stepNumber.toString(),
-			time,
-			duration: '',
-		})
+		const meta =
+			event.type === 'step' && event.stepIndex !== undefined
+				? this.#i18n.t('ui.panel.step', {
+						number: (event.stepIndex + 1).toString(),
+						time,
+						duration: '',
+					})
+				: time
 
 		if (event.type === 'step') {
 			// Reflection card
