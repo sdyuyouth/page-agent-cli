@@ -1,5 +1,4 @@
 {
-    "editor.fontLigatures": true,
     "cSpell.words": [
         "deepseek",
         "historychange",
@@ -16,6 +15,9 @@
         "statuschange",
         "wouter"
     ],
+    "files.exclude": {
+        "packages/*/node_modules": true,
+    },
     "markdownlint.config": {
         // "comment": "Relaxed rules",
         "default": true,
