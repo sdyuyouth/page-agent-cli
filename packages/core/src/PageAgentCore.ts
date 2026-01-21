@@ -263,6 +263,7 @@ export class PageAgentCore extends EventTarget {
 
 				this.history.push({
 					type: 'step',
+					stepIndex: step,
 					reflection,
 					action,
 					usage: result.usage,
