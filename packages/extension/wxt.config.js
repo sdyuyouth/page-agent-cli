@@ -16,6 +16,7 @@ export default defineConfig({
 	vite: () => ({
 		plugins: [tailwindcss()],
 		build: {
+			minify: false,
 			chunkSizeWarningLimit: 2000,
 			cssCodeSplit: true,
 			rollupOptions: {
@@ -28,7 +29,9 @@ export default defineConfig({
 	}),
 	manifest: {
 		name: 'Page Agent Ext',
-		description: 'AI Agent for browser automation',
+		description:
+			'AI-powered browser automation assistant. Control web pages with natural language.',
+		homepage_url: 'https://alibaba.github.io/page-agent/',
 		permissions: ['tabs', 'activeTab', 'scripting', 'sidePanel', 'storage'],
 		host_permissions: ['<all_urls>'],
 		icons: {
