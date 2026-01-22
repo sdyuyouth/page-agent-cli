@@ -413,6 +413,10 @@ export class PageAgentCore extends EventTarget {
 	 * Get system prompt, dynamically replace language settings based on configured language
 	 */
 	#getSystemPrompt(): string {
+		if (this.config.customSystemPrompt) {
+			return this.config.customSystemPrompt
+		}
+
 		let systemPrompt = SYSTEM_PROMPT
 
 		const targetLanguage = this.config.language === 'zh-CN' ? '中文' : 'English'
