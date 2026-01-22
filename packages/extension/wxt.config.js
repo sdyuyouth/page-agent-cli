@@ -32,7 +32,7 @@ export default defineConfig({
 		description:
 			'AI-powered browser automation assistant. Control web pages with natural language.',
 		homepage_url: 'https://alibaba.github.io/page-agent/',
-		permissions: ['tabs', 'activeTab', 'scripting', 'sidePanel', 'storage'],
+		permissions: ['tabs', 'sidePanel', 'storage'],
 		host_permissions: ['<all_urls>'],
 		icons: {
 			64: 'assets/page-agent-64.png',
