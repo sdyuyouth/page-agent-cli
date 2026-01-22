@@ -108,6 +108,7 @@ export class PageAgentCore extends EventTarget {
 		})
 		this.#llm.addEventListener('error', (e) => {
 			const error = (e as CustomEvent).detail.error as Error | InvokeError
+			if ((error as any)?.rawError?.name === 'AbortError') return
 			const message = String(error)
 			this.emitActivity({ type: 'error', message })
 			// Also push to history for panel rendering
@@ -581,16 +582,16 @@ export class PageAgentCore extends EventTarget {
 		`)
 	}
 
-	dispose(reason?: string) {
+	dispose() {
 		console.log('Disposing PageAgent...')
 		this.disposed = true
 		this.pageController.dispose()
-		this.history = []
-		this.#abortController.abort(reason ?? 'PageAgent disposed')
+		// this.history = []
+		this.#abortController.abort()
 
 		// Emit dispose event for UI cleanup
 		this.dispatchEvent(new Event('dispose'))
 
-		this.config.onDispose?.(this, reason)
+		this.config.onDispose?.(this)
 	}
 }
