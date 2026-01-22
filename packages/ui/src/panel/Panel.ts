@@ -608,6 +608,13 @@ export class Panel {
 			)
 		} else if (event.type === 'user_takeover') {
 			cards.push(createCard({ icon: '👤', content: 'User takeover', meta, type: 'input' }))
+		} else if (event.type === 'retry') {
+			const retryInfo = `${event.message || 'Retrying'} (${event.attempt}/${event.maxAttempts})`
+			cards.push(createCard({ icon: '🔄', content: retryInfo, meta, type: 'observation' }))
+		} else if (event.type === 'error') {
+			cards.push(
+				createCard({ icon: '❌', content: event.message || 'Error', meta, type: 'observation' })
+			)
 		}
 
 		return cards

@@ -40,7 +40,7 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.4/dist/iife/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.5/dist/iife/page-agent.demo.js"
     crossorigin="true"
 ></script>
 ```
@@ -50,8 +50,8 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 | Mirrors | URL                                                                                       |
 | ------- | ----------------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.4/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.0.0-beta.4/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.0.0-beta.5/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.0.0-beta.5/files/dist/iife/page-agent.demo.js |
 
 ### NPM Installation
 

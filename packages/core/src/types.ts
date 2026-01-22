@@ -69,14 +69,21 @@ export interface UserTakeoverEvent {
 }
 
 /**
- * Error event (retry or error from LLM)
+ * Retry event - LLM call is being retried
+ */
+export interface RetryEvent {
+	type: 'retry'
+	message: string
+	attempt: number
+	maxAttempts: number
+}
+
+/**
+ * Error event - fatal error from LLM or execution
  */
 export interface AgentErrorEvent {
 	type: 'error'
-	errorType: 'retry' | 'error'
 	message: string
-	attempt?: number
-	maxAttempts?: number
 	rawResponse?: unknown
 }
 
@@ -87,6 +94,7 @@ export type HistoricalEvent =
 	| AgentStepEvent
 	| ObservationEvent
 	| UserTakeoverEvent
+	| RetryEvent
 	| AgentErrorEvent
 
 /**
