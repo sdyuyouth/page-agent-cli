@@ -15,7 +15,7 @@ import {
 	AgentActivity,
 	AgentReflection,
 	AgentStatus,
-	AgentStep,
+	AgentStepEvent,
 	ExecutionResult,
 	HistoricalEvent,
 	MacroToolInput,
@@ -256,7 +256,7 @@ export class PageAgentCore extends EventTarget {
 					next_goal: input.next_goal,
 				}
 				const actionName = Object.keys(input.action)[0]
-				const action: AgentStep['action'] = {
+				const action: AgentStepEvent['action'] = {
 					name: actionName,
 					input: input.action[actionName],
 					output: output,
@@ -269,7 +269,7 @@ export class PageAgentCore extends EventTarget {
 					action,
 					usage: result.usage,
 					rawResponse: result.rawResponse,
-				} as AgentStep)
+				} as AgentStepEvent)
 				this.#emitHistoryChange()
 
 				console.log(chalk.green('Step finished:'), actionName)

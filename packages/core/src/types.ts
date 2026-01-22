@@ -33,7 +33,7 @@ export interface MacroToolResult {
 /**
  * A single agent step with reflection and action
  */
-export interface AgentStep {
+export interface AgentStepEvent {
 	type: 'step'
 	stepIndex: number
 	reflection: Partial<AgentReflection>
@@ -71,7 +71,7 @@ export interface UserTakeoverEvent {
 /**
  * Error event (retry or error from LLM)
  */
-export interface ErrorEvent {
+export interface AgentErrorEvent {
 	type: 'error'
 	errorType: 'retry' | 'error'
 	message: string
@@ -83,7 +83,11 @@ export interface ErrorEvent {
 /**
  * Union type for all history events
  */
-export type HistoricalEvent = AgentStep | ObservationEvent | UserTakeoverEvent | ErrorEvent
+export type HistoricalEvent =
+	| AgentStepEvent
+	| ObservationEvent
+	| UserTakeoverEvent
+	| AgentErrorEvent
 
 /**
  * Agent execution status
