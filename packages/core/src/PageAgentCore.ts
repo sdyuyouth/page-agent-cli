@@ -99,8 +99,7 @@ export class PageAgentCore extends EventTarget {
 			this.emitActivity({ type: 'retrying', attempt, maxAttempts })
 			// Also push to history for panel rendering
 			this.history.push({
-				type: 'error',
-				errorType: 'retry',
+				type: 'retry',
 				message: `LLM retry attempt ${attempt} of ${maxAttempts}`,
 				attempt,
 				maxAttempts,
@@ -114,7 +113,6 @@ export class PageAgentCore extends EventTarget {
 			// Also push to history for panel rendering
 			this.history.push({
 				type: 'error',
-				errorType: 'error',
 				message,
 				rawResponse: (error as InvokeError).rawResponse,
 			})
