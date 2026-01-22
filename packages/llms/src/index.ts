@@ -88,11 +88,11 @@ async function withRetry<T>(
 		try {
 			return await fn()
 		} catch (error: unknown) {
+			// do not retry if aborted by user
+			if ((error as any)?.rawError?.name === 'AbortError') throw error
+
 			console.error(error)
 			settings.onError(error as Error)
-
-			// do not retry if aborted by user
-			if ((error as { name?: string })?.name === 'AbortError') throw error
 
 			// do not retry if error is not retryable (InvokeError)
 			if (error instanceof InvokeError && !error.retryable) throw error
