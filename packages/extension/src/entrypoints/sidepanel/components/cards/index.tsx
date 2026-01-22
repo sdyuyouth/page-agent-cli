@@ -1,4 +1,4 @@
-import { type AgentStep, type ErrorEvent, type ObservationEvent } from '@page-agent/core'
+import { type AgentErrorEvent, type AgentStepEvent, type ObservationEvent } from '@page-agent/core'
 import {
 	CheckCircle,
 	ChevronDown,
@@ -144,7 +144,7 @@ function RawResponseSection({ rawResponse }: { rawResponse: unknown }) {
 	)
 }
 
-function StepCard({ event }: { event: AgentStep }) {
+function StepCard({ event }: { event: AgentStepEvent }) {
 	return (
 		<div className="rounded-lg border-l-2 border-l-blue-500/50 border bg-muted/40 p-2.5">
 			<div className="text-[11px] font-semibold text-foreground tracking-wide mb-2">
@@ -200,7 +200,7 @@ function ObservationCard({ event }: { event: ObservationEvent }) {
 	)
 }
 
-function ErrorCard({ event }: { event: ErrorEvent }) {
+function ErrorCard({ event }: { event: AgentErrorEvent }) {
 	return (
 		<div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5">
 			<div className="flex items-start gap-1.5">
@@ -219,7 +219,7 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 		const input = event.action.input as { text?: string; success?: boolean }
 		return (
 			<>
-				<StepCard event={event as AgentStep} />
+				<StepCard event={event as AgentStepEvent} />
 				<ResultCard
 					success={input?.success ?? true}
 					text={input?.text || event.action.output || ''}
@@ -231,7 +231,7 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 	}
 
 	if (event.type === 'step') {
-		return <StepCard event={event as AgentStep} />
+		return <StepCard event={event as AgentStepEvent} />
 	}
 
 	if (event.type === 'observation') {
@@ -239,7 +239,7 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 	}
 
 	if (event.type === 'error') {
-		return <ErrorCard event={event as ErrorEvent} />
+		return <ErrorCard event={event as AgentErrorEvent} />
 	}
 
 	return null
