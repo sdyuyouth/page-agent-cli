@@ -1,7 +1,7 @@
 {
     "name": "@page-agent/ext",
     "private": true,
-    "version": "1.0.0-beta.5",
+    "version": "1.0.0-beta.6",
     "type": "module",
     "scripts": {
         "dev": "wxt",
@@ -30,10 +30,10 @@
         "wxt": "^0.20.13"
     },
     "dependencies": {
-        "@page-agent/core": "1.0.0-beta.5",
-        "@page-agent/llms": "1.0.0-beta.5",
-        "@page-agent/page-controller": "1.0.0-beta.5",
-        "@page-agent/ui": "1.0.0-beta.5",
+        "@page-agent/core": "1.0.0",
+        "@page-agent/llms": "1.0.0",
+        "@page-agent/page-controller": "1.0.0",
+        "@page-agent/ui": "1.0.0",
         "@radix-ui/react-hover-card": "^1.1.15",
         "@radix-ui/react-icons": "^1.3.2",
         "@radix-ui/react-label": "^2.1.8",
