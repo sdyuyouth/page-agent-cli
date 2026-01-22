@@ -55,7 +55,7 @@ export type AgentActivity =
 
 /** Historical event (simplified for serialization) */
 export interface HistoricalEvent {
-	type: 'step' | 'observation' | 'user_takeover' | 'error'
+	type: 'step' | 'observation' | 'user_takeover' | 'retry' | 'error'
 	// For 'step' type
 	stepIndex?: number
 	reflection?: {
@@ -70,8 +70,10 @@ export interface HistoricalEvent {
 	}
 	// For 'observation' type
 	content?: string
-	// For 'error' type
-	errorType?: 'retry' | 'error'
+	// For 'retry' type
+	attempt?: number
+	maxAttempts?: number
+	// For 'error' and 'retry' types
 	message?: string
 	// Raw LLM response for debugging (step and error types)
 	rawResponse?: unknown

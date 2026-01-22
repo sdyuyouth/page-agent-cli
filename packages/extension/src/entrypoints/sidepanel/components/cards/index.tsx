@@ -1,4 +1,9 @@
-import { type AgentErrorEvent, type AgentStepEvent, type ObservationEvent } from '@page-agent/core'
+import {
+	type AgentErrorEvent,
+	type AgentStepEvent,
+	type ObservationEvent,
+	type RetryEvent,
+} from '@page-agent/core'
 import {
 	CheckCircle,
 	ChevronDown,
@@ -8,6 +13,7 @@ import {
 	Keyboard,
 	Mouse,
 	MoveVertical,
+	RefreshCw,
 	Sparkles,
 	XCircle,
 	Zap,
@@ -200,6 +206,19 @@ function ObservationCard({ event }: { event: ObservationEvent }) {
 	)
 }
 
+function RetryCard({ event }: { event: RetryEvent }) {
+	return (
+		<div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5">
+			<div className="flex items-start gap-1.5">
+				<RefreshCw className="size-3 text-amber-500 shrink-0 mt-0.5" />
+				<span className="text-xs text-amber-600 dark:text-amber-400">
+					{event.message} ({event.attempt}/{event.maxAttempts})
+				</span>
+			</div>
+		</div>
+	)
+}
+
 function ErrorCard({ event }: { event: AgentErrorEvent }) {
 	return (
 		<div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5">
@@ -236,6 +255,10 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 
 	if (event.type === 'observation') {
 		return <ObservationCard event={event as ObservationEvent} />
+	}
+
+	if (event.type === 'retry') {
+		return <RetryCard event={event as RetryEvent} />
 	}
 
 	if (event.type === 'error') {
