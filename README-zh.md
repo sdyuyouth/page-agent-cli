@@ -48,10 +48,10 @@
 > - **⚠️ 仅用于技术评估。** Demo LLM 有速率和使用限制，可能随时变更。
 > - **🌷 建议使用自己的 LLM API。**
 
-| 镜像   | URL                                                                                       |
-| ------ | ----------------------------------------------------------------------------------------- |
-| Global | https://cdn.jsdelivr.net/npm/page-agent@1.0.0/dist/iife/page-agent.demo.js         |
-| China  | https://registry.npmmirror.com/page-agent/1.0.0/files/dist/iife/page-agent.demo.js |
+| Mirrors | URL                                                                                |
+| ------- | ---------------------------------------------------------------------------------- |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.0.0/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.0.0/files/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 
