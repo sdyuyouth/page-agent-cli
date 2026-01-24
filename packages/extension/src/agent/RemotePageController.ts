@@ -76,7 +76,7 @@ export class RemotePageController {
 	/**
 	 * Set the target tab for all RPC operations.
 	 * Called by TabsManager when switching tabs.
-	 * Handles cleanup on old tab and mask show on new tab.
+	 * Only handles cleanup on old tab - mask control is managed by AgentController.
 	 */
 	async setTargetTab(tabId: number): Promise<void> {
 		const previousTabId = this._currentTabId
@@ -84,22 +84,16 @@ export class RemotePageController {
 
 		console.debug(`${DEBUG_PREFIX} setTargetTab: ${previousTabId} → ${tabId}`)
 
-		// Clean up old tab completely (highlights + mask)
+		// Clean up old tab highlights only (mask is controlled by AgentController)
 		if (previousTabId && previousTabId !== tabId && previousRpc) {
-			console.debug(`${DEBUG_PREFIX} Cleaning up previous tab ${previousTabId}`)
+			console.debug(`${DEBUG_PREFIX} Cleaning up highlights on previous tab ${previousTabId}`)
 			try {
-				// Clean up highlights first - this is important for visual cleanup
 				await previousRpc.cleanUpHighlights()
 			} catch (e) {
 				console.debug(
 					`${DEBUG_PREFIX} cleanUpHighlights on tab ${previousTabId} failed (ignored):`,
 					e
 				)
-			}
-			try {
-				await previousRpc.hideMask()
-			} catch (e) {
-				console.debug(`${DEBUG_PREFIX} hideMask on tab ${previousTabId} failed (ignored):`, e)
 			}
 		}
 
@@ -133,15 +127,7 @@ export class RemotePageController {
 			// Don't clear rpc - subsequent calls will retry and may succeed
 		}
 
-		// Show mask on new tab
-		try {
-			await this.rpc.showMask()
-			console.debug(`${DEBUG_PREFIX} Mask shown on tab ${tabId}`)
-		} catch (error) {
-			console.error(`${DEBUG_PREFIX} Failed to show mask on tab ${tabId}:`, error)
-			// Continue anyway - mask is optional
-		}
-
+		// Note: Mask show/hide is now controlled by AgentController.syncMaskState()
 		console.debug(`${DEBUG_PREFIX} Target tab set to ${tabId}`)
 	}
 

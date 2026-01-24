@@ -44,7 +44,7 @@ The extension operates across three isolated JavaScript contexts:
 **Responsibilities:**
 
 - Relays RPC messages from SidePanel to ContentScript
-- Forwards tab events (onRemoved, onUpdated) to SidePanel
+- Forwards tab events (onRemoved, onUpdated, onActivated, onFocusChanged) to SidePanel
 - Opens sidepanel on action click
 - **NO** agent logic, **NO** state
 
@@ -99,7 +99,8 @@ SW → SidePanel (tab events)
 │                      └───────┬────────┘                          │
 │                              │                                   │
 │  Tab Events ─────────────────┼─────────────────► SidePanel       │
-│  (onRemoved, onUpdated)      │                                   │
+│  (removed, updated,          │                                   │
+│   activated, focusChanged)   │                                   │
 └──────────────────────────────┼───────────────────────────────────┘
                                │ RPC Forward
                                ▼
@@ -133,7 +134,7 @@ All messages use a simple type-based protocol defined in `src/messaging/protocol
 | `cs:rpc` | SW → ContentScript | Forwarded RPC call |
 | `cs:query` | ContentScript → SW | Query to SidePanel (e.g., shouldShowMask) |
 | `query:response` | SW → ContentScript | Response to query |
-| `tab:event` | SW → SidePanel | Tab removed/updated notification |
+| `tab:event` | SW → SidePanel | Tab events (removed/updated/activated/focusChanged) |
 
 ### RPC Methods
 
@@ -178,7 +179,7 @@ All PageController methods are available via RPC:
 2. Content script initializes
 3. Content script queries: shouldShowMask?
    └─> cs:query → SW → SidePanel
-4. SidePanel checks if tab is current + agent running
+4. SidePanel checks: agentRunning + windowFocus + (browserActiveTab === agentCurrentTab)
    └─> query:response → SW → ContentScript
 5. Content script shows/hides mask accordingly
 ```
@@ -256,6 +257,40 @@ Agent-opened tabs are grouped in a Chrome tab group named `Task(<taskId>)`.
 ### Tab Switching
 
 Only initial tab and managed tabs can be switched to. This prevents the agent from accessing unrelated tabs.
+
+## Mask Management
+
+The visual mask overlay blocks user interaction during automation. Mask visibility is centrally controlled by `AgentController` based on three conditions:
+
+```
+shouldMaskBeVisible = agentRunning && windowHasFocus && (browserActiveTab === agentCurrentTab)
+```
+
+### Key Concepts
+
+- **browserActiveTab** - The tab currently visible to the user (tracked via `chrome.tabs.onActivated`)
+- **agentCurrentTab** - The tab agent is operating on (`TabsManager.currentTabId`)
+- **windowHasFocus** - Whether browser window has focus (tracked via `chrome.windows.onFocusChanged`)
+
+### State Transitions
+
+| Event | Action |
+|-------|--------|
+| Agent starts | Show mask if current tab is in foreground |
+| Agent stops | Hide mask |
+| User switches to agent's tab | Show mask |
+| User switches away from agent's tab | Hide mask |
+| Window loses focus | Hide mask |
+| Window regains focus | Show mask if on agent's tab |
+| Agent switches to different tab | Sync mask based on new state |
+| Page reloads | Content script queries `shouldShowMask` |
+
+### Implementation
+
+- `AgentController.syncMaskState()` - Syncs mask visibility based on current state
+- `AgentController.shouldShowMaskForTab(tabId)` - Used by content script queries
+- Background forwards `activated` and `windowFocusChanged` events to SidePanel
+- `RemotePageController` does NOT auto-show mask on tab switch (controlled by AgentController)
 
 ## Configuration
 

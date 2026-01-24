@@ -134,7 +134,7 @@ export interface QueryResponseMessage extends BaseMessage {
 // ============================================================================
 
 /** Tab event types */
-export type TabEventType = 'removed' | 'updated'
+export type TabEventType = 'removed' | 'updated' | 'activated' | 'windowFocusChanged'
 
 /** SW → SidePanel: Tab event notification */
 export interface TabEventMessage extends BaseMessage {
@@ -145,6 +145,10 @@ export interface TabEventMessage extends BaseMessage {
 		// For 'updated' events
 		status?: string
 		url?: string
+		// For 'activated' events
+		windowId?: number
+		// For 'windowFocusChanged' events
+		focused?: boolean
 	}
 }
 

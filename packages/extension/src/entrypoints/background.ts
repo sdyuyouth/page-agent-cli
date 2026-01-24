@@ -177,6 +177,45 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 	})
 })
 
+/**
+ * Forward tab activated events to sidepanel (user switches tabs)
+ */
+chrome.tabs.onActivated.addListener((activeInfo) => {
+	const message: TabEventMessage = {
+		type: 'tab:event',
+		id: generateMessageId(),
+		eventType: 'activated',
+		tabId: activeInfo.tabId,
+		data: {
+			windowId: activeInfo.windowId,
+		},
+	}
+	chrome.runtime.sendMessage(message).catch(() => {
+		// Sidepanel may not be open
+	})
+})
+
+/**
+ * Forward window focus changed events to sidepanel
+ */
+chrome.windows.onFocusChanged.addListener((windowId) => {
+	// windowId is chrome.windows.WINDOW_ID_NONE (-1) when all windows lose focus
+	const focused = windowId !== chrome.windows.WINDOW_ID_NONE
+	const message: TabEventMessage = {
+		type: 'tab:event',
+		id: generateMessageId(),
+		eventType: 'windowFocusChanged',
+		tabId: -1, // Not applicable for window focus events
+		data: {
+			windowId: focused ? windowId : undefined,
+			focused,
+		},
+	}
+	chrome.runtime.sendMessage(message).catch(() => {
+		// Sidepanel may not be open
+	})
+})
+
 // ============================================================================
 // Extension Setup
 // ============================================================================

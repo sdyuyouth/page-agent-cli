@@ -16,6 +16,8 @@ import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } fro
 import { RemotePageController } from '../../agent/RemotePageController'
 import { type TabInfo, TabsManager } from '../../agent/TabsManager'
 import { createTabTools } from '../../agent/tabTools'
+import type { TabEventMessage } from '../../messaging/protocol'
+import { isExtensionMessage } from '../../messaging/protocol'
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '../../utils/constants'
 
 /** LLM configuration */
@@ -85,6 +87,14 @@ export class AgentController extends EventTarget {
 	/** Current task being executed */
 	currentTask = ''
 
+	// ===== Mask State Management =====
+	/** Browser's currently active tab (the one user sees) */
+	private browserActiveTabId: number | null = null
+	/** Whether the browser window has focus */
+	private windowHasFocus = true
+	/** Bound handler for tab events */
+	private tabEventHandler: (message: unknown) => void
+
 	constructor() {
 		super()
 		// Default to demo config
@@ -93,6 +103,8 @@ export class AgentController extends EventTarget {
 			baseURL: DEMO_BASE_URL,
 			model: DEMO_MODEL,
 		}
+		// Bind tab event handler
+		this.tabEventHandler = this.handleTabEvent.bind(this)
 	}
 
 	/**
@@ -100,7 +112,17 @@ export class AgentController extends EventTarget {
 	 */
 	async init(): Promise<void> {
 		await this.loadConfig()
-		console.log('[AgentController] Initialized')
+
+		// Initialize browser active tab
+		const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true })
+		if (activeTab?.id) {
+			this.browserActiveTabId = activeTab.id
+		}
+
+		// Register tab event listener
+		chrome.runtime.onMessage.addListener(this.tabEventHandler)
+
+		console.log('[AgentController] Initialized, browserActiveTabId:', this.browserActiveTabId)
 	}
 
 	/**
@@ -185,6 +207,20 @@ export class AgentController extends EventTarget {
 	}
 
 	/**
+	 * Check if mask should be shown for a specific tab.
+	 * Used by content script queries on page load.
+	 */
+	shouldShowMaskForTab(tabId: number): boolean {
+		const agentCurrentTabId = this.tabsManager?.getCurrentTabId()
+		return (
+			this.status === 'running' &&
+			this.windowHasFocus &&
+			this.browserActiveTabId === tabId &&
+			agentCurrentTabId === tabId
+		)
+	}
+
+	/**
 	 * Create and configure agent instance
 	 */
 	private async createAgent(): Promise<PageAgentCore> {
@@ -265,12 +301,16 @@ export class AgentController extends EventTarget {
 	}
 
 	/**
-	 * Create a proxy for PageController that injects tab info into BrowserState.header
+	 * Create a proxy for PageController that:
+	 * 1. Injects tab info into BrowserState.header
+	 * 2. Syncs mask state after setTargetTab
 	 */
 	private createPageControllerProxy(
 		controller: RemotePageController,
 		tabs: TabsManager
 	): RemotePageController {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const agentController = this
 		return new Proxy(controller, {
 			get(target, prop, receiver) {
 				if (prop === 'getBrowserState') {
@@ -284,6 +324,13 @@ export class AgentController extends EventTarget {
 							...state,
 							header: tabHeader + (state.header || ''),
 						}
+					}
+				}
+				if (prop === 'setTargetTab') {
+					return async function (tabId: number) {
+						await target.setTargetTab(tabId)
+						// Sync mask after tab switch
+						await agentController.syncMaskState()
 					}
 				}
 				return Reflect.get(target, prop, receiver)
@@ -321,6 +368,9 @@ export class AgentController extends EventTarget {
 			this.agent = await this.createAgent()
 			console.log('[AgentController] Agent created successfully')
 
+			// Show mask if conditions are met (agent running + tab in foreground)
+			await this.syncMaskState()
+
 			// Execute task
 			console.log('[AgentController] Starting task execution...')
 			const result = await this.agent.execute(task)
@@ -349,11 +399,89 @@ export class AgentController extends EventTarget {
 		}
 	}
 
+	// ===== Mask State Management =====
+
+	/**
+	 * Handle tab events from background script
+	 */
+	private handleTabEvent(message: unknown): void {
+		if (!isExtensionMessage(message)) return
+		if (message.type !== 'tab:event') return
+
+		const event = message as TabEventMessage
+
+		switch (event.eventType) {
+			case 'activated':
+				this.browserActiveTabId = event.tabId
+				console.debug('[AgentController] Tab activated:', event.tabId)
+				this.syncMaskState()
+				break
+
+			case 'windowFocusChanged':
+				this.windowHasFocus = event.data?.focused ?? false
+				console.debug('[AgentController] Window focus changed:', this.windowHasFocus)
+				this.syncMaskState()
+				break
+		}
+	}
+
+	/**
+	 * Calculate whether mask should be visible.
+	 * Mask is shown only when:
+	 * 1. Agent is running
+	 * 2. Window has focus
+	 * 3. Browser's active tab === agent's current tab
+	 */
+	private get shouldMaskBeVisible(): boolean {
+		const agentCurrentTabId = this.tabsManager?.getCurrentTabId()
+		return (
+			this.status === 'running' &&
+			this.windowHasFocus &&
+			this.browserActiveTabId !== null &&
+			agentCurrentTabId !== null &&
+			this.browserActiveTabId === agentCurrentTabId
+		)
+	}
+
+	/**
+	 * Sync mask visibility based on current state.
+	 * Shows mask on agent's current tab if conditions are met, hides otherwise.
+	 */
+	async syncMaskState(): Promise<void> {
+		const agentCurrentTabId = this.tabsManager?.getCurrentTabId()
+		if (!this.pageController || agentCurrentTabId === null) {
+			return
+		}
+
+		const shouldShow = this.shouldMaskBeVisible
+		console.debug('[AgentController] syncMaskState:', {
+			shouldShow,
+			agentCurrentTabId,
+			browserActiveTabId: this.browserActiveTabId,
+			windowHasFocus: this.windowHasFocus,
+			status: this.status,
+		})
+
+		try {
+			if (shouldShow) {
+				await this.pageController.showMask()
+			} else {
+				await this.pageController.hideMask()
+			}
+		} catch (e) {
+			console.debug('[AgentController] syncMaskState failed (ignored):', e)
+		}
+	}
+
 	/**
 	 * Dispose controller and clean up
 	 */
 	dispose(): void {
 		console.log('[AgentController] Disposing controller')
+
+		// Remove tab event listener
+		chrome.runtime.onMessage.removeListener(this.tabEventHandler)
+
 		if (this.agent && !this.agent.disposed) {
 			this.agent.dispose()
 		}

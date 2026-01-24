@@ -87,16 +87,15 @@ export function useAgent(): UseAgentResult {
 					return true
 				}
 
-				const isManaged = ctrl.isTabManaged(query.tabId)
-				const isCurrent = ctrl.getCurrentTabId() === query.tabId
-				const isRunning = ctrl.status === 'running'
-				const shouldShow = isManaged && isCurrent && isRunning
+				// Use AgentController's shouldShowMaskForTab which checks:
+				// 1. Agent is running
+				// 2. Window has focus
+				// 3. Browser's active tab === query.tabId
+				// 4. Agent's current tab === query.tabId
+				const shouldShow = ctrl.shouldShowMaskForTab(query.tabId)
 
 				console.debug('[useAgent] shouldShowMask query:', {
 					tabId: query.tabId,
-					isManaged,
-					isCurrent,
-					isRunning,
 					shouldShow,
 				})
 
