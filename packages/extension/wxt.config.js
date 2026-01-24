@@ -15,6 +15,9 @@ export default defineConfig({
 	},
 	vite: () => ({
 		plugins: [tailwindcss()],
+		optimizeDeps: {
+			force: true,
+		},
 		build: {
 			minify: false,
 			chunkSizeWarningLimit: 2000,
@@ -32,7 +35,7 @@ export default defineConfig({
 		description:
 			'AI-powered browser automation assistant. Control web pages with natural language.',
 		homepage_url: 'https://alibaba.github.io/page-agent/',
-		permissions: ['tabs', 'sidePanel', 'storage'],
+		permissions: ['tabs', 'tabGroups', 'sidePanel', 'storage'],
 		host_permissions: ['<all_urls>'],
 		icons: {
 			64: 'assets/page-agent-64.png',

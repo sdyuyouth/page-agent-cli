@@ -2,78 +2,72 @@
  * Content Script Entry Point
  *
  * This script runs in the context of web pages and hosts the real PageController.
- * It listens for RPC messages from Background and dispatches them to PageController.
+ * It listens for RPC messages relayed through the Background Script and
+ * dispatches them to PageController.
  *
- * PageController is created lazily on first RPC call and can be disposed/recreated
- * between tasks. This supports multi-page workflows and ensures clean state.
+ * Message flow:
+ * - RPC: SidePanel → SW → ContentScript (this file) → response → SW → SidePanel
+ * - Query: ContentScript → SW → SidePanel → SW → ContentScript (for shouldShowMask)
  */
 import { PageController } from '@page-agent/page-controller'
 
-import { contentScriptQuery, pageControllerRPC } from '../messaging/protocol'
+import type {
+	CSQueryMessage,
+	CSRPCMessage,
+	QueryResponseMessage,
+	RPCMethod,
+} from '../messaging/protocol'
+import { generateMessageId, isExtensionMessage } from '../messaging/protocol'
+
+const DEBUG_PREFIX = '[ContentScript]'
 
 export default defineContentScript({
 	matches: ['<all_urls>'],
 	runAt: 'document_idle',
 
 	async main() {
-		console.log('[PageAgentExt] Content script loaded on', window.location.href)
+		const pageUrl = window.location.href
+		console.debug(`${DEBUG_PREFIX} Content script loaded on ${pageUrl}`)
 
 		// Lazy-initialized controller - created on demand, disposed between tasks
 		let controller: PageController | null = null
 		let initError: Error | null = null
 
 		function getController(): PageController {
-			// Re-throw init error if controller creation previously failed
 			if (initError) {
+				console.debug(`${DEBUG_PREFIX} getController: re-throwing init error`)
 				throw initError
 			}
 			if (!controller) {
 				try {
 					controller = new PageController({ enableMask: true })
-					console.log('[PageAgentExt] PageController created')
+					console.debug(`${DEBUG_PREFIX} PageController created`)
 				} catch (error) {
 					initError = error instanceof Error ? error : new Error(String(error))
-					console.error('[PageAgentExt] Failed to create PageController:', initError)
-					// Report error to background
-					reportError(initError.message)
+					console.error(`${DEBUG_PREFIX} Failed to create PageController:`, initError)
 					throw initError
 				}
 			}
 			return controller
 		}
 
-		// Register RPC handlers with lazy controller access
-		registerRPCHandlers(
-			getController,
-			() => controller,
-			() => {
-				controller?.dispose()
-				controller = null
-				initError = null // Clear error on dispose to allow retry
-				console.log('[PageAgentExt] PageController disposed')
-			}
-		)
+		function disposeController(): void {
+			console.debug(`${DEBUG_PREFIX} Disposing controller...`)
+			controller?.dispose()
+			controller = null
+			initError = null
+			console.debug(`${DEBUG_PREFIX} PageController disposed`)
+		}
+
+		// Register RPC message handler
+		registerRPCHandler(getController, () => controller, disposeController)
 
 		// Check if there's an active task that needs mask to be shown
-		// This handles page reload/navigation during task execution
-		setTimeout(async () => {
-			try {
-				const shouldShowMask = await contentScriptQuery.sendMessage(
-					'content:shouldShowMask',
-					undefined
-				)
-				if (shouldShowMask) {
-					console.log('[PageAgentExt] Restoring mask after page reload')
-					await getController().showMask()
-				}
-			} catch (error) {
-				// Ignore errors - background may not be ready
-				console.log('[PageAgentExt] shouldShowMask check skipped:', error)
-			}
-		}, 100)
+		setTimeout(() => queryShouldShowMask(getController), 100)
 
 		// Cleanup on page unload
 		window.addEventListener('beforeunload', () => {
+			console.debug(`${DEBUG_PREFIX} Page unloading, disposing controller`)
 			controller?.dispose()
 			controller = null
 		})
@@ -81,84 +75,178 @@ export default defineContentScript({
 })
 
 /**
- * Report content script error to background for user visibility
+ * Query the sidepanel (via SW) whether mask should be shown
  */
-function reportError(message: string): void {
-	contentScriptQuery
-		.sendMessage('content:error', { message, url: window.location.href })
-		.catch(() => {
-			// Silently ignore if background is not available
+async function queryShouldShowMask(getController: () => PageController): Promise<void> {
+	const tabId = await getCurrentTabId()
+	if (!tabId) {
+		console.debug(`${DEBUG_PREFIX} Cannot query shouldShowMask: no tab ID`)
+		return
+	}
+
+	const queryId = generateMessageId()
+	const queryMessage: CSQueryMessage = {
+		type: 'cs:query',
+		id: queryId,
+		queryType: 'shouldShowMask',
+		tabId,
+	}
+
+	try {
+		// Set up response listener
+		const responsePromise = new Promise<boolean>((resolve) => {
+			const timeout = setTimeout(() => {
+				chrome.runtime.onMessage.removeListener(listener)
+				resolve(false)
+			}, 3000)
+
+			const listener = (message: unknown) => {
+				if (!isExtensionMessage(message)) return
+				if (message.type !== 'query:response') return
+				if ((message as QueryResponseMessage).id !== queryId) return
+
+				clearTimeout(timeout)
+				chrome.runtime.onMessage.removeListener(listener)
+				resolve((message as QueryResponseMessage).result as boolean)
+			}
+
+			chrome.runtime.onMessage.addListener(listener)
 		})
+
+		// Send query
+		await chrome.runtime.sendMessage(queryMessage)
+
+		// Wait for response
+		const shouldShowMask = await responsePromise
+		console.debug(`${DEBUG_PREFIX} shouldShowMask result:`, shouldShowMask)
+
+		if (shouldShowMask) {
+			console.debug(`${DEBUG_PREFIX} Restoring mask after page reload`)
+			await getController().showMask()
+		}
+	} catch (error) {
+		console.debug(`${DEBUG_PREFIX} shouldShowMask query failed:`, error)
+	}
 }
 
 /**
- * Register all RPC message handlers for PageController methods
+ * Get current tab ID
  */
-function registerRPCHandlers(
+async function getCurrentTabId(): Promise<number | null> {
+	try {
+		const response = await chrome.runtime.sendMessage({ type: 'getTabId' })
+		return response?.tabId ?? null
+	} catch {
+		// Fallback: we're in content script, tab ID comes from sender in SW
+		return null
+	}
+}
+
+/**
+ * Register RPC message handler
+ */
+function registerRPCHandler(
 	getController: () => PageController,
 	getControllerIfExists: () => PageController | null,
 	disposeController: () => void
 ): void {
-	// State queries
-	pageControllerRPC.onMessage('rpc:getCurrentUrl', async () => {
-		return getController().getCurrentUrl()
-	})
+	chrome.runtime.onMessage.addListener(
+		(
+			message: unknown,
+			_sender: chrome.runtime.MessageSender,
+			sendResponse: (response?: unknown) => void
+		): boolean => {
+			if (!isExtensionMessage(message)) return false
+			if (message.type !== 'cs:rpc') return false
 
-	pageControllerRPC.onMessage('rpc:getLastUpdateTime', async () => {
-		return getController().getLastUpdateTime()
-	})
+			const rpcMessage = message as CSRPCMessage
+			const { method, args } = rpcMessage
 
-	pageControllerRPC.onMessage('rpc:getBrowserState', async () => {
-		return getController().getBrowserState()
-	})
+			console.debug(`${DEBUG_PREFIX} RPC: ${method}`, args)
 
-	// DOM operations
-	pageControllerRPC.onMessage('rpc:updateTree', async () => {
-		return getController().updateTree()
-	})
+			// Handle the RPC call
+			handleRPCCall(method, args, getController, getControllerIfExists, disposeController)
+				.then((result) => {
+					sendResponse(result)
+				})
+				.catch((error) => {
+					console.error(`${DEBUG_PREFIX} RPC ${method} failed:`, error)
+					sendResponse({ error: error instanceof Error ? error.message : String(error) })
+				})
 
-	pageControllerRPC.onMessage('rpc:cleanUpHighlights', async () => {
-		await getControllerIfExists()?.cleanUpHighlights()
-	})
+			// Return true to indicate async response
+			return true
+		}
+	)
 
-	// Element actions
-	pageControllerRPC.onMessage('rpc:clickElement', async ({ data: index }) => {
-		return getController().clickElement(index)
-	})
+	console.debug(`${DEBUG_PREFIX} RPC handler registered`)
+}
 
-	pageControllerRPC.onMessage('rpc:inputText', async ({ data }) => {
-		return getController().inputText(data.index, data.text)
-	})
+/**
+ * Handle an RPC call
+ */
+async function handleRPCCall(
+	method: RPCMethod,
+	args: unknown[],
+	getController: () => PageController,
+	getControllerIfExists: () => PageController | null,
+	disposeController: () => void
+): Promise<unknown> {
+	switch (method) {
+		// State queries
+		case 'getCurrentUrl':
+			return getController().getCurrentUrl()
 
-	pageControllerRPC.onMessage('rpc:selectOption', async ({ data }) => {
-		return getController().selectOption(data.index, data.optionText)
-	})
+		case 'getLastUpdateTime':
+			return getController().getLastUpdateTime()
 
-	pageControllerRPC.onMessage('rpc:scroll', async ({ data: options }) => {
-		return getController().scroll(options)
-	})
+		case 'getBrowserState':
+			return getController().getBrowserState()
 
-	pageControllerRPC.onMessage('rpc:scrollHorizontally', async ({ data: options }) => {
-		return getController().scrollHorizontally(options)
-	})
+		// DOM operations
+		case 'updateTree':
+			return getController().updateTree()
 
-	pageControllerRPC.onMessage('rpc:executeJavascript', async ({ data: script }) => {
-		return getController().executeJavascript(script)
-	})
+		case 'cleanUpHighlights':
+			await getControllerIfExists()?.cleanUpHighlights()
+			return undefined
 
-	// Mask operations
-	pageControllerRPC.onMessage('rpc:showMask', async () => {
-		await getController().showMask()
-	})
+		// Element actions
+		case 'clickElement':
+			return getController().clickElement(args[0] as number)
 
-	pageControllerRPC.onMessage('rpc:hideMask', async () => {
-		await getControllerIfExists()?.hideMask()
-	})
+		case 'inputText':
+			return getController().inputText(args[0] as number, args[1] as string)
 
-	// Lifecycle - dispose clears the controller, next call will create fresh one
-	pageControllerRPC.onMessage('rpc:dispose', async () => {
-		disposeController()
-	})
+		case 'selectOption':
+			return getController().selectOption(args[0] as number, args[1] as string)
 
-	console.log('[PageAgentExt] RPC handlers registered')
+		case 'scroll':
+			return getController().scroll(args[0] as Parameters<PageController['scroll']>[0])
+
+		case 'scrollHorizontally':
+			return getController().scrollHorizontally(
+				args[0] as Parameters<PageController['scrollHorizontally']>[0]
+			)
+
+		case 'executeJavascript':
+			return getController().executeJavascript(args[0] as string)
+
+		// Mask operations
+		case 'showMask':
+			await getController().showMask()
+			return undefined
+
+		case 'hideMask':
+			await getControllerIfExists()?.hideMask()
+			return undefined
+
+		// Lifecycle
+		case 'dispose':
+			disposeController()
+			return undefined
+
+		default:
+			throw new Error(`Unknown RPC method: ${method}`)
+	}
 }

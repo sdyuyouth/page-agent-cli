@@ -1,34 +1,35 @@
 import { Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { agentCommands } from '@/messaging'
+import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/utils/constants'
 
-// Configuration panel component
-export function ConfigPanel({ onClose }: { onClose: () => void }) {
-	const [apiKey, setApiKey] = useState(DEMO_API_KEY)
-	const [baseURL, setBaseURL] = useState(DEMO_BASE_URL)
-	const [model, setModel] = useState(DEMO_MODEL)
+import type { LLMConfig } from '../AgentController'
+
+interface ConfigPanelProps {
+	config: LLMConfig
+	onSave: (config: LLMConfig) => Promise<void>
+	onClose: () => void
+}
+
+export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
+	const [apiKey, setApiKey] = useState(config.apiKey || DEMO_API_KEY)
+	const [baseURL, setBaseURL] = useState(config.baseURL || DEMO_BASE_URL)
+	const [model, setModel] = useState(config.model || DEMO_MODEL)
 	const [saving, setSaving] = useState(false)
 
+	// Update local state when config prop changes
 	useEffect(() => {
-		chrome.storage.local.get('llmConfig').then((result) => {
-			const config = result.llmConfig as
-				| { apiKey?: string; baseURL?: string; model?: string }
-				| undefined
-			if (config) {
-				setApiKey(config.apiKey || DEMO_API_KEY)
-				setBaseURL(config.baseURL || DEMO_BASE_URL)
-				setModel(config.model || DEMO_MODEL)
-			}
-		})
-	}, [])
+		setApiKey(config.apiKey || DEMO_API_KEY)
+		setBaseURL(config.baseURL || DEMO_BASE_URL)
+		setModel(config.model || DEMO_MODEL)
+	}, [config])
 
 	const handleSave = async () => {
 		setSaving(true)
 		try {
-			await agentCommands.sendMessage('agent:configure', { apiKey, baseURL, model })
-			onClose()
+			await onSave({ apiKey, baseURL, model })
 		} finally {
 			setSaving(false)
 		}

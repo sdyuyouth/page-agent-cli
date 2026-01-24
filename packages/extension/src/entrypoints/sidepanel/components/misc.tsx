@@ -1,5 +1,6 @@
+import type { AgentStatus } from '@page-agent/core'
+
 import { cn } from '@/lib/utils'
-import { AgentStatus } from '@/messaging'
 
 // Status dot indicator
 export function StatusDot({ status }: { status: AgentStatus }) {

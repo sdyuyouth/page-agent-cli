@@ -1,15 +1,19 @@
 /**
  * Message Protocol for PageAgentExt
  *
- * This file defines all message types for cross-context communication:
- * - RPC: Background <-> ContentScript (PageController remote calls)
- * - Commands: SidePanel -> Background (user actions)
- * - Events: Background -> SidePanel (agent state updates)
+ * NEW ARCHITECTURE (MV3 compliant):
+ * - SidePanel hosts the agent, all state lives there
+ * - Background (SW) is a stateless message relay
+ * - Content Script runs PageController
+ *
+ * Message flows:
+ * 1. RPC: SidePanel → SW → ContentScript → SW → SidePanel (PageController calls)
+ * 2. Query: ContentScript → SW → SidePanel → SW → ContentScript (mask state check)
+ * 3. Events: SW → SidePanel (tab events from chrome.tabs API)
  */
-import { defineExtensionMessaging } from '@webext-core/messaging'
 
 // ============================================================================
-// Shared Types (re-exported from core packages for convenience)
+// Shared Types
 // ============================================================================
 
 /** Action result from PageController operations */
@@ -42,146 +46,138 @@ export interface ScrollHorizontallyOptions {
 	index?: number
 }
 
-/** Agent execution status */
-export type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
+// ============================================================================
+// Message Types
+// ============================================================================
 
-/** Agent activity for real-time UI feedback */
-export type AgentActivity =
-	| { type: 'thinking' }
-	| { type: 'executing'; tool: string; input: unknown }
-	| { type: 'executed'; tool: string; input: unknown; output: string; duration: number }
-	| { type: 'retrying'; attempt: number; maxAttempts: number }
-	| { type: 'error'; message: string }
+/** Message type identifier */
+type MessageType =
+	| 'rpc:call' // SidePanel → SW: RPC call to content script
+	| 'rpc:response' // SW → SidePanel: RPC response from content script
+	| 'cs:rpc' // SW → ContentScript: Forwarded RPC call
+	| 'cs:query' // ContentScript → SW: Query to sidepanel
+	| 'query:response' // SW → ContentScript: Query response
+	| 'tab:event' // SW → SidePanel: Tab event notification
 
-/** Historical event (simplified for serialization) */
-export interface HistoricalEvent {
-	type: 'step' | 'observation' | 'user_takeover' | 'retry' | 'error'
-	// For 'step' type
-	stepIndex?: number
-	reflection?: {
-		evaluation_previous_goal?: string
-		memory?: string
-		next_goal?: string
+/** Base message structure */
+interface BaseMessage {
+	type: MessageType
+	id: string // Unique message ID for request-response matching
+}
+
+// ============================================================================
+// RPC Messages (SidePanel ↔ SW ↔ ContentScript)
+// ============================================================================
+
+/** RPC method names matching PageController interface */
+export type RPCMethod =
+	| 'getCurrentUrl'
+	| 'getLastUpdateTime'
+	| 'getBrowserState'
+	| 'updateTree'
+	| 'cleanUpHighlights'
+	| 'clickElement'
+	| 'inputText'
+	| 'selectOption'
+	| 'scroll'
+	| 'scrollHorizontally'
+	| 'executeJavascript'
+	| 'showMask'
+	| 'hideMask'
+	| 'dispose'
+
+/** SidePanel → SW: Request to call PageController method */
+export interface RPCCallMessage extends BaseMessage {
+	type: 'rpc:call'
+	tabId: number
+	method: RPCMethod
+	args: unknown[]
+}
+
+/** SW → SidePanel: Response from PageController */
+export interface RPCResponseMessage extends BaseMessage {
+	type: 'rpc:response'
+	success: boolean
+	result?: unknown
+	error?: string
+}
+
+/** SW → ContentScript: Forwarded RPC call */
+export interface CSRPCMessage extends BaseMessage {
+	type: 'cs:rpc'
+	method: RPCMethod
+	args: unknown[]
+}
+
+// ============================================================================
+// Query Messages (ContentScript → SW → SidePanel)
+// ============================================================================
+
+/** Query types that content script can ask */
+export type QueryType = 'shouldShowMask'
+
+/** ContentScript → SW: Query to sidepanel */
+export interface CSQueryMessage extends BaseMessage {
+	type: 'cs:query'
+	queryType: QueryType
+	tabId: number
+}
+
+/** SW → ContentScript: Query response */
+export interface QueryResponseMessage extends BaseMessage {
+	type: 'query:response'
+	result: unknown
+}
+
+// ============================================================================
+// Tab Event Messages (SW → SidePanel)
+// ============================================================================
+
+/** Tab event types */
+export type TabEventType = 'removed' | 'updated'
+
+/** SW → SidePanel: Tab event notification */
+export interface TabEventMessage extends BaseMessage {
+	type: 'tab:event'
+	eventType: TabEventType
+	tabId: number
+	data?: {
+		// For 'updated' events
+		status?: string
+		url?: string
 	}
-	action?: {
-		name: string
-		input: unknown
-		output: string
-	}
-	// For 'observation' type
-	content?: string
-	// For 'retry' type
-	attempt?: number
-	maxAttempts?: number
-	// For 'error' and 'retry' types
-	message?: string
-	// Raw LLM response for debugging (step and error types)
-	rawResponse?: unknown
-}
-
-/** Agent state snapshot */
-export interface AgentState {
-	status: AgentStatus
-	task: string
-	history: HistoricalEvent[]
 }
 
 // ============================================================================
-// RPC Protocol: Background <-> ContentScript
-// Used by RemotePageController to call PageController methods
+// Union Types
 // ============================================================================
 
-export interface PageControllerRPCProtocol {
-	// State queries
-	'rpc:getCurrentUrl': () => string
-	'rpc:getLastUpdateTime': () => number
-	'rpc:getBrowserState': () => BrowserState
+/** All message types */
+export type ExtensionMessage =
+	| RPCCallMessage
+	| RPCResponseMessage
+	| CSRPCMessage
+	| CSQueryMessage
+	| QueryResponseMessage
+	| TabEventMessage
 
-	// DOM operations
-	'rpc:updateTree': () => string
-	'rpc:cleanUpHighlights': () => void
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
-	// Element actions
-	'rpc:clickElement': (index: number) => ActionResult
-	'rpc:inputText': (data: { index: number; text: string }) => ActionResult
-	'rpc:selectOption': (data: { index: number; optionText: string }) => ActionResult
-	'rpc:scroll': (options: ScrollOptions) => ActionResult
-	'rpc:scrollHorizontally': (options: ScrollHorizontallyOptions) => ActionResult
-	'rpc:executeJavascript': (script: string) => ActionResult
-
-	// Mask operations
-	'rpc:showMask': () => void
-	'rpc:hideMask': () => void
-
-	// Lifecycle
-	'rpc:dispose': () => void
+/** Generate unique message ID */
+export function generateMessageId(): string {
+	return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-// ============================================================================
-// Command Protocol: SidePanel -> Background
-// Used by SidePanel UI to control the agent
-// ============================================================================
-
-export interface AgentCommandProtocol {
-	// Task control
-	'agent:execute': (task: string) => void
-	'agent:stop': () => void
-
-	// State queries
-	'agent:getState': () => AgentState
-
-	// Configuration
-	'agent:configure': (config: { apiKey: string; baseURL: string; model: string }) => void
+/** Type guard for our messages */
+export function isExtensionMessage(msg: unknown): msg is ExtensionMessage {
+	return (
+		typeof msg === 'object' &&
+		msg !== null &&
+		'type' in msg &&
+		'id' in msg &&
+		typeof (msg as ExtensionMessage).type === 'string' &&
+		typeof (msg as ExtensionMessage).id === 'string'
+	)
 }
-
-// ============================================================================
-// Content Script Query Protocol: ContentScript -> Background
-// Used by ContentScript to query Background state
-// ============================================================================
-
-export interface ContentScriptQueryProtocol {
-	/** Check if there's an active task for this tab, returns true if mask should be shown */
-	'content:shouldShowMask': () => boolean
-	/** Report content script initialization error to background */
-	'content:error': (error: { message: string; url: string }) => void
-}
-
-// ============================================================================
-// Event Protocol: Background -> SidePanel
-// Used by Background to push updates to SidePanel
-// ============================================================================
-
-export interface AgentEventProtocol {
-	'event:status': (status: AgentStatus) => void
-	'event:history': (history: HistoricalEvent[]) => void
-	'event:activity': (activity: AgentActivity) => void
-	'event:stateSnapshot': (state: AgentState) => void
-}
-
-// ============================================================================
-// Messaging Instances
-// ============================================================================
-
-/**
- * RPC messaging for PageController remote calls
- * Background sends, ContentScript receives
- */
-export const pageControllerRPC = defineExtensionMessaging<PageControllerRPCProtocol>()
-
-/**
- * Command messaging for agent control
- * SidePanel sends, Background receives
- */
-export const agentCommands = defineExtensionMessaging<AgentCommandProtocol>()
-
-/**
- * Event messaging for agent updates
- * Background sends, SidePanel receives
- */
-export const agentEvents = defineExtensionMessaging<AgentEventProtocol>()
-
-/**
- * Content script query messaging
- * ContentScript sends, Background receives
- */
-export const contentScriptQuery = defineExtensionMessaging<ContentScriptQueryProtocol>()

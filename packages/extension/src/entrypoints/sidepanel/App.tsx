@@ -8,65 +8,19 @@ import {
 	InputGroupButton,
 	InputGroupTextarea,
 } from '@/components/ui/input-group'
-import { subscribeToEvents } from '@/messaging/events'
-import { agentCommands } from '@/messaging/protocol'
-import type { AgentActivity, AgentState, AgentStatus, HistoricalEvent } from '@/messaging/protocol'
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/utils/constants'
 
-import { EmptyState, Logo, StatusDot } from './components'
 import { ConfigPanel } from './components/ConfigPanel'
 import { ActivityCard, EventCard } from './components/cards'
+import { EmptyState, Logo, StatusDot } from './components/misc'
+import { useAgent } from './useAgent'
 
 export default function App() {
 	const [showConfig, setShowConfig] = useState(false)
 	const [task, setTask] = useState('')
-	const [status, setStatus] = useState<AgentStatus>('idle')
-	const [history, setHistory] = useState<HistoricalEvent[]>([])
-	const [activity, setActivity] = useState<AgentActivity | null>(null)
-	const [currentTask, setCurrentTask] = useState('')
 	const historyRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-	// Subscribe to agent events
-	useEffect(() => {
-		// Initialize with demo config if not set
-		chrome.storage.local.get('llmConfig').then((result) => {
-			if (!result.llmConfig) {
-				chrome.storage.local.set({
-					llmConfig: { apiKey: DEMO_API_KEY, baseURL: DEMO_BASE_URL, model: DEMO_MODEL },
-				})
-			}
-		})
-
-		const unsubscribe = subscribeToEvents({
-			onStatus: (newStatus) => {
-				setStatus(newStatus)
-				if (newStatus === 'idle' || newStatus === 'completed' || newStatus === 'error') {
-					setActivity(null)
-				}
-			},
-			onHistory: (newHistory) => {
-				setHistory(newHistory)
-			},
-			onActivity: (newActivity) => {
-				setActivity(newActivity)
-			},
-			onStateSnapshot: (state) => {
-				setStatus(state.status)
-				setHistory(state.history)
-				setCurrentTask(state.task)
-			},
-		})
-
-		// Get initial state
-		agentCommands.sendMessage('agent:getState', undefined).then((state: AgentState) => {
-			setStatus(state.status)
-			setHistory(state.history)
-			setCurrentTask(state.task)
-		})
-
-		return unsubscribe
-	}, [])
+	const { status, history, activity, currentTask, config, execute, stop, configure } = useAgent()
 
 	// Auto-scroll to bottom on new events
 	useEffect(() => {
@@ -76,21 +30,25 @@ export default function App() {
 	}, [history, activity])
 
 	const handleSubmit = useCallback(
-		async (e?: React.FormEvent) => {
+		(e?: React.FormEvent) => {
 			e?.preventDefault()
 			if (!task.trim() || status === 'running') return
 
-			setCurrentTask(task)
-			setHistory([])
-			await agentCommands.sendMessage('agent:execute', task)
+			const taskToExecute = task.trim()
 			setTask('')
+
+			console.log('[SidePanel] Executing task:', taskToExecute)
+			execute(taskToExecute).catch((error) => {
+				console.error('[SidePanel] Failed to execute task:', error)
+			})
 		},
-		[task, status]
+		[task, status, execute]
 	)
 
-	const handleStop = useCallback(async () => {
-		await agentCommands.sendMessage('agent:stop', undefined)
-	}, [])
+	const handleStop = useCallback(() => {
+		console.log('[SidePanel] Stopping task...')
+		stop()
+	}, [stop])
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -100,7 +58,16 @@ export default function App() {
 	}
 
 	if (showConfig) {
-		return <ConfigPanel onClose={() => setShowConfig(false)} />
+		return (
+			<ConfigPanel
+				config={config}
+				onSave={async (newConfig) => {
+					await configure(newConfig)
+					setShowConfig(false)
+				}}
+				onClose={() => setShowConfig(false)}
+			/>
+		)
 	}
 
 	const isRunning = status === 'running'
@@ -157,7 +124,6 @@ export default function App() {
 						onChange={(e) => setTask(e.target.value)}
 						onKeyDown={handleKeyDown}
 						disabled={isRunning}
-						// rows={2}
 						className="text-xs pr-12 min-h-10"
 					/>
 					<InputGroupAddon align="inline-end" className="absolute bottom-0 right-0">

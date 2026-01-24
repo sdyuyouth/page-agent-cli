@@ -1,208 +1,186 @@
 # PageAgentExt Architecture
 
-This document describes the architecture of the Chrome extension version of PageAgent, including environment definitions, communication protocols, and extension considerations.
+This document describes the MV3-compliant architecture of the Chrome extension version of PageAgent.
+
+## Design Principles
+
+The architecture follows Chrome MV3 Service Worker constraints:
+
+1. **Service Worker is stateless** - No long-running loops, no in-memory state
+2. **Agent runs in frontend context** - SidePanel hosts all agent logic
+3. **SW is a message relay** - Only forwards messages between contexts
+4. **Event-driven** - All operations are triggered by user actions or message events
 
 ## Environment Definitions
 
 The extension operates across three isolated JavaScript contexts:
 
-### 1. Background (Service Worker)
-
-**File:** `src/entrypoints/background.ts`
-
-**Responsibilities:**
-
-- Hosts the headless `PageAgentCore` instance
-- Manages agent lifecycle (create, execute, stop, dispose)
-- Stores LLM configuration in `chrome.storage.local`
-- Receives commands from SidePanel via messaging
-- Broadcasts events to SidePanel for UI updates
-- Uses `RemotePageController` to proxy DOM operations to ContentScript
-
-**Key Components:**
-
-- `PageAgentCore` - The AI agent (from `@page-agent/core`)
-- `RemotePageController` - Proxy that forwards calls to ContentScript
-- Command handlers for `agent:execute`, `agent:stop`, `agent:configure`
-
-### 2. Content Script
-
-**File:** `src/entrypoints/content.ts`
-
-**Responsibilities:**
-
-- Runs in the context of web pages
-- Hosts the real `PageController` instance (lazy-initialized)
-- Performs actual DOM operations (click, input, scroll, etc.)
-- Responds to RPC messages from Background
-- Manages visual mask overlay during automation
-
-**Key Components:**
-
-- `PageController` - DOM controller (from `@page-agent/page-controller`)
-- RPC handlers for all PageController methods
-
-**Lifecycle:** PageController is created lazily on first RPC call and disposed between tasks. This ensures clean state for each task and enables future multi-page support.
-
-### 3. Side Panel (React UI)
+### 1. Side Panel (Frontend - Agent Host)
 
 **Files:** `src/entrypoints/sidepanel/`
 
 **Responsibilities:**
 
-- Provides user interface for controlling the agent
-- Displays task input and execution history
-- Shows real-time agent activity (thinking, executing, etc.)
-- Manages LLM configuration settings
-- Sends commands to Background and receives event updates
+- Hosts `PageAgentCore` instance and main execution loop
+- Manages `TabsManager` for multi-tab control
+- Uses `RemotePageController` to proxy DOM operations via SW
+- Stores agent state (task, history, status)
+- Provides React UI for user interaction
+- Handles `shouldShowMask` queries from content scripts
 
 **Key Components:**
 
-- `App.tsx` - Main React component with chat-style UI
-- `ConfigPanel` - Settings form for LLM configuration
-- Event subscription for real-time updates
+- `AgentController` - Encapsulates agent lifecycle, isolated from UI
+- `useAgent` hook - React integration for AgentController
+- `App.tsx` - Main UI component
+- `ConfigPanel` - LLM settings
 
-## Communication Architecture
+**Lifecycle:** When sidepanel closes, agent disposes naturally. No state persists in SW.
+
+### 2. Background (Service Worker - Stateless Relay)
+
+**File:** `src/entrypoints/background.ts`
+
+**Responsibilities:**
+
+- Relays RPC messages from SidePanel to ContentScript
+- Forwards tab events (onRemoved, onUpdated) to SidePanel
+- Opens sidepanel on action click
+- **NO** agent logic, **NO** state
+
+**Message Flows:**
+
+```
+SidePanel → SW → ContentScript (RPC calls)
+ContentScript → SW → SidePanel (mask state queries)
+SW → SidePanel (tab events)
+```
+
+### 3. Content Script
+
+**File:** `src/entrypoints/content.ts`
+
+**Responsibilities:**
+
+- Runs in web page context
+- Hosts real `PageController` instance (lazy-initialized)
+- Handles RPC messages for DOM operations
+- Queries SidePanel for mask state on page load
+- Manages visual mask overlay
+
+**Lifecycle:** PageController is created on first RPC call and disposed between tasks.
+
+## Architecture Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         Side Panel                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌───────────────────────┐  │
-│  │  Task Input  │  │ Event Stream │  │   History Display     │  │
-│  └──────┬───────┘  └──────▲───────┘  └───────────────────────┘  │
-└─────────┼─────────────────┼─────────────────────────────────────┘
-          │ Commands        │ Events
-          ▼                 │
+│                       Side Panel (Frontend)                      │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │                     AgentController                        │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │  │
+│  │  │ PageAgentCore│  │ TabsManager  │  │RemotePageController│ │  │
+│  │  └──────────────┘  └──────────────┘  └────────┬─────────┘  │  │
+│  └───────────────────────────────────────────────┼────────────┘  │
+│                                                  │               │
+│  ┌──────────────┐  ┌──────────────┐              │               │
+│  │   React UI   │  │ Query Handler│◄─────────────┼───────────┐   │
+│  │  (App.tsx)   │  │(shouldShowMask)             │           │   │
+│  └──────────────┘  └──────────────┘              │           │   │
+└──────────────────────────────────────────────────┼───────────┼───┘
+                                                   │           │
+                                        RPC Call   │  Query    │
+                                                   ▼           │
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Background                               │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    PageAgentCore                         │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐  │   │
-│  │  │     LLM     │  │    Tools    │  │ RemotePageCtrl   │  │   │
-│  │  └─────────────┘  └─────────────┘  └────────┬─────────┘  │   │
-│  └─────────────────────────────────────────────┼────────────┘   │
-└────────────────────────────────────────────────┼────────────────┘
-                                                 │ RPC
-                                                 ▼
+│                  Background (Service Worker)                     │
+│                                                                  │
+│                      ┌────────────────┐                          │
+│                      │  Message Relay │                          │
+│                      │  (stateless)   │                          │
+│                      └───────┬────────┘                          │
+│                              │                                   │
+│  Tab Events ─────────────────┼─────────────────► SidePanel       │
+│  (onRemoved, onUpdated)      │                                   │
+└──────────────────────────────┼───────────────────────────────────┘
+                               │ RPC Forward
+                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      Content Script                             │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    PageController                        │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐  │   │
-│  │  │  DOM Tree   │  │   Actions   │  │      Mask        │  │   │
-│  │  └─────────────┘  └─────────────┘  └──────────────────┘  │   │
-│  └──────────────────────────────────────────────────────────┘   │
+│                      Content Script                              │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │                    PageController                          │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐    │  │
+│  │  │  DOM Tree   │  │   Actions   │  │      Mask        │    │  │
+│  │  └─────────────┘  └─────────────┘  └──────────────────┘    │  │
+│  └────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-                            ┌───────────────┐
-                            │   Web Page    │
-                            │     DOM       │
-                            └───────────────┘
+                                   │
+                                   ▼
+                           ┌───────────────┐
+                           │   Web Page    │
+                           │     DOM       │
+                           └───────────────┘
 ```
 
 ## Message Protocol
 
-All cross-context communication uses `@webext-core/messaging` for type safety.
+All messages use a simple type-based protocol defined in `src/messaging/protocol.ts`.
 
-### Protocol Definition
+### Message Types
 
-**File:** `src/messaging/protocol.ts`
+| Type | Direction | Purpose |
+|------|-----------|---------|
+| `rpc:call` | SidePanel → SW | Request to call PageController method |
+| `rpc:response` | SW → SidePanel | Response from PageController |
+| `cs:rpc` | SW → ContentScript | Forwarded RPC call |
+| `cs:query` | ContentScript → SW | Query to SidePanel (e.g., shouldShowMask) |
+| `query:response` | SW → ContentScript | Response to query |
+| `tab:event` | SW → SidePanel | Tab removed/updated notification |
 
-### 1. RPC Protocol (Background → ContentScript)
+### RPC Methods
 
-Used by `RemotePageController` to call `PageController` methods.
+All PageController methods are available via RPC:
 
-```typescript
-interface PageControllerRPCProtocol {
-    // State queries
-    'rpc:getCurrentUrl': () => string
-    'rpc:getLastUpdateTime': () => number
-    'rpc:getBrowserState': () => BrowserState
-
-    // DOM operations
-    'rpc:updateTree': () => string
-    'rpc:cleanUpHighlights': () => void
-
-    // Element actions
-    'rpc:clickElement': (index: number) => ActionResult
-    'rpc:inputText': (data: { index: number; text: string }) => ActionResult
-    'rpc:selectOption': (data: { index: number; optionText: string }) => ActionResult
-    'rpc:scroll': (options: ScrollOptions) => ActionResult
-    'rpc:scrollHorizontally': (options: ScrollHorizontallyOptions) => ActionResult
-    'rpc:executeJavascript': (script: string) => ActionResult
-
-    // Mask operations
-    'rpc:showMask': () => void
-    'rpc:hideMask': () => void
-
-    // Lifecycle
-    'rpc:dispose': () => void
-}
-```
-
-### 2. Command Protocol (SidePanel → Background)
-
-Used by SidePanel UI to control the agent.
-
-```typescript
-interface AgentCommandProtocol {
-    'agent:execute': (task: string) => void
-    'agent:stop': () => void
-    'agent:getState': () => AgentState
-    'agent:configure': (config: LLMConfig) => void
-}
-```
-
-### 3. Event Protocol (Background → SidePanel)
-
-Used by Background to push updates to SidePanel.
-
-```typescript
-interface AgentEventProtocol {
-    'event:status': (status: AgentStatus) => void
-    'event:history': (history: HistoricalEvent[]) => void
-    'event:activity': (activity: AgentActivity) => void
-    'event:stateSnapshot': (state: AgentState) => void
-}
-```
+- State: `getCurrentUrl`, `getLastUpdateTime`, `getBrowserState`
+- DOM: `updateTree`, `cleanUpHighlights`
+- Actions: `clickElement`, `inputText`, `selectOption`, `scroll`, `scrollHorizontally`, `executeJavascript`
+- Mask: `showMask`, `hideMask`
+- Lifecycle: `dispose`
 
 ## Communication Flow
 
-### Task Execution Flow
+### Task Execution
 
 ```
 1. User enters task in SidePanel
-   └─> SidePanel sends 'agent:execute' command
+   └─> AgentController.execute(task)
 
-2. Background receives command
-   ├─> Creates PageAgentCore with RemotePageController
-   └─> Starts task execution
+2. AgentController creates agent instances
+   ├─> new PageAgentCore()
+   ├─> new TabsManager()
+   └─> new RemotePageController()
 
 3. Agent executes step loop:
    ├─> LLM generates next action
-   ├─> Agent calls RemotePageController method
-   │   └─> RPC message sent to ContentScript
+   ├─> RemotePageController.method() called
+   │   └─> RPC message → SW → ContentScript
    ├─> ContentScript executes on real PageController
-   │   └─> RPC response returned
+   │   └─> Response → SW → SidePanel
    ├─> Agent updates history
-   └─> Background broadcasts events to SidePanel
+   └─> React UI re-renders via events
 
-4. SidePanel receives events
-   └─> Updates UI (status, history, activity)
-
-5. Task completes or user stops
-   └─> Agent disposes, status changes to idle/completed/error
+4. Task completes or user stops
+   └─> Agent disposes, status changes
 ```
 
-### Configuration Flow
+### Page Reload During Task
 
 ```
-1. User opens Settings in SidePanel
-2. User enters API credentials
-3. SidePanel sends 'agent:configure' command
-4. Background saves config to chrome.storage.local
-5. Next agent creation uses new config
+1. Page reloads/navigates
+2. Content script initializes
+3. Content script queries: shouldShowMask?
+   └─> cs:query → SW → SidePanel
+4. SidePanel checks if tab is current + agent running
+   └─> query:response → SW → ContentScript
+5. Content script shows/hides mask accordingly
 ```
 
 ## File Structure
@@ -210,99 +188,85 @@ interface AgentEventProtocol {
 ```
 packages/extension/src/
 ├── agent/
-│   └── RemotePageController.ts    # Proxy for PageController
+│   ├── RemotePageController.ts    # Proxy for PageController RPC
+│   ├── TabsManager.ts             # Multi-tab management
+│   └── tabTools.ts                # Agent tools for tab control
 ├── entrypoints/
-│   ├── background.ts              # Service worker
-│   ├── content.ts                 # Content script
+│   ├── background.ts              # Stateless SW relay
+│   ├── content.ts                 # Content script with PageController
 │   └── sidepanel/
+│       ├── AgentController.ts     # Agent lifecycle management
+│       ├── useAgent.ts            # React hook for agent
+│       ├── App.tsx                # Main UI component
+│       ├── components/
+│       │   ├── ConfigPanel.tsx
+│       │   ├── cards/
+│       │   └── index.tsx
 │       ├── index.html
-│       ├── main.tsx
-│       └── App.tsx                # Main UI component
+│       └── main.tsx
 ├── messaging/
 │   ├── protocol.ts                # Message type definitions
-│   ├── rpc.ts                     # RPC client for PageController
-│   ├── events.ts                  # Event broadcasting utilities
-│   └── index.ts                   # Module exports
+│   ├── rpc.ts                     # RPC client for SidePanel
+│   └── index.ts
 ├── components/ui/                 # shadcn components
-├── lib/utils.ts                   # Utility functions
-└── assets/index.css               # Tailwind styles
+├── lib/utils.ts
+└── utils/constants.ts
 ```
 
 ## Design Decisions
 
-### Tab ID Binding
+### Why Agent in SidePanel?
 
-**Problem:** When a task completes while the page is not focused (user switched tabs), RPC messages like `hideMask` or `dispose` would be sent to the wrong tab because `chrome.tabs.query({ active: true })` returns the currently active tab, not the original target tab.
+MV3 Service Workers have strict lifecycle constraints:
+- Terminate after ~30s of inactivity
+- Cannot maintain long-running loops
+- State is lost on termination
 
-**Solution:** `RemotePageController` captures the target tab ID at construction time and binds it to its RPC client. All subsequent RPC calls use this fixed tab ID regardless of which tab is currently active.
+By hosting the agent in SidePanel (a visible frontend page), we get:
+- Persistent execution while panel is open
+- Natural disposal when panel closes
+- No SW wake-up complexity
 
-```
-Task starts → RemotePageController created → tabId captured (e.g., 123)
-User switches to another tab (456 is now active)
-Task completes → hideMask RPC sent to tab 123 (correct!)
-```
+### Agent Isolation from UI
 
-### Lazy PageController Lifecycle
+`AgentController` is a separate class from the React UI for:
+- **Testability** - Can test agent logic without React
+- **Portability** - Future: move agent to popup, options page, or external page
+- **Clean separation** - UI concerns don't pollute agent logic
 
-**Problem:** PageController was created once when content script loaded and persisted until page unload. If the mask was disposed mid-task, subsequent tasks couldn't show it again.
+### Simplified Messaging
 
-**Solution:** PageController is now lazy-initialized on first RPC call and fully disposed between tasks. Each task gets a fresh PageController instance with its own mask.
+Previous architecture had complex retry/wake-up logic for SW. New architecture:
+- SW is stateless, always ready
+- No ping/wake-up needed
+- Simple request-response pattern
+- Retry logic only for content script initialization
 
-```
-Task 1: showMask → creates PageController + Mask → execute → hideMask → dispose → null
-Task 2: showMask → creates new PageController + Mask → ...
-```
+## Multi-Tab Control
 
-This also prepares for future multi-page workflows where PageController may need to be recreated when navigating between pages.
+### Tab Types
 
-## Extension Considerations
+- **Initial Tab** - Where user started the task
+- **Managed Tabs** - Tabs opened by agent via `open_new_tab`
 
-### Current Limitations (v1)
+### Tab Grouping
 
-1. **Single page control only** - Agent controls the active tab where SidePanel was opened
-2. **No cross-tab navigation** - Cannot follow links that open in new tabs
-3. **Session-based** - Agent state is not persisted across extension restarts
+Agent-opened tabs are grouped in a Chrome tab group named `Task(<taskId>)`.
 
-### Future Extension Points
+### Tab Switching
 
-#### Multi-tab Control
+Only initial tab and managed tabs can be switched to. This prevents the agent from accessing unrelated tabs.
 
-To support controlling multiple tabs:
+## Configuration
 
-1. Add `tabId` parameter to RPC messages
-2. Track tab-to-controller mapping in Background
-3. Allow SidePanel to switch between controlled tabs
+LLM config (apiKey, baseURL, model) is stored in `chrome.storage.local`. This persists across sessions and is managed via the ConfigPanel.
 
-#### Persistent Sessions
+## Security
 
-To persist agent sessions:
-
-1. Store session state in `chrome.storage.local`
-2. Restore agent on extension startup
-3. Handle service worker restarts gracefully
-
-#### Cross-tab Navigation
-
-To follow links in new tabs:
-
-1. Listen to `chrome.tabs.onCreated` events
-2. Inject content script into new tabs
-3. Transfer control to new tab when navigation occurs
-
-#### Screenshot/Vision Support
-
-To add visual context for the agent:
-
-1. Use `chrome.tabs.captureVisibleTab` for screenshots
-2. Send images to vision-capable LLM models
-3. Add screenshot tool to agent toolkit
-
-## Security Considerations
-
-1. **API Key Storage** - Keys stored in `chrome.storage.local` (extension-only access)
-2. **Content Script Isolation** - Runs in isolated world, not accessible to page scripts
-3. **Message Validation** - Only trusted extension contexts can send/receive messages
-4. **Permission Scope** - Request minimal permissions needed for functionality
+1. **API Key Storage** - Keys in `chrome.storage.local` (extension-only access)
+2. **Content Script Isolation** - Runs in isolated world
+3. **Tab Restriction** - Agent can only control tabs it opened or started from
+4. **No Arbitrary Tab Access** - Cannot switch to unmanaged tabs
 
 ## Development
 
