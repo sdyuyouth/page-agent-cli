@@ -92,10 +92,17 @@ async function queryShouldShowMask(getController: () => PageController): Promise
 		tabId,
 	}
 
+	console.debug(`${DEBUG_PREFIX} shouldShowMask query:`, {
+		tabId,
+		url: window.location.href,
+		queryId,
+	})
+
 	try {
 		// Set up response listener
 		const responsePromise = new Promise<boolean>((resolve) => {
 			const timeout = setTimeout(() => {
+				console.debug(`${DEBUG_PREFIX} shouldShowMask query timeout (3s)`)
 				chrome.runtime.onMessage.removeListener(listener)
 				resolve(false)
 			}, 3000)
@@ -118,11 +125,16 @@ async function queryShouldShowMask(getController: () => PageController): Promise
 
 		// Wait for response
 		const shouldShowMask = await responsePromise
-		console.debug(`${DEBUG_PREFIX} shouldShowMask result:`, shouldShowMask)
+
+		console.debug(`${DEBUG_PREFIX} shouldShowMask response:`, {
+			tabId,
+			shouldShowMask,
+			action: shouldShowMask ? 'showMask' : 'noAction',
+		})
 
 		if (shouldShowMask) {
-			console.debug(`${DEBUG_PREFIX} Restoring mask after page reload`)
 			await getController().showMask()
+			console.debug(`${DEBUG_PREFIX} Mask shown after page load`)
 		}
 	} catch (error) {
 		console.debug(`${DEBUG_PREFIX} shouldShowMask query failed:`, error)

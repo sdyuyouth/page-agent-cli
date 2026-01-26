@@ -212,12 +212,24 @@ export class AgentController extends EventTarget {
 	 */
 	shouldShowMaskForTab(tabId: number): boolean {
 		const agentCurrentTabId = this.tabsManager?.getCurrentTabId()
-		return (
-			this.status === 'running' &&
-			this.windowHasFocus &&
-			this.browserActiveTabId === tabId &&
-			agentCurrentTabId === tabId
-		)
+		const isRunning = this.status === 'running'
+		const isBrowserActiveTab = this.browserActiveTabId === tabId
+		const isAgentCurrentTab = agentCurrentTabId === tabId
+		const shouldShow = isRunning && this.windowHasFocus && isBrowserActiveTab && isAgentCurrentTab
+
+		console.debug('[AgentController] shouldShowMaskForTab:', {
+			queryTabId: tabId,
+			agentStatus: this.status,
+			isRunning,
+			windowHasFocus: this.windowHasFocus,
+			browserActiveTabId: this.browserActiveTabId,
+			isBrowserActiveTab,
+			agentCurrentTabId,
+			isAgentCurrentTab,
+			shouldShow,
+		})
+
+		return shouldShow
 	}
 
 	/**

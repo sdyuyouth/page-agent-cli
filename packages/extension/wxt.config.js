@@ -12,6 +12,7 @@ export default defineConfig({
 	webExt: {
 		chromiumProfile: chromeProfile,
 		keepProfileChanges: true,
+		chromiumArgs: ['--hide-crash-restore-bubble'],
 	},
 	vite: () => ({
 		plugins: [tailwindcss()],
