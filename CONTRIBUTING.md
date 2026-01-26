@@ -92,9 +92,27 @@ We use a simplified monorepo solution with `native npm-workspace + ts reference 
 ### Vibe coding with AI
 
 - It's **recommended** to heavily rely on AI (aka "vibe coding") when maintaining **demo pages and tests**.
-- BUT **NOT the core lib!!!** Be very careful if AI ever touched the core lib!!!
+- Be very careful if AI ever touched the core lib!!!
 - Review anything AI wrote before make a commit. You are the author of anything you commit. NOT AI.
 - Update the [AI instructions](AGENTS.md) when structure changed.
+
+If your lame AI assistant does not support [AGENTS.md](https://agents.md/). Add a alias for it. And make sure it's ignored by git.
+
+- claude-code (`CLAUDE.md`)
+
+    ```markdown
+    @AGENTS.md
+    ```
+
+- antigravity (`.agent/rules/alias.md`)
+
+    ```markdown
+    ---
+    trigger: always_on
+    ---
+
+    @../../AGENTS.md
+    ```
 
 ## 🔧 Development Workflows
 
