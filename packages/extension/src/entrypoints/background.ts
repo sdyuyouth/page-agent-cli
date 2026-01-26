@@ -15,7 +15,6 @@ import {
 	type ExtensionMessage,
 	type QueryResponseMessage,
 	type RPCCallMessage,
-	type RPCResponseMessage,
 	type TabEventMessage,
 	generateMessageId,
 	isExtensionMessage,
@@ -42,9 +41,9 @@ chrome.runtime.onMessage.addListener(
 
 		switch (msg.type) {
 			case 'rpc:call':
-				// SidePanel → SW: Forward RPC to content script
-				handleRPCCall(msg as RPCCallMessage)
-				return false // No sync response needed
+				// SidePanel → SW: Forward RPC to content script, return result via sendResponse
+				handleRPCCall(msg as RPCCallMessage, sendResponse)
+				return true // Async response
 
 			case 'cs:query':
 				// ContentScript → SW: Forward query to sidepanel
@@ -59,15 +58,18 @@ chrome.runtime.onMessage.addListener(
 
 /**
  * Forward RPC call from SidePanel to ContentScript
+ * Uses sendResponse to return result directly (MV3 compliant)
  */
-async function handleRPCCall(msg: RPCCallMessage): Promise<void> {
-	const { id, tabId, method, args } = msg
+async function handleRPCCall(
+	msg: RPCCallMessage,
+	sendResponse: (response: { success: boolean; result?: unknown; error?: string }) => void
+): Promise<void> {
+	const { tabId, method, args } = msg
 
 	// Create message for content script
 	const csMessage: CSRPCMessage = {
-		isPageAgentMessage: true,
 		type: 'cs:rpc',
-		id,
+		id: msg.id,
 		method,
 		args,
 	}
@@ -75,27 +77,11 @@ async function handleRPCCall(msg: RPCCallMessage): Promise<void> {
 	try {
 		// Send to content script and wait for response
 		const result = await chrome.tabs.sendMessage(tabId, csMessage)
-
-		// Forward response back to sidepanel
-		const response: RPCResponseMessage = {
-			isPageAgentMessage: true,
-			type: 'rpc:response',
-			id,
-			success: true,
-			result,
-		}
-		await chrome.runtime.sendMessage(response)
+		sendResponse({ success: true, result })
 	} catch (error) {
-		// Forward error back to sidepanel
-		const response: RPCResponseMessage = {
-			isPageAgentMessage: true,
-			type: 'rpc:response',
-			id,
+		sendResponse({
 			success: false,
 			error: error instanceof Error ? error.message : String(error),
-		}
-		await chrome.runtime.sendMessage(response).catch(() => {
-			// Sidepanel may be closed
 		})
 	}
 }
@@ -120,7 +106,6 @@ async function handleCSQuery(
 		// Forward response back to content script
 		if (sender.tab?.id) {
 			const queryResponse: QueryResponseMessage = {
-				isPageAgentMessage: true,
 				type: 'query:response',
 				id,
 				result: response,
@@ -131,7 +116,6 @@ async function handleCSQuery(
 		// Sidepanel not open or no response, return default
 		if (sender.tab?.id) {
 			const queryResponse: QueryResponseMessage = {
-				isPageAgentMessage: true,
 				type: 'query:response',
 				id,
 				result: queryType === 'shouldShowMask' ? false : null,
@@ -150,7 +134,6 @@ async function handleCSQuery(
  */
 chrome.tabs.onRemoved.addListener((tabId) => {
 	const message: TabEventMessage = {
-		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'removed',
@@ -169,7 +152,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 	if (!changeInfo.status) return
 
 	const message: TabEventMessage = {
-		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'updated',
@@ -189,7 +171,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
  */
 chrome.tabs.onActivated.addListener((activeInfo) => {
 	const message: TabEventMessage = {
-		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'activated',
@@ -210,7 +191,6 @@ chrome.windows.onFocusChanged.addListener((windowId) => {
 	// windowId is chrome.windows.WINDOW_ID_NONE (-1) when all windows lose focus
 	const focused = windowId !== chrome.windows.WINDOW_ID_NONE
 	const message: TabEventMessage = {
-		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'windowFocusChanged',

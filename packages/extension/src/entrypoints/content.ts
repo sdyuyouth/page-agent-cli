@@ -81,7 +81,6 @@ async function queryShouldShowMask(getController: () => PageController): Promise
 
 	const queryId = generateMessageId()
 	const queryMessage: CSQueryMessage = {
-		isPageAgentMessage: true,
 		type: 'cs:query',
 		id: queryId,
 		queryType: 'shouldShowMask',

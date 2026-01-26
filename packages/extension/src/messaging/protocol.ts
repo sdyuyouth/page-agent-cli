@@ -1,13 +1,13 @@
 /**
  * Message Protocol for PageAgentExt
  *
- * NEW ARCHITECTURE (MV3 compliant):
+ * MV3 Compliant Architecture:
  * - SidePanel hosts the agent, all state lives there
  * - Background (SW) is a stateless message relay
  * - Content Script runs PageController
  *
  * Message flows:
- * 1. RPC: SidePanel → SW → ContentScript → SW → SidePanel (PageController calls)
+ * 1. RPC: SidePanel → SW → ContentScript → sendResponse (PageController calls)
  * 2. Query: ContentScript → SW → SidePanel → SW → ContentScript (mask state check)
  * 3. Events: SW → SidePanel (tab events from chrome.tabs API)
  */
@@ -52,8 +52,7 @@ export interface ScrollHorizontallyOptions {
 
 /** Message type identifier */
 type MessageType =
-	| 'rpc:call' // SidePanel → SW: RPC call to content script
-	| 'rpc:response' // SW → SidePanel: RPC response from content script
+	| 'rpc:call' // SidePanel → SW: RPC call to content script (response via sendResponse)
 	| 'cs:rpc' // SW → ContentScript: Forwarded RPC call
 	| 'cs:query' // ContentScript → SW: Query to sidepanel
 	| 'query:response' // SW → ContentScript: Query response
@@ -61,7 +60,6 @@ type MessageType =
 
 /** Base message structure */
 interface BaseMessage {
-	isPageAgentMessage: true
 	type: MessageType
 	id: string // Unique message ID for request-response matching
 }
@@ -76,14 +74,6 @@ export interface RPCCallMessage extends BaseMessage {
 	tabId: number
 	method: string
 	args: unknown[]
-}
-
-/** SW → SidePanel: Response from PageController */
-export interface RPCResponseMessage extends BaseMessage {
-	type: 'rpc:response'
-	success: boolean
-	result?: unknown
-	error?: string
 }
 
 /** SW → ContentScript: Forwarded RPC call */
@@ -143,7 +133,6 @@ export interface TabEventMessage extends BaseMessage {
 /** All message types */
 export type ExtensionMessage =
 	| RPCCallMessage
-	| RPCResponseMessage
 	| CSRPCMessage
 	| CSQueryMessage
 	| QueryResponseMessage
@@ -158,12 +147,16 @@ export function generateMessageId(): string {
 	return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-/** Type guard for our messages */
+/** Known message types for type guard */
+const MESSAGE_TYPES = new Set<string>([
+	'rpc:call',
+	'cs:rpc',
+	'cs:query',
+	'query:response',
+	'tab:event',
+])
+
+/** Type guard - checks if message has a known type */
 export function isExtensionMessage(msg: unknown): msg is ExtensionMessage {
-	return (
-		typeof msg === 'object' &&
-		msg !== null &&
-		'isPageAgentMessage' in msg &&
-		(msg as any).isPageAgentMessage === true
-	)
+	return typeof msg === 'object' && msg !== null && MESSAGE_TYPES.has((msg as any).type)
 }

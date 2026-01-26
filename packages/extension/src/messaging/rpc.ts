@@ -4,17 +4,18 @@
  * This module provides RPC functionality from SidePanel to ContentScript
  * via the Background (SW) relay.
  *
- * Flow: SidePanel → SW (relay) → ContentScript → SW → SidePanel
+ * Flow: SidePanel → SW (relay) → ContentScript → sendResponse → SidePanel
+ *
+ * MV3 Compliant: Uses chrome.runtime.sendMessage with direct sendResponse,
+ * no pending calls map or custom response listeners needed.
  */
 import {
 	type ActionResult,
 	type BrowserState,
 	type RPCCallMessage,
-	type RPCResponseMessage,
 	type ScrollHorizontallyOptions,
 	type ScrollOptions,
 	generateMessageId,
-	isExtensionMessage,
 } from './protocol'
 
 /** RPC configuration */
@@ -23,52 +24,6 @@ const RPC_CONFIG = {
 	maxRetries: 3,
 	/** Base delay between retries in ms (exponential backoff) */
 	retryDelayMs: 500,
-	/** Timeout for individual RPC call in ms */
-	callTimeoutMs: 30000,
-}
-
-/** Pending RPC calls waiting for response */
-const pendingCalls = new Map<
-	string,
-	{
-		resolve: (value: unknown) => void
-		reject: (error: Error) => void
-		timeout: ReturnType<typeof setTimeout>
-	}
->()
-
-/** Whether the response listener is registered */
-let listenerRegistered = false
-
-/**
- * Register the RPC response listener (called once)
- */
-function ensureResponseListener(): void {
-	if (listenerRegistered) return
-	listenerRegistered = true
-
-	chrome.runtime.onMessage.addListener((message: unknown) => {
-		if (!isExtensionMessage(message)) return
-		if (message.type !== 'rpc:response') return
-
-		const response = message as RPCResponseMessage
-		const pending = pendingCalls.get(response.id)
-		if (!pending) {
-			console.debug('[RPC] Received response for unknown call:', response.id)
-			return
-		}
-
-		pendingCalls.delete(response.id)
-		clearTimeout(pending.timeout)
-
-		if (response.success) {
-			pending.resolve(response.result)
-		} else {
-			pending.reject(new Error(response.error || 'RPC call failed'))
-		}
-	})
-
-	console.debug('[RPC] Response listener registered')
 }
 
 /**
@@ -96,43 +51,40 @@ async function tabExists(tabId: number): Promise<boolean> {
 export class RPCError extends Error {
 	constructor(
 		message: string,
-		public readonly code: 'TAB_CLOSED' | 'CONTENT_SCRIPT_NOT_READY' | 'RPC_FAILED' | 'TIMEOUT'
+		public readonly code: 'TAB_CLOSED' | 'CONTENT_SCRIPT_NOT_READY' | 'RPC_FAILED'
 	) {
 		super(message)
 		this.name = 'RPCError'
 	}
 }
 
+/** Response type from background script */
+interface RPCResponse {
+	success: boolean
+	result?: unknown
+	error?: string
+}
+
 /**
  * Make a single RPC call (no retry)
+ * Uses chrome.runtime.sendMessage which returns the response directly via sendResponse
  */
 async function callOnce(tabId: number, method: string, args: unknown[]): Promise<unknown> {
-	ensureResponseListener()
-
-	const id = generateMessageId()
 	const message: RPCCallMessage = {
-		isPageAgentMessage: true,
 		type: 'rpc:call',
-		id,
+		id: generateMessageId(),
 		tabId,
 		method,
 		args,
 	}
 
-	return new Promise((resolve, reject) => {
-		const timeout = setTimeout(() => {
-			pendingCalls.delete(id)
-			reject(new RPCError(`RPC ${method} timed out`, 'TIMEOUT'))
-		}, RPC_CONFIG.callTimeoutMs)
+	const response = (await chrome.runtime.sendMessage(message)) as RPCResponse
 
-		pendingCalls.set(id, { resolve, reject, timeout })
-
-		chrome.runtime.sendMessage(message).catch((error: Error) => {
-			pendingCalls.delete(id)
-			clearTimeout(timeout)
-			reject(error)
-		})
-	})
+	if (response?.success) {
+		return response.result
+	} else {
+		throw new Error(response?.error || 'RPC call failed')
+	}
 }
 
 /**
