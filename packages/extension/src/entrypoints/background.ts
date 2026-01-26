@@ -18,7 +18,7 @@ import {
 	type TabEventMessage,
 	generateMessageId,
 	isExtensionMessage,
-} from '../messaging/protocol'
+} from '../agent/protocol'
 
 // ============================================================================
 // Message Relay Handlers

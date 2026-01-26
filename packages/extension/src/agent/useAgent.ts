@@ -7,9 +7,9 @@
 import type { AgentActivity, AgentStatus, HistoricalEvent } from '@page-agent/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import type { CSQueryMessage } from '../../messaging/protocol'
-import { isExtensionMessage } from '../../messaging/protocol'
 import { type AgentController, type LLMConfig, getAgentController } from './AgentController'
+import type { CSQueryMessage } from './protocol'
+import { isExtensionMessage } from './protocol'
 
 export interface UseAgentResult {
 	// State

@@ -7,15 +7,13 @@
  *
  * Tab targeting is managed externally by TabsManager via setTargetTab().
  */
-import type { PageController } from '@page-agent/page-controller'
-
 import type {
 	ActionResult,
 	BrowserState,
 	ScrollHorizontallyOptions,
 	ScrollOptions,
-} from '../messaging/protocol'
-import { type RPCClient, createRPCClient } from '../messaging/rpc'
+} from './protocol'
+import { type RPCClient, createRPCClient } from './rpc'
 
 const DEBUG_PREFIX = '[RemotePageController]'
 

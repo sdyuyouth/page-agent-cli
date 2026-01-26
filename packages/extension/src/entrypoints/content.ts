@@ -11,8 +11,8 @@
  */
 import { PageController } from '@page-agent/page-controller'
 
-import type { CSQueryMessage, CSRPCMessage, QueryResponseMessage } from '../messaging/protocol'
-import { generateMessageId, isExtensionMessage } from '../messaging/protocol'
+import type { CSQueryMessage, CSRPCMessage, QueryResponseMessage } from '../agent/protocol'
+import { generateMessageId, isExtensionMessage } from '../agent/protocol'
 
 const DEBUG_PREFIX = '[ContentScript]'
 

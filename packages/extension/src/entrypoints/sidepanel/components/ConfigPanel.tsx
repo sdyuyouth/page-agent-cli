@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/utils/constants'
 
-import type { LLMConfig } from '../AgentController'
+import type { LLMConfig } from '../../../agent/AgentController'
 
 interface ConfigPanelProps {
 	config: LLMConfig

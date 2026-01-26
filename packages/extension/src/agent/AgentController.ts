@@ -13,12 +13,12 @@
 import { PageAgentCore } from '@page-agent/core'
 import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
 
-import { RemotePageController } from '../../agent/RemotePageController'
-import { type TabInfo, TabsManager } from '../../agent/TabsManager'
-import { createTabTools } from '../../agent/tabTools'
-import type { TabEventMessage } from '../../messaging/protocol'
-import { isExtensionMessage } from '../../messaging/protocol'
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '../../utils/constants'
+import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '../utils/constants'
+import { RemotePageController } from './RemotePageController'
+import { type TabInfo, TabsManager } from './TabsManager'
+import type { TabEventMessage } from './protocol'
+import { isExtensionMessage } from './protocol'
+import { createTabTools } from './tabTools'
 
 /** LLM configuration */
 export interface LLMConfig {

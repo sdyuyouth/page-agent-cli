@@ -9,10 +9,10 @@ import {
 	InputGroupTextarea,
 } from '@/components/ui/input-group'
 
+import { useAgent } from '../../agent/useAgent'
 import { ConfigPanel } from './components/ConfigPanel'
 import { ActivityCard, EventCard } from './components/cards'
 import { EmptyState, Logo, StatusDot } from './components/misc'
-import { useAgent } from './useAgent'
 
 export default function App() {
 	const [showConfig, setShowConfig] = useState(false)
