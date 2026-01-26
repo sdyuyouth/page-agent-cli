@@ -1,68 +1,81 @@
 /**
  * Content Script Entry Point
  *
- * This script runs in the context of web pages and hosts the real PageController.
- * It listens for RPC messages relayed through the Background Script and
- * dispatches them to PageController.
- *
- * Message flow:
- * - RPC: SidePanel → SW → ContentScript (this file) → response → SW → SidePanel
- * - Query: ContentScript → SW → SidePanel → SW → ContentScript (for shouldShowMask)
+ * Runs in web page context, hosts PageController.
+ * - Receives AGENT_TO_PAGE messages and responds via sendResponse
+ * - Polls chrome.storage to manage mask visibility (no outgoing messages)
  */
 import { PageController } from '@page-agent/page-controller'
 
-import type { CSQueryMessage, CSRPCMessage, QueryResponseMessage } from '../agent/protocol'
-import { generateMessageId, isExtensionMessage } from '../agent/protocol'
+import type { AgentState, AgentToPageMessage } from '../agent/protocol'
+import { isExtensionMessage } from '../agent/protocol'
 
-const DEBUG_PREFIX = '[ContentScript]'
+const DEBUG_PREFIX = '[Content]'
 
 export default defineContentScript({
 	matches: ['<all_urls>'],
 	runAt: 'document_idle',
 
 	async main() {
-		const pageUrl = window.location.href
-		console.debug(`${DEBUG_PREFIX} Content script loaded on ${pageUrl}`)
+		console.debug(`${DEBUG_PREFIX} Loaded on ${window.location.href}`)
 
-		// Lazy-initialized controller - created on demand, disposed between tasks
+		// Lazy-initialized controller
 		let controller: PageController | null = null
 		let initError: Error | null = null
+		let myTabId: number | null = null
 
 		function getController(): PageController {
-			if (initError) {
-				console.debug(`${DEBUG_PREFIX} getController: re-throwing init error`)
-				throw initError
-			}
+			if (initError) throw initError
 			if (!controller) {
 				try {
 					controller = new PageController({ enableMask: true })
 					console.debug(`${DEBUG_PREFIX} PageController created`)
 				} catch (error) {
 					initError = error instanceof Error ? error : new Error(String(error))
-					console.error(`${DEBUG_PREFIX} Failed to create PageController:`, initError)
 					throw initError
 				}
 			}
 			return controller
 		}
 
-		function disposeController(): void {
-			console.debug(`${DEBUG_PREFIX} Disposing controller...`)
-			controller?.dispose()
-			controller = null
-			initError = null
-			console.debug(`${DEBUG_PREFIX} PageController disposed`)
-		}
+		// Register message handler
+		chrome.runtime.onMessage.addListener(
+			(
+				message: unknown,
+				_sender: chrome.runtime.MessageSender,
+				sendResponse: (response?: unknown) => void
+			): boolean => {
+				if (!isExtensionMessage(message)) return false
+				if (message.type !== 'AGENT_TO_PAGE') return false
 
-		// Register RPC message handler
-		registerRPCHandler(getController, () => controller, disposeController)
+				const msg = message as AgentToPageMessage
 
-		// Check if there's an active task that needs mask to be shown
-		setTimeout(() => queryShouldShowMask(getController), 100)
+				// Cache our tab ID from the first message
+				if (myTabId === null) {
+					myTabId = msg.tabId
+					console.debug(`${DEBUG_PREFIX} Tab ID: ${myTabId}`)
+				}
 
-		// Cleanup on page unload
+				handleRPC(msg.method, msg.args, getController, () => controller)
+					.then(sendResponse)
+					.catch((error) => {
+						console.error(`${DEBUG_PREFIX} RPC ${msg.method} failed:`, error)
+						sendResponse({ error: error instanceof Error ? error.message : String(error) })
+					})
+
+				return true // Async response
+			}
+		)
+
+		// Start mask polling
+		startMaskPolling(
+			() => myTabId,
+			getController,
+			() => controller
+		)
+
+		// Cleanup on unload
 		window.addEventListener('beforeunload', () => {
-			console.debug(`${DEBUG_PREFIX} Page unloading, disposing controller`)
 			controller?.dispose()
 			controller = null
 		})
@@ -70,137 +83,59 @@ export default defineContentScript({
 })
 
 /**
- * Query the sidepanel (via SW) whether mask should be shown
+ * Poll storage every second to manage mask visibility.
+ * Content script is autonomous - decides mask state based on:
+ * - agentState in storage (tabId, running)
+ * - document.visibilityState
  */
-async function queryShouldShowMask(getController: () => PageController): Promise<void> {
-	const tabId = await getCurrentTabId()
-	if (!tabId) {
-		console.debug(`${DEBUG_PREFIX} Cannot query shouldShowMask: no tab ID`)
-		return
-	}
+function startMaskPolling(
+	getTabId: () => number | null,
+	getController: () => PageController,
+	getControllerIfExists: () => PageController | null
+): void {
+	let maskVisible = false
 
-	const queryId = generateMessageId()
-	const queryMessage: CSQueryMessage = {
-		type: 'cs:query',
-		id: queryId,
-		queryType: 'shouldShowMask',
-		tabId,
-	}
+	const poll = async () => {
+		const tabId = getTabId()
+		if (tabId === null) return // Don't know our tab ID yet
 
-	console.debug(`${DEBUG_PREFIX} shouldShowMask query:`, {
-		tabId,
-		url: window.location.href,
-		queryId,
-	})
-
-	try {
-		// Set up response listener
-		const responsePromise = new Promise<boolean>((resolve) => {
-			const timeout = setTimeout(() => {
-				console.debug(`${DEBUG_PREFIX} shouldShowMask query timeout (3s)`)
-				chrome.runtime.onMessage.removeListener(listener)
-				resolve(false)
-			}, 3000)
-
-			const listener = (message: unknown) => {
-				if (!isExtensionMessage(message)) return
-				if (message.type !== 'query:response') return
-				if ((message as QueryResponseMessage).id !== queryId) return
-
-				clearTimeout(timeout)
-				chrome.runtime.onMessage.removeListener(listener)
-				resolve((message as QueryResponseMessage).result as boolean)
+		try {
+			const { agentState } = (await chrome.storage.local.get('agentState')) as {
+				agentState?: AgentState
 			}
 
-			chrome.runtime.onMessage.addListener(listener)
-		})
+			const shouldShow =
+				agentState?.running === true &&
+				agentState?.tabId === tabId &&
+				document.visibilityState === 'visible'
 
-		// Send query
-		await chrome.runtime.sendMessage(queryMessage)
-
-		// Wait for response
-		const shouldShowMask = await responsePromise
-
-		console.debug(`${DEBUG_PREFIX} shouldShowMask response:`, {
-			tabId,
-			shouldShowMask,
-			action: shouldShowMask ? 'showMask' : 'noAction',
-		})
-
-		if (shouldShowMask) {
-			await getController().showMask()
-			console.debug(`${DEBUG_PREFIX} Mask shown after page load`)
+			if (shouldShow && !maskVisible) {
+				await getController().showMask()
+				maskVisible = true
+			} else if (!shouldShow && maskVisible) {
+				await getControllerIfExists()?.hideMask()
+				maskVisible = false
+			}
+		} catch {
+			// Storage access failed, ignore
 		}
-	} catch (error) {
-		console.debug(`${DEBUG_PREFIX} shouldShowMask query failed:`, error)
 	}
+
+	setInterval(poll, 1000)
+	// Also poll on visibility change for faster response
+	document.addEventListener('visibilitychange', poll)
 }
 
 /**
- * Get current tab ID
+ * Handle RPC method call
  */
-async function getCurrentTabId(): Promise<number | null> {
-	try {
-		const response = await chrome.runtime.sendMessage({ type: 'getTabId' })
-		return response?.tabId ?? null
-	} catch {
-		// Fallback: we're in content script, tab ID comes from sender in SW
-		return null
-	}
-}
-
-/**
- * Register RPC message handler
- */
-function registerRPCHandler(
-	getController: () => PageController,
-	getControllerIfExists: () => PageController | null,
-	disposeController: () => void
-): void {
-	chrome.runtime.onMessage.addListener(
-		(
-			message: unknown,
-			_sender: chrome.runtime.MessageSender,
-			sendResponse: (response?: unknown) => void
-		): boolean => {
-			if (!isExtensionMessage(message)) return false
-			if (message.type !== 'cs:rpc') return false
-
-			const rpcMessage = message as CSRPCMessage
-			const { method, args } = rpcMessage
-
-			console.debug(`${DEBUG_PREFIX} RPC: ${method}`, args)
-
-			// Handle the RPC call
-			handleRPCCall(method, args, getController, getControllerIfExists, disposeController)
-				.then((result) => {
-					sendResponse(result)
-				})
-				.catch((error) => {
-					console.error(`${DEBUG_PREFIX} RPC ${method} failed:`, error)
-					sendResponse({ error: error instanceof Error ? error.message : String(error) })
-				})
-
-			// Return true to indicate async response
-			return true
-		}
-	)
-
-	console.debug(`${DEBUG_PREFIX} RPC handler registered`)
-}
-
-/**
- * Handle an RPC call
- */
-async function handleRPCCall(
+async function handleRPC(
 	method: string,
 	args: unknown[],
 	getController: () => PageController,
-	getControllerIfExists: () => PageController | null,
-	disposeController: () => void
+	getControllerIfExists: () => PageController | null
 ): Promise<unknown> {
 	switch (method) {
-		// State queries
 		case 'getCurrentUrl':
 			return getController().getCurrentUrl()
 
@@ -210,7 +145,6 @@ async function handleRPCCall(
 		case 'getBrowserState':
 			return getController().getBrowserState()
 
-		// DOM operations
 		case 'updateTree':
 			return getController().updateTree()
 
@@ -218,7 +152,6 @@ async function handleRPCCall(
 			await getControllerIfExists()?.cleanUpHighlights()
 			return undefined
 
-		// Element actions
 		case 'clickElement':
 			return getController().clickElement(args[0] as number)
 
@@ -238,20 +171,6 @@ async function handleRPCCall(
 
 		case 'executeJavascript':
 			return getController().executeJavascript(args[0] as string)
-
-		// Mask operations
-		case 'showMask':
-			await getController().showMask()
-			return undefined
-
-		case 'hideMask':
-			await getControllerIfExists()?.hideMask()
-			return undefined
-
-		// Lifecycle
-		case 'dispose':
-			disposeController()
-			return undefined
 
 		default:
 			throw new Error(`Unknown RPC method: ${method}`)

@@ -1,41 +1,25 @@
 /**
  * RPC Client for PageController remote calls
  *
- * This module provides RPC functionality from SidePanel to ContentScript
- * via the Background (SW) relay.
- *
- * Flow: SidePanel → SW (relay) → ContentScript → sendResponse → SidePanel
- *
- * MV3 Compliant: Uses chrome.runtime.sendMessage with direct sendResponse,
- * no pending calls map or custom response listeners needed.
+ * Flow: SidePanel → SW (relay) → ContentScript → sendResponse
  */
-import {
-	type ActionResult,
-	type BrowserState,
-	type RPCCallMessage,
-	type ScrollHorizontallyOptions,
-	type ScrollOptions,
-	generateMessageId,
+import type {
+	ActionResult,
+	AgentToPageMessage,
+	BrowserState,
+	ScrollHorizontallyOptions,
+	ScrollOptions,
 } from './protocol'
 
-/** RPC configuration */
 const RPC_CONFIG = {
-	/** Maximum retry attempts for transient failures */
 	maxRetries: 3,
-	/** Base delay between retries in ms (exponential backoff) */
 	retryDelayMs: 500,
 }
 
-/**
- * Sleep for a given number of milliseconds
- */
 function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-/**
- * Check if a tab exists
- */
 async function tabExists(tabId: number): Promise<boolean> {
 	try {
 		await chrome.tabs.get(tabId)
@@ -45,9 +29,6 @@ async function tabExists(tabId: number): Promise<boolean> {
 	}
 }
 
-/**
- * Error thrown when RPC call fails
- */
 export class RPCError extends Error {
 	constructor(
 		message: string,
@@ -58,21 +39,15 @@ export class RPCError extends Error {
 	}
 }
 
-/** Response type from background script */
 interface RPCResponse {
 	success: boolean
 	result?: unknown
 	error?: string
 }
 
-/**
- * Make a single RPC call (no retry)
- * Uses chrome.runtime.sendMessage which returns the response directly via sendResponse
- */
 async function callOnce(tabId: number, method: string, args: unknown[]): Promise<unknown> {
-	const message: RPCCallMessage = {
-		type: 'rpc:call',
-		id: generateMessageId(),
+	const message: AgentToPageMessage = {
+		type: 'AGENT_TO_PAGE',
 		tabId,
 		method,
 		args,
@@ -87,9 +62,6 @@ async function callOnce(tabId: number, method: string, args: unknown[]): Promise
 	}
 }
 
-/**
- * Make an RPC call with retry logic
- */
 async function call(tabId: number, method: string, args: unknown[]): Promise<unknown> {
 	let lastError: Error | null = null
 
@@ -100,38 +72,33 @@ async function call(tabId: number, method: string, args: unknown[]): Promise<unk
 			lastError = error as Error
 			const message = lastError.message || String(error)
 
-			// Check if tab still exists
 			if (!(await tabExists(tabId))) {
 				throw new RPCError(`Tab ${tabId} was closed`, 'TAB_CLOSED')
 			}
 
-			// Check for retryable errors
 			if (
 				message.includes('Could not establish connection') ||
 				message.includes('Receiving end does not exist') ||
 				message.includes('content script not ready')
 			) {
 				const delay = RPC_CONFIG.retryDelayMs * Math.pow(2, attempt)
-				console.debug(
-					`[RPC] Retry ${attempt + 1}/${RPC_CONFIG.maxRetries} for ${method}, waiting ${delay}ms`
-				)
+				console.debug(`[RPC] Retry ${attempt + 1}/${RPC_CONFIG.maxRetries} for ${method}`)
 				await sleep(delay)
 				continue
 			}
 
-			// Non-retryable error
 			throw lastError
 		}
 	}
 
 	throw new RPCError(
-		`Content script not ready after ${RPC_CONFIG.maxRetries} attempts for ${method}`,
+		`Content script not ready after ${RPC_CONFIG.maxRetries} attempts`,
 		'CONTENT_SCRIPT_NOT_READY'
 	)
 }
 
 /**
- * RPC client interface matching PageController methods
+ * RPC client interface (no mask/dispose - content manages via storage polling)
  */
 export interface RPCClient {
 	tabId: number
@@ -146,17 +113,9 @@ export interface RPCClient {
 	scroll(options: ScrollOptions): Promise<ActionResult>
 	scrollHorizontally(options: ScrollHorizontallyOptions): Promise<ActionResult>
 	executeJavascript(script: string): Promise<ActionResult>
-	showMask(): Promise<void>
-	hideMask(): Promise<void>
-	dispose(): Promise<void>
 }
 
-/**
- * Create an RPC client bound to a specific tab
- */
 export function createRPCClient(tabId: number): RPCClient {
-	console.debug(`[RPC] Creating client for tab ${tabId}`)
-
 	return {
 		tabId,
 
@@ -202,28 +161,6 @@ export function createRPCClient(tabId: number): RPCClient {
 
 		async executeJavascript(script: string): Promise<ActionResult> {
 			return call(tabId, 'executeJavascript', [script]) as Promise<ActionResult>
-		},
-
-		async showMask(): Promise<void> {
-			await call(tabId, 'showMask', [])
-		},
-
-		async hideMask(): Promise<void> {
-			// Best effort - don't throw if content script is gone
-			try {
-				await callOnce(tabId, 'hideMask', [])
-			} catch (e) {
-				console.debug('[RPC] hideMask failed (ignored):', e)
-			}
-		},
-
-		async dispose(): Promise<void> {
-			// Best effort - don't throw if content script is gone
-			try {
-				await callOnce(tabId, 'dispose', [])
-			} catch (e) {
-				console.debug('[RPC] dispose failed (ignored):', e)
-			}
 		},
 	}
 }

@@ -83,16 +83,25 @@ export class TabsManager {
 	/** Bound handler for cleanup */
 	private onTabRemovedHandler: (tabId: number) => void
 
+	/** Callback when current tab changes */
+	private onTabSwitch: ((tabId: number) => void) | null = null
+
 	constructor() {
 		this.onTabRemovedHandler = this.onTabRemoved.bind(this)
 	}
 
 	/**
 	 * Initialize the manager with current active tab
+	 * @param onTabSwitch - Callback when current tab changes (for storage updates)
 	 */
-	async init(taskId: string, pageController: RemotePageController): Promise<void> {
+	async init(
+		taskId: string,
+		pageController: RemotePageController,
+		onTabSwitch?: (tabId: number) => void
+	): Promise<void> {
 		this.taskId = taskId
 		this.pageController = pageController
+		this.onTabSwitch = onTabSwitch ?? null
 		this.disposed = false
 
 		// Get current active tab as initial tab
@@ -103,6 +112,8 @@ export class TabsManager {
 		if (!activeTab?.id) {
 			throw new Error('No active tab found')
 		}
+
+		console.log(`${DEBUG_PREFIX} Initialized with tab:`, activeTab.id)
 
 		this.initialTabId = activeTab.id
 		this.currentTabId = activeTab.id
@@ -118,11 +129,10 @@ export class TabsManager {
 
 		// Set target tab on page controller
 		await pageController.setTargetTab(activeTab.id)
+		this.onTabSwitch?.(activeTab.id)
 
 		// Register tab removal listener
 		chrome.tabs.onRemoved.addListener(this.onTabRemovedHandler)
-
-		console.debug(`${DEBUG_PREFIX} Initialized with tab:`, activeTab.id)
 	}
 
 	/**
@@ -264,6 +274,7 @@ export class TabsManager {
 
 		// Update page controller target
 		await this.pageController.setTargetTab(tabId)
+		this.onTabSwitch?.(tabId)
 
 		// Update tab info cache
 		const tab = await chrome.tabs.get(tabId)
@@ -411,34 +422,10 @@ export class TabsManager {
 	}
 
 	/**
-	 * Dispose PageController on all managed tabs.
-	 * This cleans up highlights and masks on every tab.
-	 * Should be called before dispose() to ensure clean state.
-	 */
-	async disposeAllPageControllers(): Promise<void> {
-		if (!this.pageController) return
-
-		const allTabIds = this.getAllManagedTabIds()
-		console.debug(
-			`${DEBUG_PREFIX} Disposing PageControllers on ${allTabIds.length} tabs:`,
-			allTabIds
-		)
-
-		// Dispose each tab in parallel
-		await Promise.all(
-			allTabIds.map((tabId) =>
-				this.pageController!.disposeTab(tabId).catch((e) => {
-					console.debug(`${DEBUG_PREFIX} disposeTab(${tabId}) failed:`, e)
-				})
-			)
-		)
-
-		console.debug(`${DEBUG_PREFIX} All PageControllers disposed`)
-	}
-
-	/**
-	 * Dispose manager and clean up
-	 * Note: Tab group is intentionally kept - only internal state is cleared
+	 * Dispose manager and clean up.
+	 * Tab group is intentionally kept for user.
+	 * PageControllers in content scripts are not explicitly disposed - they are
+	 * lazy-loaded and will clean up via storage polling (running=false).
 	 */
 	dispose(): void {
 		if (this.disposed) return

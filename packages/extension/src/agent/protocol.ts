@@ -1,15 +1,15 @@
 /**
  * Message Protocol for PageAgentExt
  *
- * MV3 Compliant Architecture:
- * - SidePanel hosts the agent, all state lives there
- * - Background (SW) is a stateless message relay
- * - Content Script runs PageController
+ * Simple unidirectional architecture:
+ * - AGENT_TO_PAGE: SidePanel → SW → ContentScript (RPC calls)
+ * - TAB_CHANGE: SW broadcasts tab events to all extension pages
  *
- * Message flows:
- * 1. RPC: SidePanel → SW → ContentScript → sendResponse (PageController calls)
- * 2. Query: ContentScript → SW → SidePanel → SW → ContentScript (mask state check)
- * 3. Events: SW → SidePanel (tab events from chrome.tabs API)
+ * Key principles:
+ * - SW is stateless, only relays messages
+ * - No long-lived connections
+ * - All responses via sendResponse callback
+ * - Content script never sends messages, only responds
  */
 
 // ============================================================================
@@ -46,117 +46,53 @@ export interface ScrollHorizontallyOptions {
 	index?: number
 }
 
+/** Agent state stored in chrome.storage for mask coordination */
+export interface AgentState {
+	tabId: number | null
+	running: boolean
+}
+
 // ============================================================================
-// Message Types
+// Message Types (only 2)
 // ============================================================================
 
 /** Message type identifier */
-type MessageType =
-	| 'rpc:call' // SidePanel → SW: RPC call to content script (response via sendResponse)
-	| 'cs:rpc' // SW → ContentScript: Forwarded RPC call
-	| 'cs:query' // ContentScript → SW: Query to sidepanel
-	| 'query:response' // SW → ContentScript: Query response
-	| 'tab:event' // SW → SidePanel: Tab event notification
+export type MessageType = 'AGENT_TO_PAGE' | 'TAB_CHANGE'
 
-/** Base message structure */
-interface BaseMessage {
-	type: MessageType
-	id: string // Unique message ID for request-response matching
-}
-
-// ============================================================================
-// RPC Messages (SidePanel ↔ SW ↔ ContentScript)
-// ============================================================================
-
-/** SidePanel → SW: Request to call PageController method */
-export interface RPCCallMessage extends BaseMessage {
-	type: 'rpc:call'
+/** SidePanel → SW → ContentScript: RPC call to PageController */
+export interface AgentToPageMessage {
+	type: 'AGENT_TO_PAGE'
 	tabId: number
 	method: string
 	args: unknown[]
 }
-
-/** SW → ContentScript: Forwarded RPC call */
-export interface CSRPCMessage extends BaseMessage {
-	type: 'cs:rpc'
-	method: string
-	args: unknown[]
-}
-
-// ============================================================================
-// Query Messages (ContentScript → SW → SidePanel)
-// ============================================================================
-
-/** Query types that content script can ask */
-export type QueryType = 'shouldShowMask'
-
-/** ContentScript → SW: Query to sidepanel */
-export interface CSQueryMessage extends BaseMessage {
-	type: 'cs:query'
-	queryType: QueryType
-	tabId: number
-}
-
-/** SW → ContentScript: Query response */
-export interface QueryResponseMessage extends BaseMessage {
-	type: 'query:response'
-	result: unknown
-}
-
-// ============================================================================
-// Tab Event Messages (SW → SidePanel)
-// ============================================================================
 
 /** Tab event types */
 export type TabEventType = 'removed' | 'updated' | 'activated' | 'windowFocusChanged'
 
-/** SW → SidePanel: Tab event notification */
-export interface TabEventMessage extends BaseMessage {
-	type: 'tab:event'
+/** SW → All: Tab event broadcast */
+export interface TabChangeMessage {
+	type: 'TAB_CHANGE'
 	eventType: TabEventType
 	tabId: number
 	data?: {
-		// For 'updated' events
 		status?: string
 		url?: string
-		// For 'activated' events
 		windowId?: number
-		// For 'windowFocusChanged' events
 		focused?: boolean
 	}
 }
 
-// ============================================================================
-// Union Types
-// ============================================================================
-
 /** All message types */
-export type ExtensionMessage =
-	| RPCCallMessage
-	| CSRPCMessage
-	| CSQueryMessage
-	| QueryResponseMessage
-	| TabEventMessage
+export type ExtensionMessage = AgentToPageMessage | TabChangeMessage
 
 // ============================================================================
-// Utility Functions
+// Type Guard
 // ============================================================================
 
-/** Generate unique message ID */
-export function generateMessageId(): string {
-	return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-}
+const MESSAGE_TYPES = new Set<string>(['AGENT_TO_PAGE', 'TAB_CHANGE'])
 
-/** Known message types for type guard */
-const MESSAGE_TYPES = new Set<string>([
-	'rpc:call',
-	'cs:rpc',
-	'cs:query',
-	'query:response',
-	'tab:event',
-])
-
-/** Type guard - checks if message has a known type */
+/** Type guard - checks if message is a known extension message */
 export function isExtensionMessage(msg: unknown): msg is ExtensionMessage {
 	return typeof msg === 'object' && msg !== null && MESSAGE_TYPES.has((msg as any).type)
 }

@@ -1,25 +1,17 @@
 /**
  * React hook for using AgentController
- *
- * This hook provides a React-friendly interface to the AgentController,
- * handling event subscriptions and state updates.
  */
 import type { AgentActivity, AgentStatus, HistoricalEvent } from '@page-agent/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { type AgentController, type LLMConfig, getAgentController } from './AgentController'
-import type { CSQueryMessage } from './protocol'
-import { isExtensionMessage } from './protocol'
 
 export interface UseAgentResult {
-	// State
 	status: AgentStatus
 	history: HistoricalEvent[]
 	activity: AgentActivity | null
 	currentTask: string
 	config: LLMConfig
-
-	// Actions
 	execute: (task: string) => Promise<void>
 	stop: () => void
 	configure: (config: LLMConfig) => Promise<void>
@@ -37,17 +29,14 @@ export function useAgent(): UseAgentResult {
 		model: '',
 	})
 
-	// Initialize controller and subscribe to events
 	useEffect(() => {
 		const controller = getAgentController()
 		controllerRef.current = controller
 
-		// Initialize
 		controller.init().then(() => {
 			setConfig(controller.getConfig())
 		})
 
-		// Event handlers
 		const handleStatusChange = (e: Event) => {
 			const newStatus = (e as CustomEvent).detail as AgentStatus
 			setStatus(newStatus)
@@ -70,50 +59,10 @@ export function useAgent(): UseAgentResult {
 		controller.addEventListener('historychange', handleHistoryChange)
 		controller.addEventListener('activity', handleActivity)
 
-		// Handle shouldShowMask queries from content scripts
-		const handleMessage = (
-			message: unknown,
-			_sender: chrome.runtime.MessageSender,
-			sendResponse: (response?: unknown) => void
-		): boolean => {
-			if (!isExtensionMessage(message)) return false
-			if (message.type !== 'cs:query') return false
-
-			const query = message as CSQueryMessage
-			if (query.queryType === 'shouldShowMask') {
-				const ctrl = controllerRef.current
-				if (!ctrl) {
-					sendResponse(false)
-					return true
-				}
-
-				// Use AgentController's shouldShowMaskForTab which checks:
-				// 1. Agent is running
-				// 2. Window has focus
-				// 3. Browser's active tab === query.tabId
-				// 4. Agent's current tab === query.tabId
-				const shouldShow = ctrl.shouldShowMaskForTab(query.tabId)
-
-				console.debug('[useAgent] shouldShowMask query:', {
-					tabId: query.tabId,
-					shouldShow,
-				})
-
-				sendResponse(shouldShow)
-				return true
-			}
-
-			return false
-		}
-
-		chrome.runtime.onMessage.addListener(handleMessage)
-
-		// Cleanup
 		return () => {
 			controller.removeEventListener('statuschange', handleStatusChange)
 			controller.removeEventListener('historychange', handleHistoryChange)
 			controller.removeEventListener('activity', handleActivity)
-			chrome.runtime.onMessage.removeListener(handleMessage)
 			controller.dispose()
 		}
 	}, [])
