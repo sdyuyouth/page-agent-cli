@@ -10,7 +10,6 @@ import {
 	type ActionResult,
 	type BrowserState,
 	type RPCCallMessage,
-	type RPCMethod,
 	type RPCResponseMessage,
 	type ScrollHorizontallyOptions,
 	type ScrollOptions,
@@ -107,11 +106,12 @@ export class RPCError extends Error {
 /**
  * Make a single RPC call (no retry)
  */
-async function callOnce(tabId: number, method: RPCMethod, args: unknown[]): Promise<unknown> {
+async function callOnce(tabId: number, method: string, args: unknown[]): Promise<unknown> {
 	ensureResponseListener()
 
 	const id = generateMessageId()
 	const message: RPCCallMessage = {
+		isPageAgentMessage: true,
 		type: 'rpc:call',
 		id,
 		tabId,
@@ -138,7 +138,7 @@ async function callOnce(tabId: number, method: RPCMethod, args: unknown[]): Prom
 /**
  * Make an RPC call with retry logic
  */
-async function call(tabId: number, method: RPCMethod, args: unknown[]): Promise<unknown> {
+async function call(tabId: number, method: string, args: unknown[]): Promise<unknown> {
 	let lastError: Error | null = null
 
 	for (let attempt = 0; attempt < RPC_CONFIG.maxRetries; attempt++) {

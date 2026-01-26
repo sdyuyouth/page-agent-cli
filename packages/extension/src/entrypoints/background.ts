@@ -65,6 +65,7 @@ async function handleRPCCall(msg: RPCCallMessage): Promise<void> {
 
 	// Create message for content script
 	const csMessage: CSRPCMessage = {
+		isPageAgentMessage: true,
 		type: 'cs:rpc',
 		id,
 		method,
@@ -77,6 +78,7 @@ async function handleRPCCall(msg: RPCCallMessage): Promise<void> {
 
 		// Forward response back to sidepanel
 		const response: RPCResponseMessage = {
+			isPageAgentMessage: true,
 			type: 'rpc:response',
 			id,
 			success: true,
@@ -86,6 +88,7 @@ async function handleRPCCall(msg: RPCCallMessage): Promise<void> {
 	} catch (error) {
 		// Forward error back to sidepanel
 		const response: RPCResponseMessage = {
+			isPageAgentMessage: true,
 			type: 'rpc:response',
 			id,
 			success: false,
@@ -117,6 +120,7 @@ async function handleCSQuery(
 		// Forward response back to content script
 		if (sender.tab?.id) {
 			const queryResponse: QueryResponseMessage = {
+				isPageAgentMessage: true,
 				type: 'query:response',
 				id,
 				result: response,
@@ -127,6 +131,7 @@ async function handleCSQuery(
 		// Sidepanel not open or no response, return default
 		if (sender.tab?.id) {
 			const queryResponse: QueryResponseMessage = {
+				isPageAgentMessage: true,
 				type: 'query:response',
 				id,
 				result: queryType === 'shouldShowMask' ? false : null,
@@ -145,6 +150,7 @@ async function handleCSQuery(
  */
 chrome.tabs.onRemoved.addListener((tabId) => {
 	const message: TabEventMessage = {
+		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'removed',
@@ -163,6 +169,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 	if (!changeInfo.status) return
 
 	const message: TabEventMessage = {
+		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'updated',
@@ -182,6 +189,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
  */
 chrome.tabs.onActivated.addListener((activeInfo) => {
 	const message: TabEventMessage = {
+		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'activated',
@@ -202,6 +210,7 @@ chrome.windows.onFocusChanged.addListener((windowId) => {
 	// windowId is chrome.windows.WINDOW_ID_NONE (-1) when all windows lose focus
 	const focused = windowId !== chrome.windows.WINDOW_ID_NONE
 	const message: TabEventMessage = {
+		isPageAgentMessage: true,
 		type: 'tab:event',
 		id: generateMessageId(),
 		eventType: 'windowFocusChanged',

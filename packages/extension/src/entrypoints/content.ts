@@ -11,12 +11,7 @@
  */
 import { PageController } from '@page-agent/page-controller'
 
-import type {
-	CSQueryMessage,
-	CSRPCMessage,
-	QueryResponseMessage,
-	RPCMethod,
-} from '../messaging/protocol'
+import type { CSQueryMessage, CSRPCMessage, QueryResponseMessage } from '../messaging/protocol'
 import { generateMessageId, isExtensionMessage } from '../messaging/protocol'
 
 const DEBUG_PREFIX = '[ContentScript]'
@@ -86,6 +81,7 @@ async function queryShouldShowMask(getController: () => PageController): Promise
 
 	const queryId = generateMessageId()
 	const queryMessage: CSQueryMessage = {
+		isPageAgentMessage: true,
 		type: 'cs:query',
 		id: queryId,
 		queryType: 'shouldShowMask',
@@ -198,7 +194,7 @@ function registerRPCHandler(
  * Handle an RPC call
  */
 async function handleRPCCall(
-	method: RPCMethod,
+	method: string,
 	args: unknown[],
 	getController: () => PageController,
 	getControllerIfExists: () => PageController | null,

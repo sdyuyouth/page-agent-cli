@@ -61,6 +61,7 @@ type MessageType =
 
 /** Base message structure */
 interface BaseMessage {
+	isPageAgentMessage: true
 	type: MessageType
 	id: string // Unique message ID for request-response matching
 }
@@ -69,28 +70,11 @@ interface BaseMessage {
 // RPC Messages (SidePanel ↔ SW ↔ ContentScript)
 // ============================================================================
 
-/** RPC method names matching PageController interface */
-export type RPCMethod =
-	| 'getCurrentUrl'
-	| 'getLastUpdateTime'
-	| 'getBrowserState'
-	| 'updateTree'
-	| 'cleanUpHighlights'
-	| 'clickElement'
-	| 'inputText'
-	| 'selectOption'
-	| 'scroll'
-	| 'scrollHorizontally'
-	| 'executeJavascript'
-	| 'showMask'
-	| 'hideMask'
-	| 'dispose'
-
 /** SidePanel → SW: Request to call PageController method */
 export interface RPCCallMessage extends BaseMessage {
 	type: 'rpc:call'
 	tabId: number
-	method: RPCMethod
+	method: string
 	args: unknown[]
 }
 
@@ -105,7 +89,7 @@ export interface RPCResponseMessage extends BaseMessage {
 /** SW → ContentScript: Forwarded RPC call */
 export interface CSRPCMessage extends BaseMessage {
 	type: 'cs:rpc'
-	method: RPCMethod
+	method: string
 	args: unknown[]
 }
 
@@ -179,9 +163,7 @@ export function isExtensionMessage(msg: unknown): msg is ExtensionMessage {
 	return (
 		typeof msg === 'object' &&
 		msg !== null &&
-		'type' in msg &&
-		'id' in msg &&
-		typeof (msg as ExtensionMessage).type === 'string' &&
-		typeof (msg as ExtensionMessage).id === 'string'
+		'isPageAgentMessage' in msg &&
+		(msg as any).isPageAgentMessage === true
 	)
 }
