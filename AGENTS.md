@@ -129,3 +129,5 @@ const pageInfo = await this.pageController.getPageInfo()
 - ESLint relaxes some unsafe rules for rapid iteration
 - Every change you make should not only implement the desired functionality but also improve the quality of the codebase
 - All code and comments must be in English.
+- Do not try to hide errors or risks. They are valuable feedbacks for developers and users. Make them visible and actionable.
+- Traceability and predictability is more important than success rate.
