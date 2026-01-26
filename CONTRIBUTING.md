@@ -96,7 +96,7 @@ We use a simplified monorepo solution with `native npm-workspace + ts reference 
 - Review anything AI wrote before make a commit. You are the author of anything you commit. NOT AI.
 - Update the [AI instructions](AGENTS.md) when structure changed.
 
-If your lame AI assistant does not support [AGENTS.md](https://agents.md/). Add a alias for it. And make sure it's ignored by git.
+If your lame AI assistant does not support [AGENTS.md](https://agents.md/). Add an alias for it:
 
 - claude-code (`CLAUDE.md`)
 
