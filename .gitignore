@@ -37,3 +37,10 @@ packages/page-agent/LICENSE
 # extension
 .output
 .wxt
+
+# AI
+.agent
+.claude
+.cursor
+.gemini
+CLAUDE.md
