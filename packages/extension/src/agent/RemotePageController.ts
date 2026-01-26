@@ -84,19 +84,6 @@ export class RemotePageController {
 
 		console.debug(`${DEBUG_PREFIX} setTargetTab: ${previousTabId} → ${tabId}`)
 
-		// Clean up old tab highlights only (mask is controlled by AgentController)
-		if (previousTabId && previousTabId !== tabId && previousRpc) {
-			console.debug(`${DEBUG_PREFIX} Cleaning up highlights on previous tab ${previousTabId}`)
-			try {
-				await previousRpc.cleanUpHighlights()
-			} catch (e) {
-				console.debug(
-					`${DEBUG_PREFIX} cleanUpHighlights on tab ${previousTabId} failed (ignored):`,
-					e
-				)
-			}
-		}
-
 		// Get tab info to check URL
 		const tab = await chrome.tabs.get(tabId)
 		const tabUrl = tab.url
@@ -284,6 +271,7 @@ export class RemotePageController {
 	 */
 	async hideMask(): Promise<void> {
 		if (!this.rpc) return
+		await this.cleanUpHighlights()
 		return this.rpc.hideMask()
 	}
 
