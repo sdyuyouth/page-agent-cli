@@ -6,6 +6,7 @@ import styles from './SimulatorMask.module.css'
 import cursorStyles from './cursor.module.css'
 
 export class SimulatorMask {
+	shown: boolean = false
 	wrapper = document.createElement('div')
 	motion = new Motion({
 		mode: isPageDark() ? 'dark' : 'light',
@@ -140,6 +141,9 @@ export class SimulatorMask {
 	}
 
 	show() {
+		if (this.shown) return
+
+		this.shown = true
 		this.motion.start()
 		this.motion.fadeIn()
 
@@ -155,6 +159,9 @@ export class SimulatorMask {
 	}
 
 	hide() {
+		if (!this.shown) return
+
+		this.shown = false
 		this.motion.fadeOut()
 		this.motion.pause()
 

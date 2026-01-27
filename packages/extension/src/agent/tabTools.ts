@@ -8,7 +8,7 @@
  */
 import zod from 'zod'
 
-import type { TabsManager } from './TabsManager'
+import type { TabsController } from './TabsController'
 
 /** Tool definition compatible with PageAgentCore customTools */
 interface TabTool {
@@ -21,7 +21,7 @@ interface TabTool {
  * Create tab control tools bound to a TabsManager instance.
  * These tools are injected into PageAgentCore via customTools config.
  */
-export function createTabTools(tabsManager: TabsManager): Record<string, TabTool> {
+export function createTabTools(tabsController: TabsController): Record<string, TabTool> {
 	return {
 		open_new_tab: {
 			description:
@@ -31,7 +31,7 @@ export function createTabTools(tabsManager: TabsManager): Record<string, TabTool
 			}),
 			execute: async (input: unknown) => {
 				const { url } = input as { url: string }
-				const result = await tabsManager.openNewTab(url)
+				const result = await tabsController.openNewTab(url)
 				return result.message
 			},
 		},
@@ -44,7 +44,7 @@ export function createTabTools(tabsManager: TabsManager): Record<string, TabTool
 			}),
 			execute: async (input: unknown) => {
 				const { tab_id } = input as { tab_id: number }
-				return tabsManager.switchToTab(tab_id)
+				return (await tabsController.switchToTab(tab_id)).message
 			},
 		},
 
@@ -53,17 +53,10 @@ export function createTabTools(tabsManager: TabsManager): Record<string, TabTool
 				'Close a tab by its ID. Cannot close the initial tab. Optionally specify which tab to switch to after closing.',
 			inputSchema: zod.object({
 				tab_id: zod.number().int().describe('The tab ID to close'),
-				switch_to: zod
-					.number()
-					.int()
-					.optional()
-					.describe(
-						'Optional: Tab ID to switch to after closing. If not specified, will switch to previous tab in history.'
-					),
 			}),
 			execute: async (input: unknown) => {
-				const { tab_id, switch_to } = input as { tab_id: number; switch_to?: number }
-				return tabsManager.closeTab(tab_id, switch_to)
+				const { tab_id } = input as { tab_id: number }
+				return (await tabsController.closeTab(tab_id)).message
 			},
 		},
 	}

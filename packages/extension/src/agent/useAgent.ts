@@ -4,41 +4,57 @@
 import type { AgentActivity, AgentStatus, HistoricalEvent } from '@page-agent/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { type AgentController, type LLMConfig, getAgentController } from './AgentController'
+import { LLMConfig } from '@/utils'
+import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/utils/constants'
+
+import { MultiPageAgent } from './MultiPageAgent'
+
+// import { type AgentController, type LLMConfig, getAgentController } from './old/AgentController'
 
 export interface UseAgentResult {
 	status: AgentStatus
 	history: HistoricalEvent[]
 	activity: AgentActivity | null
 	currentTask: string
-	config: LLMConfig
+	config: LLMConfig | null
 	execute: (task: string) => Promise<void>
 	stop: () => void
 	configure: (config: LLMConfig) => Promise<void>
 }
 
+const DEMO_CONFIG: LLMConfig = {
+	apiKey: DEMO_API_KEY,
+	baseURL: DEMO_BASE_URL,
+	model: DEMO_MODEL,
+}
+
 export function useAgent(): UseAgentResult {
-	const controllerRef = useRef<AgentController | null>(null)
+	const agentRef = useRef<MultiPageAgent | null>(null)
 	const [status, setStatus] = useState<AgentStatus>('idle')
 	const [history, setHistory] = useState<HistoricalEvent[]>([])
 	const [activity, setActivity] = useState<AgentActivity | null>(null)
 	const [currentTask, setCurrentTask] = useState('')
-	const [config, setConfig] = useState<LLMConfig>({
-		apiKey: '',
-		baseURL: '',
-		model: '',
-	})
+	const [config, setConfig] = useState<LLMConfig | null>(null)
 
 	useEffect(() => {
-		const controller = getAgentController()
-		controllerRef.current = controller
-
-		controller.init().then(() => {
-			setConfig(controller.getConfig())
+		chrome.storage.local.get('llmConfig').then((result) => {
+			if (result.llmConfig) {
+				setConfig(result.llmConfig as LLMConfig)
+			} else {
+				chrome.storage.local.set({ llmConfig: DEMO_CONFIG })
+				setConfig(DEMO_CONFIG)
+			}
 		})
+	}, [])
+
+	useEffect(() => {
+		if (!config) return
+
+		const agent = new MultiPageAgent(config)
+		agentRef.current = agent
 
 		const handleStatusChange = (e: Event) => {
-			const newStatus = (e as CustomEvent).detail as AgentStatus
+			const newStatus = agent.status as AgentStatus
 			setStatus(newStatus)
 			if (newStatus === 'idle' || newStatus === 'completed' || newStatus === 'error') {
 				setActivity(null)
@@ -46,8 +62,7 @@ export function useAgent(): UseAgentResult {
 		}
 
 		const handleHistoryChange = (e: Event) => {
-			const newHistory = (e as CustomEvent).detail as HistoricalEvent[]
-			setHistory([...newHistory])
+			setHistory([...agent.history])
 		}
 
 		const handleActivity = (e: Event) => {
@@ -55,36 +70,32 @@ export function useAgent(): UseAgentResult {
 			setActivity(newActivity)
 		}
 
-		controller.addEventListener('statuschange', handleStatusChange)
-		controller.addEventListener('historychange', handleHistoryChange)
-		controller.addEventListener('activity', handleActivity)
+		agent.addEventListener('statuschange', handleStatusChange)
+		agent.addEventListener('historychange', handleHistoryChange)
+		agent.addEventListener('activity', handleActivity)
 
 		return () => {
-			controller.removeEventListener('statuschange', handleStatusChange)
-			controller.removeEventListener('historychange', handleHistoryChange)
-			controller.removeEventListener('activity', handleActivity)
-			controller.dispose()
+			agent.removeEventListener('statuschange', handleStatusChange)
+			agent.removeEventListener('historychange', handleHistoryChange)
+			agent.removeEventListener('activity', handleActivity)
+			agent.dispose()
 		}
-	}, [])
+	}, [config])
 
 	const execute = useCallback(async (task: string) => {
-		const controller = controllerRef.current
-		if (!controller) return
+		const agent = agentRef.current
+		if (!agent) return
 
 		setCurrentTask(task)
 		setHistory([])
-		await controller.execute(task)
+		await agent.execute(task)
 	}, [])
 
 	const stop = useCallback(() => {
-		controllerRef.current?.stop()
+		agentRef.current?.dispose()
 	}, [])
 
 	const configure = useCallback(async (newConfig: LLMConfig) => {
-		const controller = controllerRef.current
-		if (!controller) return
-
-		await controller.configure(newConfig)
 		setConfig(newConfig)
 	}, [])
 

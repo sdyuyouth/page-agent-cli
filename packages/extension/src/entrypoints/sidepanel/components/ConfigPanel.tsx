@@ -3,27 +3,26 @@ import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import type { LLMConfig } from '@/utils'
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/utils/constants'
 
-import type { LLMConfig } from '../../../agent/AgentController'
-
 interface ConfigPanelProps {
-	config: LLMConfig
+	config: LLMConfig | null
 	onSave: (config: LLMConfig) => Promise<void>
 	onClose: () => void
 }
 
 export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
-	const [apiKey, setApiKey] = useState(config.apiKey || DEMO_API_KEY)
-	const [baseURL, setBaseURL] = useState(config.baseURL || DEMO_BASE_URL)
-	const [model, setModel] = useState(config.model || DEMO_MODEL)
+	const [apiKey, setApiKey] = useState(config?.apiKey || DEMO_API_KEY)
+	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
+	const [model, setModel] = useState(config?.model || DEMO_MODEL)
 	const [saving, setSaving] = useState(false)
 
 	// Update local state when config prop changes
 	useEffect(() => {
-		setApiKey(config.apiKey || DEMO_API_KEY)
-		setBaseURL(config.baseURL || DEMO_BASE_URL)
-		setModel(config.model || DEMO_MODEL)
+		setApiKey(config?.apiKey || DEMO_API_KEY)
+		setBaseURL(config?.baseURL || DEMO_BASE_URL)
+		setModel(config?.model || DEMO_MODEL)
 	}, [config])
 
 	const handleSave = async () => {
