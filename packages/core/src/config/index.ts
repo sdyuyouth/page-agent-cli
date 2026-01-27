@@ -141,6 +141,12 @@ export interface AgentConfig {
 	 * }
 	 */
 	transformPageContent?: (content: string) => Promise<string> | string
+
+	/**
+	 * Completely override the default system prompt.
+	 * @experimental Use with caution - incorrect prompts may break agent behavior.
+	 */
+	customSystemPrompt?: string
 }
 
 export type PageAgentConfig = LLMConfig & AgentConfig & PageControllerConfig

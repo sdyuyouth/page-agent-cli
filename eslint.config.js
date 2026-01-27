@@ -8,7 +8,13 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-	globalIgnores(['**/dist', '**/node_modules', 'packages/website/src/components/ui']),
+	globalIgnores([
+		'**/dist',
+		'**/node_modules',
+		'packages/*/src/components/ui',
+		'**/.wxt',
+		'**/.output',
+	]),
 	{
 		plugins: {
 			'react-hooks': reactHooks,
@@ -69,6 +75,8 @@ export default defineConfig([
 			'react-dom/no-missing-button-type': 'off',
 			'react-x/no-nested-component-definitions': 'off',
 			'@typescript-eslint/prefer-optional-chain': 'off',
+			'@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
+			'@typescript-eslint/no-unnecessary-type-parameters': 'off',
 
 			// 'require-await': 'off',
 			'@typescript-eslint/require-await': 'off',

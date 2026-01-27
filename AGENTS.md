@@ -5,6 +5,7 @@
 This is a **monorepo** with npm workspaces:
 
 - **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
+- **Extension** (`packages/extension/`) - Browser extension (WXT + React) 🚧 WIP
 - **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
 
 Internal packages:
@@ -35,6 +36,7 @@ packages/
 ├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
+├── extension/               # 🚧 WIP: Browser extension (WXT + React)
 ├── page-controller/         # @page-agent/page-controller
 └── ui/                      # @page-agent/ui
 ```
@@ -127,3 +129,5 @@ const pageInfo = await this.pageController.getPageInfo()
 - ESLint relaxes some unsafe rules for rapid iteration
 - Every change you make should not only implement the desired functionality but also improve the quality of the codebase
 - All code and comments must be in English.
+- Do not try to hide errors or risks. They are valuable feedbacks for developers and users. Make them visible and actionable.
+- Traceability and predictability is more important than success rate.
