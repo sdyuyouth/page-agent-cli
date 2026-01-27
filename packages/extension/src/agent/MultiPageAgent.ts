@@ -1,5 +1,6 @@
 import { PageAgentConfig, PageAgentCore } from '@page-agent/core'
 
+import SYSTEM_PROMPT from '../prompts/system_prompt.md?raw'
 import { RemotePageController } from './RemotePageController'
 import { TabsController } from './TabsController'
 import { createTabTools } from './tabTools'
@@ -15,6 +16,7 @@ export class MultiPageAgent extends PageAgentCore {
 			...config,
 			pageController: pageController as any,
 			customTools: customTools,
+			customSystemPrompt: SYSTEM_PROMPT,
 
 			onBeforeTask: async (agent) => {
 				await tabsController.init(agent.taskId)
