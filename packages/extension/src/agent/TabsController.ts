@@ -98,6 +98,10 @@ export class TabsController {
 			})
 		}
 
+		// wait for the new tab to be fully loaded
+		// @todo
+		await new Promise((resolve) => setTimeout(resolve, 500))
+
 		return {
 			success: true,
 			tabId,
