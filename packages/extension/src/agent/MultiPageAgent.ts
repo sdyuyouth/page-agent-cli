@@ -18,7 +18,7 @@ export class MultiPageAgent extends PageAgentCore {
 			customSystemPrompt: SYSTEM_PROMPT,
 
 			onBeforeTask: async (agent) => {
-				await tabsController.init(agent.taskId)
+				await tabsController.init(agent.task)
 
 				await chrome.storage.local.set({
 					isAgentRunning: true,

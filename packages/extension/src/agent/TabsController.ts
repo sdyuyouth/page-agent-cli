@@ -4,16 +4,16 @@
  * - no chrome apis. call sw for tab operations
  */
 export class TabsController {
-	tabs: TabMeta[] = []
 	currentTabId: number | null = null
 
-	initialTabId: number | null = null
+	private tabs: TabMeta[] = []
+	private initialTabId: number | null = null
 	private tabGroupId: number | null = null
-	private taskId: string = ''
+	private task: string = ''
 	private windowId: number | null = null
 
-	async init(taskId: string) {
-		this.taskId = taskId
+	async init(task: string) {
+		this.task = task
 		this.tabs = []
 		this.currentTabId = null
 		this.tabGroupId = null
@@ -84,7 +84,7 @@ export class TabsController {
 				payload: {
 					groupId: this.tabGroupId,
 					properties: {
-						title: `Task(${this.taskId.slice(0, 8)})`,
+						title: `PageAgent(${this.task})`,
 						color: randomColor(),
 						collapsed: false,
 					},
