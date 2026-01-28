@@ -82,7 +82,8 @@ export function useAgent(): UseAgentResult {
 
 	const execute = useCallback(async (task: string) => {
 		const agent = agentRef.current
-		if (!agent) return
+		console.log('Fire task:', task, agent)
+		if (!agent) throw new Error('Agent not initialized')
 
 		setCurrentTask(task)
 		setHistory([])

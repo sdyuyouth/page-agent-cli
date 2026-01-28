@@ -16,7 +16,7 @@ import { EmptyState, Logo, StatusDot } from './components/misc'
 
 export default function App() {
 	const [showConfig, setShowConfig] = useState(false)
-	const [task, setTask] = useState('')
+	const [inputValue, setInputValue] = useState('')
 	const historyRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -32,17 +32,16 @@ export default function App() {
 	const handleSubmit = useCallback(
 		(e?: React.FormEvent) => {
 			e?.preventDefault()
-			if (!task.trim() || status === 'running') return
+			if (!inputValue.trim() || status === 'running') return
 
-			const taskToExecute = task.trim()
-			setTask('')
+			const taskToExecute = inputValue.trim()
+			setInputValue('')
 
-			console.log('[SidePanel] Executing task:', taskToExecute)
 			execute(taskToExecute).catch((error) => {
 				console.error('[SidePanel] Failed to execute task:', error)
 			})
 		},
-		[task, status, execute]
+		[inputValue, status, execute]
 	)
 
 	const handleStop = useCallback(() => {
@@ -120,8 +119,8 @@ export default function App() {
 					<InputGroupTextarea
 						ref={textareaRef}
 						placeholder="Describe your task... (Enter to send)"
-						value={task}
-						onChange={(e) => setTask(e.target.value)}
+						value={inputValue}
+						onChange={(e) => setInputValue(e.target.value)}
 						onKeyDown={handleKeyDown}
 						disabled={isRunning}
 						className="text-xs pr-12 min-h-10"
@@ -141,7 +140,7 @@ export default function App() {
 								size="icon-sm"
 								variant="default"
 								onClick={() => handleSubmit()}
-								disabled={!task.trim()}
+								disabled={!inputValue.trim()}
 								className="size-7"
 							>
 								<Send className="size-3" />
