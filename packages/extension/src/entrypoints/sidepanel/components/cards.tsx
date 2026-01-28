@@ -8,8 +8,6 @@ import type {
 } from '@page-agent/core'
 import {
 	CheckCircle,
-	ChevronDown,
-	ChevronRight,
 	Eye,
 	Globe,
 	Keyboard,
@@ -125,27 +123,96 @@ function ActionIcon({ name, className }: { name: string; className?: string }) {
 	return icons[name] || <Zap className={className} />
 }
 
-// Raw response section (collapsible, for debugging)
-function RawResponseSection({ rawResponse }: { rawResponse: unknown }) {
-	const [expanded, setExpanded] = useState(false)
+// Copy button with "Copied!" feedback
+function CopyButton({ text, label }: { text: string; label: string }) {
+	const [copied, setCopied] = useState(false)
+
+	return (
+		<button
+			type="button"
+			onClick={() => {
+				navigator.clipboard.writeText(text)
+				setCopied(true)
+				setTimeout(() => setCopied(false), 1500)
+			}}
+			className="text-[9px] text-muted-foreground hover:text-foreground transition-colors border px-1 rounded shrink-0 cursor-pointer backdrop-blur-xs"
+		>
+			{copied ? 'Copied!' : label}
+		</button>
+	)
+}
+
+// Extract message content by role from raw request
+function extractPrompt(rawRequest: unknown, role: 'system' | 'user'): string | null {
+	const messages = (rawRequest as { messages?: { role: string; content?: unknown }[] })?.messages
+	if (!messages) return null
+	const msg =
+		role === 'system'
+			? messages.find((m) => m.role === role)
+			: messages.findLast((m) => m.role === role)
+	if (!msg?.content) return null
+	return typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content, null, 2)
+}
+
+// Raw request/response section (collapsible tabs, for debugging)
+function RawSection({ rawRequest, rawResponse }: { rawRequest?: unknown; rawResponse?: unknown }) {
+	const [activeTab, setActiveTab] = useState<'request' | 'response' | null>(null)
+
+	if (!rawRequest && !rawResponse) return null
+
+	const handleTabClick = (tab: 'request' | 'response') => {
+		setActiveTab(activeTab === tab ? null : tab)
+	}
+
+	const content =
+		activeTab === 'request' ? rawRequest : activeTab === 'response' ? rawResponse : null
+
+	const systemPrompt = activeTab === 'request' ? extractPrompt(rawRequest, 'system') : null
+	const userPrompt = activeTab === 'request' ? extractPrompt(rawRequest, 'user') : null
 
 	return (
 		<div className="mt-2 border-t border-dashed pt-2">
-			<button
-				type="button"
-				onClick={() => setExpanded(!expanded)}
-				className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-			>
-				{expanded ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
-				<span>Raw Response</span>
-			</button>
-			{expanded && (
-				<pre
-					className="mt-1.5 p-2 text-[10px] bg-muted/50 rounded overflow-x-auto max-h-60 overflow-y-auto select-all"
-					style={{ userSelect: 'all' }}
-				>
-					{JSON.stringify(rawResponse, null, 4)}
-				</pre>
+			<div className="flex items-center gap-3 -my-1">
+				{rawRequest != null && (
+					<button
+						type="button"
+						onClick={() => handleTabClick('request')}
+						className={cn(
+							'text-[10px] mt-0.5 transition-colors border-b cursor-pointer',
+							activeTab === 'request'
+								? 'text-foreground border-foreground'
+								: 'text-muted-foreground border-transparent hover:text-foreground'
+						)}
+					>
+						Raw Request
+					</button>
+				)}
+				{rawResponse != null && (
+					<button
+						type="button"
+						onClick={() => handleTabClick('response')}
+						className={cn(
+							'text-[10px] mt-0.5 transition-colors border-b cursor-pointer',
+							activeTab === 'response'
+								? 'text-foreground border-foreground'
+								: 'text-muted-foreground border-transparent hover:text-foreground'
+						)}
+					>
+						Raw Response
+					</button>
+				)}
+			</div>
+			{content != null && (
+				<div className="relative mt-1.5">
+					<div className="absolute top-1 right-1 flex gap-1">
+						{systemPrompt && <CopyButton text={systemPrompt} label="Copy System" />}
+						{userPrompt && <CopyButton text={userPrompt} label="Copy User" />}
+						<CopyButton text={JSON.stringify(content, null, 4)} label="Copy" />
+					</div>
+					<pre className="p-2 pt-5 text-[10px] text-foreground/70 bg-muted rounded overflow-x-auto max-h-60 overflow-y-auto">
+						{JSON.stringify(content, null, 4)}
+					</pre>
+				</div>
 			)}
 		</div>
 	)
@@ -173,7 +240,7 @@ function StepCard({ event }: { event: AgentStepEvent }) {
 							className="size-3.5 text-blue-500 shrink-0 mt-0.5"
 						/>
 						<div className="flex-1 min-w-0">
-							<p className="text-xs text-foreground/80 mb-0.5">
+							<p className="text-xs text-foreground/80 mb-0.5 wrap-anywhere break-all line-clamp-1 hover:line-clamp-none">
 								<span className="font-medium text-foreground/70">{event.action.name}</span>
 								{event.action.name !== 'done' && (
 									<span className="text-muted-foreground/70 ml-1.5">
@@ -181,14 +248,19 @@ function StepCard({ event }: { event: AgentStepEvent }) {
 									</span>
 								)}
 							</p>
-							<p className="text-[11px] text-muted-foreground/70">└ {event.action.output}</p>
+							<p className="text-[11px] text-muted-foreground/70 grid grid-cols-[auto_1fr] gap-1.5">
+								<div className="">└</div>
+								<div className="wrap-anywhere break-all line-clamp-1 hover:line-clamp-3">
+									{event.action.output}
+								</div>
+							</p>
 						</div>
 					</div>
 				</div>
 			)}
 
 			{/* Raw Response */}
-			{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
+			<RawSection rawRequest={event.rawRequest} rawResponse={event.rawResponse} />
 		</div>
 	)
 }
@@ -227,7 +299,7 @@ function ErrorCard({ event }: { event: AgentErrorEvent }) {
 				<XCircle className="size-3 text-destructive shrink-0 mt-0.5" />
 				<span className="text-xs text-destructive">{event.message}</span>
 			</div>
-			{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
+			<RawSection rawResponse={event.rawResponse} />
 		</div>
 	)
 }
@@ -244,7 +316,7 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 					success={input?.success ?? true}
 					text={input?.text || event.action.output || ''}
 				>
-					{!event.rawResponse || <RawResponseSection rawResponse={event.rawResponse as any} />}
+					<RawSection rawRequest={event.rawRequest} rawResponse={event.rawResponse} />
 				</ResultCard>
 			</>
 		)

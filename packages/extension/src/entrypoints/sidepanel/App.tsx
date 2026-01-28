@@ -105,6 +105,7 @@ export default function App() {
 					{showEmptyState && <EmptyState />}
 
 					{history.map((event, index) => (
+						// eslint-disable-next-line react-x/no-array-index-key
 						<EventCard key={index} event={event} />
 					))}
 
