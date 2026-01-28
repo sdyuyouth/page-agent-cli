@@ -44,6 +44,12 @@ export default defineConfig({
 		action: {
 			default_title: 'Open Page Agent',
 		},
+		web_accessible_resources: [
+			{
+				resources: ['main-world.js'],
+				matches: ['*://*/*'],
+			},
+		],
 		side_panel: {
 			default_path: 'sidepanel/index.html',
 		},

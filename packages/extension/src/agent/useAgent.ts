@@ -5,9 +5,8 @@ import type { AgentActivity, AgentStatus, HistoricalEvent } from '@page-agent/co
 import type { LLMConfig } from '@page-agent/llms'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
-
 import { MultiPageAgent } from './MultiPageAgent'
+import { DEMO_CONFIG } from './constants'
 
 export interface UseAgentResult {
 	status: AgentStatus
@@ -18,12 +17,6 @@ export interface UseAgentResult {
 	execute: (task: string) => Promise<void>
 	stop: () => void
 	configure: (config: LLMConfig) => Promise<void>
-}
-
-const DEMO_CONFIG: LLMConfig = {
-	apiKey: DEMO_API_KEY,
-	baseURL: DEMO_BASE_URL,
-	model: DEMO_MODEL,
 }
 
 export function useAgent(): UseAgentResult {

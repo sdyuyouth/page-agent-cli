@@ -1,5 +1,5 @@
 import type { LLMConfig } from '@page-agent/llms'
-import { Loader2 } from 'lucide-react'
+import { Copy, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
@@ -17,6 +17,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
 	const [saving, setSaving] = useState(false)
+	const [userAuthToken, setUserAuthToken] = useState<string>('')
+	const [copied, setCopied] = useState(false)
 
 	// Update local state when config prop changes
 	useEffect(() => {
@@ -24,6 +26,38 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		setBaseURL(config?.baseURL || DEMO_BASE_URL)
 		setModel(config?.model || DEMO_MODEL)
 	}, [config])
+
+	// Poll for user auth token every second until found
+	useEffect(() => {
+		let interval: NodeJS.Timeout | null = null
+
+		const fetchToken = async () => {
+			const result = await chrome.storage.local.get('PageAgentExtUserAuthID')
+			const token = result.PageAgentExtUserAuthID
+			if (typeof token === 'string' && token) {
+				setUserAuthToken(token)
+				if (interval) {
+					clearInterval(interval)
+					interval = null
+				}
+			}
+		}
+
+		fetchToken()
+		interval = setInterval(fetchToken, 1000)
+
+		return () => {
+			if (interval) clearInterval(interval)
+		}
+	}, [])
+
+	const handleCopyToken = async () => {
+		if (userAuthToken) {
+			await navigator.clipboard.writeText(userAuthToken)
+			setCopied(true)
+			setTimeout(() => setCopied(false), 2000)
+		}
+	}
 
 	const handleSave = async () => {
 		setSaving(true)
@@ -37,6 +71,30 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	return (
 		<div className="flex flex-col gap-4 p-4">
 			<h2 className="text-base font-semibold">Settings</h2>
+
+			{/* User Auth Token Section */}
+			<div className="flex flex-col gap-1.5 p-3 bg-muted/50 rounded-md border">
+				<label className="text-xs font-medium text-muted-foreground">User Auth Token</label>
+				<p className="text-[10px] text-muted-foreground mb-1">
+					Add this token to a website's localStorage to give it authorization to call this extension
+				</p>
+				<div className="flex gap-2 items-center">
+					<Input
+						readOnly
+						value={userAuthToken || 'Loading...'}
+						className="text-xs h-8 font-mono bg-background"
+					/>
+					<Button
+						variant="outline"
+						size="icon"
+						className="h-8 w-8 shrink-0 cursor-pointer"
+						onClick={handleCopyToken}
+						disabled={!userAuthToken}
+					>
+						{copied ? <span className="">✓</span> : <Copy className="size-3" />}
+					</Button>
+				</div>
+			</div>
 
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Base URL</label>

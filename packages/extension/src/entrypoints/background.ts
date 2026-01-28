@@ -19,5 +19,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 export default defineBackground(() => {
 	console.log('[Background] Service Worker started')
 
+	chrome.storage.local.get('PageAgentExtUserAuthToken').then((result) => {
+		if (result.PageAgentExtUserAuthToken) return
+
+		const userAuthToken = crypto.randomUUID()
+		chrome.storage.local.set({ PageAgentExtUserAuthToken: userAuthToken })
+	})
+
 	chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {})
 })
