@@ -572,12 +572,10 @@ export class PageAgentCore extends EventTarget {
 		}
 
 		return trimLines(`<browser_state>
-			Current Page: [${state.title}](${state.url})
-
 			${state.header}
 			${content}
 			${state.footer}
-
+			
 			</browser_state>
 		`)
 	}

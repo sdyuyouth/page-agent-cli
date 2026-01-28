@@ -137,6 +137,8 @@ export class PageController extends EventTarget {
 		const content = this.simplifiedHTML
 
 		// Build header: page info + scroll position hint
+		const titleLine = `Current Page: [${title}](${url})`
+
 		const pageInfoLine = `Page info: ${pi.viewport_width}x${pi.viewport_height}px viewport, ${pi.page_width}x${pi.page_height}px total page size, ${pi.pages_above.toFixed(1)} pages above, ${pi.pages_below.toFixed(1)} pages below, ${pi.total_pages.toFixed(1)} total pages, at ${(pi.current_page_position * 100).toFixed(0)}% of page`
 
 		const elementsLabel =
@@ -150,7 +152,7 @@ export class PageController extends EventTarget {
 				? `... ${pi.pixels_above} pixels above (${pi.pages_above.toFixed(1)} pages) - scroll to see more ...`
 				: '[Start of page]'
 
-		const header = `${pageInfoLine}\n\n${elementsLabel}\n\n${scrollHintAbove}`
+		const header = `${titleLine}\n${pageInfoLine}\n\n${elementsLabel}\n\n${scrollHintAbove}`
 
 		// Build footer: scroll position hint
 		const hasContentBelow = pi.pixels_below > 4
