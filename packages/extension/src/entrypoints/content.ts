@@ -13,13 +13,22 @@ export default defineContentScript({
 
 		// if auth token matches, expose agent to page
 		chrome.storage.local.get('PageAgentExtUserAuthToken').then((result) => {
-			if (!result.PageAgentExtUserAuthToken) return
-			if (!localStorage.getItem('PageAgentExtUserAuthToken')) return
-			if (localStorage.getItem('PageAgentExtUserAuthToken') !== result.PageAgentExtUserAuthToken)
-				return
+			// extension side token.
+			// @note this is isolated world. it is safe to assume user script cannot access it
+			const extToken = result.PageAgentExtUserAuthToken
+			if (!extToken) return
 
-			exposeAgentToPage()
-			injectScript('/main-world.js')
+			// page side token
+			const pageToken = localStorage.getItem('PageAgentExtUserAuthToken')
+			if (!pageToken) return
+
+			if (pageToken !== extToken) return
+
+			// add isolated world script
+			exposeAgentToPage().then(
+				// add main-world script
+				() => injectScript('/main-world.js')
+			)
 		})
 	},
 })
@@ -42,18 +51,45 @@ async function exposeAgentToPage() {
 
 		switch (action) {
 			case 'execute': {
-				if (!multiPageAgent) multiPageAgent = new MultiPageAgent(DEMO_CONFIG)
+				if (multiPageAgent && multiPageAgent.status === 'running') {
+					window.postMessage(
+						{
+							channel: 'PAGE_AGENT_EXT_RESPONSE',
+							id,
+							action: 'execute_result',
+							error: 'Agent is already running a task. Please wait until it finishes.',
+						},
+						'*'
+					)
+					return
+				}
 
-				const result = await multiPageAgent.execute(payload)
-				window.postMessage(
-					{
-						channel: 'PAGE_AGENT_EXT_RESPONSE',
-						id,
-						action: 'execute_result',
-						payload: result,
-					},
-					'*'
-				)
+				try {
+					multiPageAgent = new MultiPageAgent(DEMO_CONFIG)
+
+					const result = await multiPageAgent.execute(payload)
+
+					window.postMessage(
+						{
+							channel: 'PAGE_AGENT_EXT_RESPONSE',
+							id,
+							action: 'execute_result',
+							payload: result,
+						},
+						'*'
+					)
+				} catch (error) {
+					window.postMessage(
+						{
+							channel: 'PAGE_AGENT_EXT_RESPONSE',
+							id,
+							action: 'execute_result',
+							error: (error as Error).message,
+						},
+						'*'
+					)
+				}
+
 				break
 			}
 

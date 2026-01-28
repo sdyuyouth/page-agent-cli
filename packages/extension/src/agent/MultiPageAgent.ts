@@ -35,6 +35,9 @@ export class MultiPageAgent extends PageAgentCore {
 				chrome.storage.local.set({
 					isAgentRunning: false,
 				})
+
+				// no need to dispose tabsController and pageController
+				// as they do not keep references
 			},
 		})
 	}

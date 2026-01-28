@@ -10,7 +10,7 @@ export default defineUnlistedScript(() => {
 	w.execute = async (task: string) => {
 		const id = getId()
 
-		const promise = new Promise((resolve) => {
+		const promise = new Promise((resolve, reject) => {
 			function handleMessage(e: MessageEvent) {
 				const data = e.data
 				if (typeof data !== 'object' || data === null) return
@@ -19,7 +19,12 @@ export default defineUnlistedScript(() => {
 				if (data.id !== id) return
 
 				window.removeEventListener('message', handleMessage)
-				resolve(data.payload)
+
+				if (data.error) {
+					reject(new Error(data.error))
+				} else {
+					resolve(data.payload)
+				}
 			}
 
 			window.addEventListener('message', handleMessage)
