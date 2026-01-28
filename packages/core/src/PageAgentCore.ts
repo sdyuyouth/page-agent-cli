@@ -53,7 +53,6 @@ export class PageAgentCore extends EventTarget {
 	config: PageAgentConfig & { maxSteps: number }
 	id = uid()
 	tools: typeof tools
-	disposed = false
 	task = ''
 	taskId = ''
 
@@ -582,7 +581,6 @@ export class PageAgentCore extends EventTarget {
 
 	dispose() {
 		console.log('Disposing PageAgent...')
-		this.disposed = true
 		this.pageController.dispose()
 		// this.history = []
 		this.#abortController.abort()
