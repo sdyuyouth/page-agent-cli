@@ -65,7 +65,7 @@ export class RemotePageController {
 		}
 
 		const sum = await this.tabsController.summarizeTabs()
-		browserState.header = sum + '\n' + (browserState.header || '')
+		browserState.header = sum + '\n\n' + (browserState.header || '')
 
 		return browserState
 	}

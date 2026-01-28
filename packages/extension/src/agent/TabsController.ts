@@ -185,10 +185,12 @@ export class TabsController {
 	}
 
 	async summarizeTabs(): Promise<string> {
-		const summaries = [`| Tab ID | URL | Title |`, `|--------|-----|-------|`]
+		const summaries = [`| Tab ID | URL | Title | Current |`, `|-----|-----|-----|-----|`]
 		for (const tab of this.tabs) {
 			const { title, url } = await this.getTabInfo(tab.id)
-			summaries.push(`| ${tab.id} | ${url} | ${title} |`)
+			summaries.push(
+				`| ${tab.id} | ${url} | ${title} | ${this.currentTabId === tab.id ? '✅' : ''} |`
+			)
 		}
 		return summaries.join('\n')
 	}
