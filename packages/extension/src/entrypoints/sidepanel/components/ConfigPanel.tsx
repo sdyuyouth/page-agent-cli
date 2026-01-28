@@ -32,8 +32,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		let interval: NodeJS.Timeout | null = null
 
 		const fetchToken = async () => {
-			const result = await chrome.storage.local.get('PageAgentExtUserAuthID')
-			const token = result.PageAgentExtUserAuthID
+			const result = await chrome.storage.local.get('PageAgentExtUserAuthToken')
+			const token = result.PageAgentExtUserAuthToken
 			if (typeof token === 'string' && token) {
 				setUserAuthToken(token)
 				if (interval) {

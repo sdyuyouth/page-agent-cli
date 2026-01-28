@@ -41,12 +41,13 @@ export function initPageController() {
 			// await getPC().hideMask()
 			if (pageController) {
 				pageController.hideMask()
+				pageController.cleanUpHighlights()
 			}
 		}
 
 		if (!isAgentRunning) {
 			if (pageController) {
-				pageController?.dispose()
+				pageController.dispose()
 				pageController = null
 			}
 		}

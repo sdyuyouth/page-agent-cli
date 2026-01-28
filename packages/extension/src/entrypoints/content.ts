@@ -24,6 +24,8 @@ export default defineContentScript({
 
 			if (pageToken !== extToken) return
 
+			console.log('[PageAgentExt]: Auth tokens match. Exposing agent to page.')
+
 			// add isolated world script
 			exposeAgentToPage().then(
 				// add main-world script
@@ -35,7 +37,7 @@ export default defineContentScript({
 
 async function exposeAgentToPage() {
 	const { MultiPageAgent } = await import('@/agent/MultiPageAgent')
-	console.log('MultiPageAgent loaded', MultiPageAgent)
+	console.log('[PageAgentExt]: MultiPageAgent loaded')
 
 	/**
 	 * singleton MultiPageAgent to handle requests from the page
