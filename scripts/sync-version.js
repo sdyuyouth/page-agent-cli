@@ -78,8 +78,11 @@ for (const pkg of packages) {
 	const pkgJson = JSON.parse(readFileSync(pkgPath, 'utf-8'))
 	let pkgChanged = false
 
-	// Update package version
-	if (pkgJson.version !== newVersion) {
+	// Skip extension package version (it has its own versioning)
+	const isExtension = pkg === 'extension'
+
+	// Update package version (skip extension)
+	if (!isExtension && pkgJson.version !== newVersion) {
 		pkgJson.version = newVersion
 		pkgChanged = true
 	}
