@@ -2,10 +2,10 @@
  * React hook for using AgentController
  */
 import type { AgentActivity, AgentStatus, HistoricalEvent } from '@page-agent/core'
+import type { LLMConfig } from '@page-agent/llms'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { LLMConfig } from '@/utils'
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/utils/constants'
+import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
 
 import { MultiPageAgent } from './MultiPageAgent'
 

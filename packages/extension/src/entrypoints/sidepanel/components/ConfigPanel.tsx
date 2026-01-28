@@ -1,10 +1,10 @@
+import type { LLMConfig } from '@page-agent/llms'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import type { LLMConfig } from '@/utils'
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/utils/constants'
 
 interface ConfigPanelProps {
 	config: LLMConfig | null

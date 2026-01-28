@@ -1,8 +1,8 @@
-import { PageAgentConfig, PageAgentCore } from '@page-agent/core'
+import { type PageAgentConfig, PageAgentCore } from '@page-agent/core'
 
-import SYSTEM_PROMPT from '../prompts/system_prompt.md?raw'
 import { RemotePageController } from './RemotePageController'
 import { TabsController } from './TabsController'
+import SYSTEM_PROMPT from './system_prompt.md?raw'
 import { createTabTools } from './tabTools'
 
 export class MultiPageAgent extends PageAgentCore {

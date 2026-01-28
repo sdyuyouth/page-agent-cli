@@ -1,8 +1,6 @@
-import type { BrowserState, PageController } from '@page-agent/page-controller'
+import type { BrowserState } from '@page-agent/page-controller'
 
-import { isContentScriptAllowed } from '@/utils'
-
-import { TabsController } from './TabsController'
+import type { TabsController } from './TabsController'
 
 /**
  * Agent side page controller.
@@ -167,4 +165,26 @@ export class RemotePageController {
 interface DomActionReturn {
 	success: boolean
 	message: string
+}
+
+/**
+ * Check if a URL can run content scripts.
+ */
+export function isContentScriptAllowed(url: string | undefined): boolean {
+	if (!url) return false
+
+	const restrictedPatterns = [
+		/^chrome:\/\//,
+		/^chrome-extension:\/\//,
+		/^about:/,
+		/^edge:\/\//,
+		/^brave:\/\//,
+		/^opera:\/\//,
+		/^vivaldi:\/\//,
+		/^file:\/\//,
+		/^view-source:/,
+		/^devtools:\/\//,
+	]
+
+	return !restrictedPatterns.some((pattern) => pattern.test(url))
 }
