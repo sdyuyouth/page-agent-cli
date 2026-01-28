@@ -39,6 +39,8 @@ export class OpenAIClient implements LLMClient {
 				: 'required',
 		}
 
+		modelPatch(requestBody)
+
 		// 2. Call API
 		let response: Response
 		try {
@@ -48,7 +50,7 @@ export class OpenAIClient implements LLMClient {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${this.config.apiKey}`,
 				},
-				body: JSON.stringify(modelPatch(requestBody)),
+				body: JSON.stringify(requestBody),
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
@@ -216,6 +218,7 @@ export class OpenAIClient implements LLMClient {
 				reasoningTokens: data.usage?.completion_tokens_details?.reasoning_tokens,
 			},
 			rawResponse: data,
+			rawRequest: requestBody,
 		}
 	}
 }

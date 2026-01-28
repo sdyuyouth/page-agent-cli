@@ -81,6 +81,7 @@ export interface InvokeResult<TResult = unknown> {
 		reasoningTokens?: number // OpenAI o1 series reasoning tokens
 	}
 	rawResponse?: unknown // Raw response for debugging
+	rawRequest?: unknown // Raw request for debugging
 }
 
 /**

@@ -227,24 +227,21 @@ export class PageAgentCore extends EventTarget {
 				console.log(chalk.blue('Thinking...'))
 				this.emitActivity({ type: 'thinking' })
 
-				const result = await this.#llm.invoke(
-					[
-						{
-							role: 'system',
-							content: this.#getSystemPrompt(),
-						},
-						{
-							role: 'user',
-							content: await this.#assembleUserPrompt(),
-						},
-					],
-					{ AgentOutput: this.#packMacroTool() },
-					this.#abortController.signal,
-					{
-						toolChoiceName: 'AgentOutput',
-						normalizeResponse,
-					}
-				)
+				// invoke LLM
+
+				const messages = [
+					{ role: 'system' as const, content: this.#getSystemPrompt() },
+					{ role: 'user' as const, content: await this.#assembleUserPrompt() },
+				]
+
+				const tools = { AgentOutput: this.#packMacroTool() }
+
+				const result = await this.#llm.invoke(messages, tools, this.#abortController.signal, {
+					toolChoiceName: 'AgentOutput',
+					normalizeResponse,
+				})
+
+				// assemble history event
 
 				const macroResult = result.toolResult as MacroToolResult
 				const input = macroResult.input
@@ -268,8 +265,11 @@ export class PageAgentCore extends EventTarget {
 					action,
 					usage: result.usage,
 					rawResponse: result.rawResponse,
+					rawRequest: result.rawRequest,
 				} as AgentStepEvent)
 				this.#emitHistoryChange()
+
+				//
 
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
@@ -278,7 +278,7 @@ export class PageAgentCore extends EventTarget {
 
 				step++
 				if (step > this.config.maxSteps) {
-					this.#onDone('Step count exceeded maximum limit', false)
+					this.#onDone(false)
 					const result: ExecutionResult = {
 						success: false,
 						data: 'Step count exceeded maximum limit',
@@ -291,7 +291,7 @@ export class PageAgentCore extends EventTarget {
 					const success = action.input?.success ?? false
 					const text = action.input?.text || 'no text provided'
 					console.log(chalk.green.bold('Task completed'), success, text)
-					this.#onDone(text, success)
+					this.#onDone(success)
 					const result: ExecutionResult = {
 						success,
 						data: text,
@@ -305,7 +305,7 @@ export class PageAgentCore extends EventTarget {
 			console.error('Task failed', error)
 			const errorMessage = String(error)
 			this.emitActivity({ type: 'error', message: errorMessage })
-			this.#onDone(errorMessage, false)
+			this.#onDone(false)
 			const result: ExecutionResult = {
 				success: false,
 				data: errorMessage,
@@ -556,7 +556,7 @@ export class PageAgentCore extends EventTarget {
 		return trimLines(prompt)
 	}
 
-	#onDone(text: string, success = true) {
+	#onDone(success = true) {
 		this.pageController.cleanUpHighlights()
 		this.pageController.hideMask() // No await - fire and forget
 		this.#setStatus(success ? 'completed' : 'error')

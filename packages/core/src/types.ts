@@ -51,6 +51,8 @@ export interface AgentStepEvent {
 	}
 	/** Raw LLM response for debugging */
 	rawResponse?: unknown
+	/** Raw LLM request for debugging */
+	rawRequest?: unknown
 }
 
 /**

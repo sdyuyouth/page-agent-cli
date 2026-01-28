@@ -27,6 +27,7 @@ export function zodToOpenAITool(name: string, tool: Tool) {
 
 /**
  * Patch model specific parameters
+ * @note in-place modification
  */
 export function modelPatch(body: Record<string, any>) {
 	const model: string = body.model || ''
