@@ -1,3 +1,5 @@
+import type { LLMConfig } from '@page-agent/llms'
+
 export default defineUnlistedScript(() => {
 	const w = window as any
 
@@ -7,7 +9,14 @@ export default defineUnlistedScript(() => {
 		return _lastId
 	}
 
-	w.execute = async (task: string) => {
+	w.execute = async (task: string, llmConfig: LLMConfig) => {
+		if (typeof task !== 'string') throw new Error('Task must be a string')
+		if (task.trim().length === 0) throw new Error('Task cannot be empty')
+		if (!llmConfig) throw new Error('LLM config is required')
+		if (!llmConfig.baseURL) throw new Error('LLM config must have a baseURL')
+		if (!llmConfig.apiKey) throw new Error('LLM config must have an apiKey')
+		if (!llmConfig.model) throw new Error('LLM config must have a model')
+
 		const id = getId()
 
 		const promise = new Promise((resolve, reject) => {
@@ -35,7 +44,7 @@ export default defineUnlistedScript(() => {
 				channel: 'PAGE_AGENT_EXT_REQUEST',
 				id,
 				action: 'execute',
-				payload: task,
+				payload: { task, llmConfig },
 			},
 			'*'
 		)

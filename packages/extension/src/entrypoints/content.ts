@@ -1,5 +1,6 @@
 import { initPageController } from '@/agent/RemotePageController.content'
-import { DEMO_CONFIG } from '@/agent/constants'
+
+// import { DEMO_CONFIG } from '@/agent/constants'
 
 const DEBUG_PREFIX = '[Content]'
 
@@ -67,9 +68,11 @@ async function exposeAgentToPage() {
 				}
 
 				try {
-					multiPageAgent = new MultiPageAgent(DEMO_CONFIG)
+					const { task, llmConfig } = payload
 
-					const result = await multiPageAgent.execute(payload)
+					multiPageAgent = new MultiPageAgent(llmConfig)
+
+					const result = await multiPageAgent.execute(task)
 
 					window.postMessage(
 						{
