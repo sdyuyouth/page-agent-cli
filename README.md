@@ -28,7 +28,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 And 😉
 
-- **🧪 `cross-page` control with an experimental chrome extension** - `-b feat/ext`
+- **🧪 `cross-page` control with an experimental chrome extension** - `packages/extension`
 
 👉 [**🗺️ Roadmap**](https://github.com/alibaba/page-agent/issues/96)
 

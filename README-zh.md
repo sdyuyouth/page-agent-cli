@@ -28,7 +28,7 @@
 
 以及 😉
 
-- **🧪 实验性的 Chrome 扩展，支持跨页面控制** - `-b feat/ext`
+- **🧪 实验性的 Chrome 扩展，支持跨页面控制** - `packages/extension`
 
 👉 [**🗺️ Roadmap**](https://github.com/alibaba/page-agent/issues/96)
 
