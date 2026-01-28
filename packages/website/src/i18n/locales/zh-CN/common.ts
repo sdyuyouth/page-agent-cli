@@ -31,6 +31,7 @@ export default {
 		custom_tools: '自定义工具',
 		knowledge_injection: '知识注入',
 		data_masking: '数据脱敏',
+		chrome_extension: 'Chrome 扩展',
 		cdn_setup: 'CDN 引入',
 		best_practices: '最佳实践',
 		third_party_agent: '接入第三方 Agent',

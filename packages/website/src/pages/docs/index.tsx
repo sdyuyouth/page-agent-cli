@@ -6,8 +6,9 @@ import DocsLayout from './Layout'
 import PageAgentCoreDocs from './advanced/page-agent-core/page'
 // Advanced
 import PageAgentDocs from './advanced/page-agent/page'
-import Instructions from './features/custom-instructions/page'
 // Features
+import ChromeExtension from './features/chrome-extension/page'
+import Instructions from './features/custom-instructions/page'
 import CustomTools from './features/custom-tools/page'
 import DataMasking from './features/data-masking/page'
 import Models from './features/models/page'
@@ -71,6 +72,11 @@ export default function DocsRouter() {
 			<Route path="/features/models">
 				<DocsPage>
 					<Models />
+				</DocsPage>
+			</Route>
+			<Route path="/features/chrome-extension">
+				<DocsPage>
+					<ChromeExtension />
 				</DocsPage>
 			</Route>
 

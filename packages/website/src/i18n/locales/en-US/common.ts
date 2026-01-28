@@ -32,6 +32,7 @@ export default {
 		custom_tools: 'Custom Tools',
 		knowledge_injection: 'Instructions',
 		data_masking: 'Data Masking',
+		chrome_extension: 'Chrome Extension',
 		cdn_setup: 'CDN Setup',
 		best_practices: 'Best Practices',
 		third_party_agent: 'Third-party Agent',
