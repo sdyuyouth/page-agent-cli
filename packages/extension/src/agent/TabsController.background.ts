@@ -8,11 +8,6 @@ export function handleTabControlMessage(
 	sender: chrome.runtime.MessageSender,
 	sendResponse: (response: unknown) => void
 ): boolean {
-	if (message.type !== 'TAB_CONTROL') {
-		sendResponse({ error: 'Invalid message type' })
-		return false
-	}
-
 	const { action, payload } = message
 
 	switch (action as TabAction) {
