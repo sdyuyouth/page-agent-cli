@@ -3,7 +3,7 @@
  * - live in the agent env (extension page or content script)
  * - no chrome apis. call sw for tab operations
  */
-export class TabsController {
+export class TabsController extends EventTarget {
 	currentTabId: number | null = null
 
 	private tabs: TabMeta[] = []
@@ -38,6 +38,42 @@ export class TabsController {
 		}
 
 		await this.updateCurrentTabId(this.currentTabId)
+
+		const tabChangeHandler = (message: any) => {
+			if (message.type !== 'TAB_CHANGE')
+				throw new Error(`[TabsController]: Invalid message type: ${message.type}`)
+
+			if (message.action === 'created') {
+				const tab = message.payload.tab as chrome.tabs.Tab
+				if (tab.groupId === this.tabGroupId && tab.id != null) {
+					// Tab created in our controlled group
+					if (!this.tabs.find((t) => t.id === tab.id)) {
+						this.tabs.push({ id: tab.id, isInitial: false })
+					}
+					this.switchToTab(tab.id)
+				}
+			} else if (message.action === 'removed') {
+				const { tabId } = message.payload as { tabId: number }
+				const targetTab = this.tabs.find((t) => t.id === tabId)
+				if (targetTab) {
+					this.tabs = this.tabs.filter((t) => t.id !== tabId)
+					if (this.currentTabId === tabId) {
+						const newCurrentTab = this.tabs[this.tabs.length - 1] || null
+						if (newCurrentTab) {
+							this.switchToTab(newCurrentTab.id)
+						} else {
+							this.updateCurrentTabId(null)
+						}
+					}
+				}
+			}
+		}
+
+		chrome.runtime.onMessage.addListener(tabChangeHandler)
+
+		this.addEventListener('dispose', () => {
+			chrome.runtime.onMessage.removeListener(tabChangeHandler)
+		})
 	}
 
 	async openNewTab(url: string): Promise<{ success: boolean; tabId: number; message: string }> {
@@ -193,6 +229,10 @@ export class TabsController {
 			)
 		}
 		return summaries.join('\n')
+	}
+
+	dispose() {
+		this.dispatchEvent(new Event('dispose'))
 	}
 }
 
