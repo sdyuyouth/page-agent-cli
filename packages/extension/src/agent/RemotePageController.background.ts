@@ -3,11 +3,6 @@
  * - redirect messages from RemotePageController(Agent, extension pages) to ContentScript
  */
 
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-// 	if (message.type !== 'PAGE_CONTROL') {
-// 		return
-// 	}
-
 export function handlePageControlMessage(
 	message: { type: 'PAGE_CONTROL'; action: string; payload: any; targetTabId: number },
 	sender: chrome.runtime.MessageSender,

@@ -7,9 +7,12 @@ import type { TabsController } from './TabsController'
  * - live in the agent env (extension page or content script)
  * - communicates with remote PageController via sw
  */
-
 export class RemotePageController {
-	tabsController!: TabsController
+	private tabsController: TabsController
+
+	constructor(tabsController: TabsController) {
+		this.tabsController = tabsController
+	}
 
 	get currentTabId(): number | null {
 		return this.tabsController.currentTabId
@@ -19,10 +22,6 @@ export class RemotePageController {
 		if (!this.currentTabId) return ''
 		const { url } = await this.tabsController.getTabInfo(this.currentTabId)
 		return url || ''
-	}
-
-	get currentTabUrl(): Promise<string> {
-		return this.getCurrentUrl()
 	}
 
 	async getCurrentTitle(): Promise<string> {
@@ -127,12 +126,11 @@ export class RemotePageController {
 		return this.remoteCallDomAction('execute_javascript', args)
 	}
 
-	/** @note Mask visibility is managed by content script via storage polling. */
+	/** @note Managed by content script via storage polling. */
 	async showMask(): Promise<void> {}
-	/** @note Mask visibility is managed by content script via storage polling. */
+	/** @note Managed by content script via storage polling. */
 	async hideMask(): Promise<void> {}
-
-	// dispose
+	/** @note Managed by content script via storage polling. */
 	dispose(): void {}
 
 	private async preCheck() {
@@ -160,6 +158,10 @@ export class RemotePageController {
 			payload,
 		})
 	}
+
+	private get currentTabUrl(): Promise<string> {
+		return this.getCurrentUrl()
+	}
 }
 
 interface DomActionReturn {
@@ -170,7 +172,7 @@ interface DomActionReturn {
 /**
  * Check if a URL can run content scripts.
  */
-export function isContentScriptAllowed(url: string | undefined): boolean {
+function isContentScriptAllowed(url: string | undefined): boolean {
 	if (!url) return false
 
 	const restrictedPatterns = [

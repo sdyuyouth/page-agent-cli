@@ -9,8 +9,6 @@ import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
 
 import { MultiPageAgent } from './MultiPageAgent'
 
-// import { type AgentController, type LLMConfig, getAgentController } from './old/AgentController'
-
 export interface UseAgentResult {
 	status: AgentStatus
 	history: HistoricalEvent[]

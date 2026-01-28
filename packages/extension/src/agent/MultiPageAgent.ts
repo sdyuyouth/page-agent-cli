@@ -8,8 +8,7 @@ import { createTabTools } from './tabTools'
 export class MultiPageAgent extends PageAgentCore {
 	constructor(config: Omit<PageAgentConfig, 'pageController'>) {
 		const tabsController = new TabsController()
-		const pageController = new RemotePageController()
-		pageController.tabsController = tabsController
+		const pageController = new RemotePageController(tabsController)
 		const customTools = createTabTools(tabsController)
 
 		super({
