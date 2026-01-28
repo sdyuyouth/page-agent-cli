@@ -15,8 +15,7 @@ export function initPageController() {
 
 	function getPC(): PageController {
 		if (!pageController) {
-			pageController = new PageController({ enableMask: true })
-			pageController.hideMask()
+			pageController = new PageController({ enableMask: false })
 		}
 		return pageController
 	}
@@ -35,7 +34,9 @@ export function initPageController() {
 		// })
 
 		if (shouldShowMask) {
-			await getPC().showMask()
+			const pc = getPC()
+			pc.initMask()
+			await pc.showMask()
 		} else {
 			// await getPC().hideMask()
 			if (pageController) {

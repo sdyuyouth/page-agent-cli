@@ -94,17 +94,18 @@ export class PageController extends EventTarget {
 
 		patchReact(this)
 
-		if (config.enableMask) {
-			this.maskReady = this.initMask()
-		}
+		if (config.enableMask) this.initMask()
 	}
 
 	/**
 	 * Initialize mask asynchronously (dynamic import to avoid CSS loading in Node)
 	 */
-	private async initMask(): Promise<void> {
-		const { SimulatorMask } = await import('./mask/SimulatorMask')
-		this.mask = new SimulatorMask()
+	initMask() {
+		if (this.maskReady !== null) return
+		this.maskReady = (async () => {
+			const { SimulatorMask } = await import('./mask/SimulatorMask')
+			this.mask = new SimulatorMask()
+		})()
 	}
 	// ======= State Queries =======
 
@@ -394,7 +395,7 @@ export class PageController extends EventTarget {
 
 	/**
 	 * Show the visual mask overlay.
-	 * Only works if enableMask was set to true in config.
+	 * Only works after mask is setup.
 	 */
 	async showMask(): Promise<void> {
 		await this.maskReady
@@ -403,7 +404,7 @@ export class PageController extends EventTarget {
 
 	/**
 	 * Hide the visual mask overlay.
-	 * Only works if enableMask was set to true in config.
+	 * Only works after mask is setup.
 	 */
 	async hideMask(): Promise<void> {
 		await this.maskReady
