@@ -515,7 +515,7 @@ export class PageAgentCore extends EventTarget {
 			</user_request>
 			<step_info>
 			Step ${stepCount + 1} of ${this.config.maxSteps} max possible steps
-			Current date and time: ${new Date().toISOString()}
+			Current date and time: ${new Date().toLocaleString()}
 			</step_info>
 			</agent_state>
 		`

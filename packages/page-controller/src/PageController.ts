@@ -227,7 +227,7 @@ export class PageController extends EventTarget {
 	 */
 	private assertIndexed(): void {
 		if (!this.isIndexed) {
-			throw new Error('DOM tree not indexed. Can not perform actions on elements.')
+			throw new Error('DOM tree not indexed yet. Can not perform actions on elements.')
 		}
 	}
 
