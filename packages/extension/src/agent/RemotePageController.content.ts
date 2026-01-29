@@ -21,17 +21,14 @@ export function initPageController() {
 	}
 
 	intervalID = window.setInterval(async () => {
+		const agentHeartbeat = (await chrome.storage.local.get('agentHeartbeat')).agentHeartbeat
+		const now = Date.now()
+		const agentInTouch = typeof agentHeartbeat === 'number' && now - agentHeartbeat < 2_000
+
 		const isAgentRunning = (await chrome.storage.local.get('isAgentRunning')).isAgentRunning
 		const currentTabId = (await chrome.storage.local.get('currentTabId')).currentTabId
 
-		const shouldShowMask = isAgentRunning && currentTabId === (await myTabIdPromise)
-
-		// console.log('[RemotePageController] polling:', {
-		// 	isAgentRunning,
-		// 	currentTabId,
-		// 	myTabId: await myTabIdPromise,
-		// 	shouldShowMask,
-		// })
+		const shouldShowMask = isAgentRunning && agentInTouch && currentTabId === (await myTabIdPromise)
 
 		if (shouldShowMask) {
 			const pc = getPC()
@@ -45,13 +42,13 @@ export function initPageController() {
 			}
 		}
 
-		if (!isAgentRunning) {
+		if (!isAgentRunning && agentInTouch) {
 			if (pageController) {
 				pageController.dispose()
 				pageController = null
 			}
 		}
-	}, 1_000)
+	}, 500)
 
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse): true | undefined => {
 		if (message.type !== 'PAGE_CONTROL') {

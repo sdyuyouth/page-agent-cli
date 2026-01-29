@@ -1,7 +1,7 @@
 import { handlePageControlMessage } from '@/agent/RemotePageController.background'
 import { handleTabControlMessage } from '@/agent/TabsController.background'
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse): true | undefined => {
 	if (message.type === 'TAB_CONTROL') {
 		return handleTabControlMessage(message, sender, sendResponse)
 	} else if (message.type === 'PAGE_CONTROL') {
