@@ -7,12 +7,12 @@ export function handlePageControlMessage(
 	message: { type: 'PAGE_CONTROL'; action: string; payload: any; targetTabId: number },
 	sender: chrome.runtime.MessageSender,
 	sendResponse: (response: unknown) => void
-): boolean {
+): true | undefined {
 	const { action, payload, targetTabId } = message
 
 	if (action === 'get_my_tab_id') {
 		sendResponse({ tabId: sender.tab?.id || null })
-		return false
+		return
 	}
 
 	chrome.tabs

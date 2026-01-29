@@ -249,10 +249,10 @@ function StepCard({ event }: { event: AgentStepEvent }) {
 								)}
 							</p>
 							<p className="text-[11px] text-muted-foreground/70 grid grid-cols-[auto_1fr] gap-1.5">
-								<div className="">└</div>
-								<div className="wrap-anywhere break-all line-clamp-1 hover:line-clamp-3">
+								<span className="">└</span>
+								<span className="wrap-anywhere break-all line-clamp-1 hover:line-clamp-3">
 									{event.action.output}
-								</div>
+								</span>
 							</p>
 						</div>
 					</div>

@@ -39,9 +39,11 @@ export class TabsController extends EventTarget {
 
 		await this.updateCurrentTabId(this.currentTabId)
 
-		const tabChangeHandler = (message: any) => {
-			if (message.type !== 'TAB_CHANGE')
-				throw new Error(`[TabsController]: Invalid message type: ${message.type}`)
+		const tabChangeHandler = (message: any): void => {
+			if (message.type !== 'TAB_CHANGE') {
+				// throw new Error(`[TabsController]: Invalid message type: ${message.type}`)
+				return
+			}
 
 			if (message.action === 'created') {
 				const tab = message.payload.tab as chrome.tabs.Tab

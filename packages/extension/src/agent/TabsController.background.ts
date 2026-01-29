@@ -7,7 +7,7 @@ export function handleTabControlMessage(
 	message: { type: 'TAB_CONTROL'; action: TabAction; payload: any },
 	sender: chrome.runtime.MessageSender,
 	sendResponse: (response: unknown) => void
-): boolean {
+): true | undefined {
 	const { action, payload } = message
 
 	switch (action as TabAction) {
@@ -102,6 +102,6 @@ export function handleTabControlMessage(
 
 		default:
 			sendResponse({ error: `Unknown action: ${action}` })
-			return false
+			return
 	}
 }

@@ -53,12 +53,12 @@ export function initPageController() {
 		}
 	}, 1_000)
 
-	chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+	chrome.runtime.onMessage.addListener((message, sender, sendResponse): true | undefined => {
 		if (message.type !== 'PAGE_CONTROL') {
-			sendResponse({
-				success: false,
-				error: `[RemotePageController.ContentScript]: Invalid message type: ${message.type}`,
-			})
+			// sendResponse({
+			// 	success: false,
+			// 	error: `[RemotePageController.ContentScript]: Invalid message type: ${message.type}`,
+			// })
 			return
 		}
 
