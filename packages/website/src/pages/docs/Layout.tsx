@@ -36,7 +36,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: t('nav.custom_tools'), path: '/features/custom-tools' },
 				{ title: t('nav.knowledge_injection'), path: '/features/custom-instructions' },
 				{ title: t('nav.data_masking'), path: '/features/data-masking' },
-				{ title: '🧪 ' + t('nav.chrome_extension'), path: '/features/chrome-extension' },
+				{ title: t('nav.chrome_extension'), path: '/features/chrome-extension' },
 			],
 		},
 		{

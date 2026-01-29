@@ -1,4 +1,18 @@
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
 import type { LLMConfig } from '@page-agent/llms'
+
+export interface ExecuteHooks {
+	onStatusChange?: (status: AgentStatus) => void
+	onActivity?: (activity: AgentActivity) => void
+	onHistoryUpdate?: (history: HistoricalEvent[]) => void
+	onDispose?: () => void
+}
+
+export type Execute = (
+	task: string,
+	llmConfig: LLMConfig,
+	hooks?: ExecuteHooks
+) => Promise<ExecutionResult>
 
 export default defineUnlistedScript(() => {
 	const w = window as any
@@ -9,7 +23,7 @@ export default defineUnlistedScript(() => {
 		return _lastId
 	}
 
-	w.execute = async (task: string, llmConfig: LLMConfig) => {
+	w.execute = async (task: string, llmConfig: LLMConfig, hooks?: ExecuteHooks) => {
 		if (typeof task !== 'string') throw new Error('Task must be a string')
 		if (task.trim().length === 0) throw new Error('Task cannot be empty')
 		if (!llmConfig) throw new Error('LLM config is required')
@@ -19,13 +33,38 @@ export default defineUnlistedScript(() => {
 
 		const id = getId()
 
-		const promise = new Promise((resolve, reject) => {
+		const promise = new Promise<ExecutionResult>((resolve, reject) => {
 			function handleMessage(e: MessageEvent) {
 				const data = e.data
 				if (typeof data !== 'object' || data === null) return
 				if (data.channel !== 'PAGE_AGENT_EXT_RESPONSE') return
-				if (data.action !== 'execute_result') return
 				if (data.id !== id) return
+
+				// events
+
+				if (data.action === 'status_change_event' && hooks?.onStatusChange) {
+					hooks.onStatusChange(data.payload)
+					return
+				}
+
+				if (data.action === 'activity_event' && hooks?.onActivity) {
+					hooks.onActivity(data.payload)
+					return
+				}
+
+				if (data.action === 'history_change_event' && hooks?.onHistoryUpdate) {
+					hooks.onHistoryUpdate(data.payload)
+					return
+				}
+
+				if (data.action === 'dispose_event' && hooks?.onDispose) {
+					hooks.onDispose()
+					return
+				}
+
+				// result
+
+				if (data.action !== 'execute_result') return
 
 				window.removeEventListener('message', handleMessage)
 

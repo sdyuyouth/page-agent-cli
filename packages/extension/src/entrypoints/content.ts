@@ -54,6 +54,7 @@ async function exposeAgentToPage() {
 
 		switch (action) {
 			case 'execute': {
+				// singleton check
 				if (multiPageAgent && multiPageAgent.status === 'running') {
 					window.postMessage(
 						{
@@ -70,7 +71,63 @@ async function exposeAgentToPage() {
 				try {
 					const { task, llmConfig } = payload
 
+					// create when used
+
 					multiPageAgent = new MultiPageAgent(llmConfig)
+
+					// events
+
+					multiPageAgent.addEventListener('statuschange', (event) => {
+						if (!multiPageAgent) return
+						window.postMessage(
+							{
+								channel: 'PAGE_AGENT_EXT_RESPONSE',
+								id,
+								action: 'status_change_event',
+								payload: multiPageAgent.status,
+							},
+							'*'
+						)
+					})
+
+					multiPageAgent.addEventListener('activity', (event) => {
+						if (!multiPageAgent) return
+						window.postMessage(
+							{
+								channel: 'PAGE_AGENT_EXT_RESPONSE',
+								id,
+								action: 'activity_event',
+								payload: (event as CustomEvent).detail,
+							},
+							'*'
+						)
+					})
+
+					multiPageAgent.addEventListener('historychange', (event) => {
+						if (!multiPageAgent) return
+						window.postMessage(
+							{
+								channel: 'PAGE_AGENT_EXT_RESPONSE',
+								id,
+								action: 'history_change_event',
+								payload: multiPageAgent.history,
+							},
+							'*'
+						)
+					})
+
+					multiPageAgent.addEventListener('dispose', () => {
+						window.postMessage(
+							{
+								channel: 'PAGE_AGENT_EXT_RESPONSE',
+								id,
+								action: 'dispose_event',
+							},
+							'*'
+						)
+					})
+
+					// result
 
 					const result = await multiPageAgent.execute(task)
 
