@@ -95,7 +95,7 @@ export class PageAgentCore extends EventTarget {
 		// Listen to LLM retry events
 		this.#llm.addEventListener('retry', (e) => {
 			const { attempt, maxAttempts } = (e as CustomEvent).detail
-			this.emitActivity({ type: 'retrying', attempt, maxAttempts })
+			this.#emitActivity({ type: 'retrying', attempt, maxAttempts })
 			// Also push to history for panel rendering
 			this.history.push({
 				type: 'retry',
@@ -109,7 +109,7 @@ export class PageAgentCore extends EventTarget {
 			const error = (e as CustomEvent).detail.error as Error | InvokeError
 			if ((error as any)?.rawError?.name === 'AbortError') return
 			const message = String(error)
-			this.emitActivity({ type: 'error', message })
+			this.#emitActivity({ type: 'error', message })
 			// Also push to history for panel rendering
 			this.history.push({
 				type: 'error',
@@ -153,7 +153,7 @@ export class PageAgentCore extends EventTarget {
 	 * Emit activity event - for transient UI feedback
 	 * @param activity - Current agent activity
 	 */
-	emitActivity(activity: AgentActivity): void {
+	#emitActivity(activity: AgentActivity): void {
 		this.dispatchEvent(new CustomEvent('activity', { detail: activity }))
 	}
 
@@ -224,7 +224,7 @@ export class PageAgentCore extends EventTarget {
 
 				// Thinking
 				console.log(chalk.blue('Thinking...'))
-				this.emitActivity({ type: 'thinking' })
+				this.#emitActivity({ type: 'thinking' })
 
 				// invoke LLM
 
@@ -303,7 +303,7 @@ export class PageAgentCore extends EventTarget {
 		} catch (error: unknown) {
 			console.error('Task failed', error)
 			const errorMessage = String(error)
-			this.emitActivity({ type: 'error', message: errorMessage })
+			this.#emitActivity({ type: 'error', message: errorMessage })
 			this.#onDone(false)
 			const result: ExecutionResult = {
 				success: false,
@@ -376,7 +376,7 @@ export class PageAgentCore extends EventTarget {
 				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
 
 				// Emit executing activity
-				this.emitActivity({ type: 'executing', tool: toolName, input: toolInput })
+				this.#emitActivity({ type: 'executing', tool: toolName, input: toolInput })
 
 				const startTime = Date.now()
 
@@ -387,7 +387,7 @@ export class PageAgentCore extends EventTarget {
 				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)
 
 				// Emit executed activity
-				this.emitActivity({
+				this.#emitActivity({
 					type: 'executed',
 					tool: toolName,
 					input: toolInput,

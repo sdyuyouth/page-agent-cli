@@ -386,13 +386,6 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Push an observation to history stream, will be seen by LLM in next step',
 						},
 						{
-							name: 'emitActivity(activity: AgentActivity)',
-							type: 'void',
-							description: isZh
-								? '发出活动事件用于 UI 反馈'
-								: 'Emit activity event for UI feedback',
-						},
-						{
 							name: 'dispose(reason?: string)',
 							type: 'void',
 							description: isZh
