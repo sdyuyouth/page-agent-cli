@@ -14,8 +14,6 @@ import CustomTools from './features/custom-tools/page'
 import DataMasking from './features/data-masking/page'
 import Models from './features/models/page'
 import BestPractices from './integration/best-practices/page'
-// Integration
-import CdnSetup from './integration/cdn-setup/page'
 import SecurityPermissions from './integration/security-permissions/page'
 import ThirdPartyAgent from './integration/third-party-agent/page'
 import Limitations from './introduction/limitations/page'
@@ -81,10 +79,20 @@ export default function DocsRouter() {
 				</DocsPage>
 			</Route>
 
-			{/* Integration */}
-			<Route path="/integration/cdn-setup">
+			{/* Advanced */}
+			<Route path="/advanced/page-agent">
 				<DocsPage>
-					<CdnSetup />
+					<PageAgentDocs />
+				</DocsPage>
+			</Route>
+			<Route path="/advanced/page-agent-core">
+				<DocsPage>
+					<PageAgentCoreDocs />
+				</DocsPage>
+			</Route>
+			<Route path="/advanced/custom-ui">
+				<DocsPage>
+					<CustomUIDocs />
 				</DocsPage>
 			</Route>
 			<Route path="/integration/security-permissions">
@@ -100,23 +108,6 @@ export default function DocsRouter() {
 			<Route path="/integration/third-party-agent">
 				<DocsPage>
 					<ThirdPartyAgent />
-				</DocsPage>
-			</Route>
-
-			{/* Advanced */}
-			<Route path="/advanced/page-agent">
-				<DocsPage>
-					<PageAgentDocs />
-				</DocsPage>
-			</Route>
-			<Route path="/advanced/page-agent-core">
-				<DocsPage>
-					<PageAgentCoreDocs />
-				</DocsPage>
-			</Route>
-			<Route path="/advanced/custom-ui">
-				<DocsPage>
-					<CustomUIDocs />
 				</DocsPage>
 			</Route>
 

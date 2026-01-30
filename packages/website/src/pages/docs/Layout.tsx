@@ -30,6 +30,10 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: isZh ? '概览' : 'Overview', path: '/introduction/overview' },
 				{ title: isZh ? '快速开始' : 'Quick Start', path: '/introduction/quick-start' },
 				{ title: isZh ? '使用限制' : 'Limitations', path: '/introduction/limitations' },
+				{
+					title: '🚧 ' + (isZh ? '最佳实践' : 'Best Practices'),
+					path: '/integration/best-practices',
+				},
 			],
 		},
 		{
@@ -40,23 +44,9 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: isZh ? '知识注入' : 'Instructions', path: '/features/custom-instructions' },
 				{ title: isZh ? '数据脱敏' : 'Data Masking', path: '/features/data-masking' },
 				{ title: isZh ? 'Chrome 扩展' : 'Chrome Extension', path: '/features/chrome-extension' },
-			],
-		},
-		{
-			title: isZh ? '集成指南' : 'Integration',
-			items: [
 				{
 					title: isZh ? '接入第三方 Agent' : 'Third-party Agent',
 					path: '/integration/third-party-agent',
-				},
-				{ title: isZh ? 'CDN 引入' : 'CDN Setup', path: '/integration/cdn-setup' },
-				{
-					title: '🚧 ' + (isZh ? '安全与权限' : 'Security & Permissions'),
-					path: '/integration/security-permissions',
-				},
-				{
-					title: '🚧 ' + (isZh ? '最佳实践' : 'Best Practices'),
-					path: '/integration/best-practices',
 				},
 			],
 		},
@@ -66,6 +56,10 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: 'PageAgent', path: '/advanced/page-agent' },
 				{ title: 'PageAgentCore', path: '/advanced/page-agent-core' },
 				{ title: isZh ? '自定义 UI' : 'Custom UI', path: '/advanced/custom-ui' },
+				{
+					title: '🚧 ' + (isZh ? '安全与权限' : 'Security & Permissions'),
+					path: '/integration/security-permissions',
+				},
 			],
 		},
 	]
