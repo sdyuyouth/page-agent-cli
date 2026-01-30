@@ -39,5 +39,6 @@ export default {
 		security_permissions: 'Security & Permissions',
 		page_agent: 'PageAgent',
 		page_agent_core: 'PageAgentCore',
+		custom_ui: 'Custom UI',
 	},
 }

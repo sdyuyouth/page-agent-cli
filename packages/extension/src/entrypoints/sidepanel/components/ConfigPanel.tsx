@@ -109,7 +109,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Model</label>
 				<Input
-					placeholder="gpt-4o"
+					placeholder="gpt-5.2"
 					value={model}
 					onChange={(e) => setModel(e.target.value)}
 					className="text-xs h-8"

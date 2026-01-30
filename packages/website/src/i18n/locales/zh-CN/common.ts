@@ -38,5 +38,6 @@ export default {
 		security_permissions: '安全与权限',
 		page_agent: 'PageAgent',
 		page_agent_core: 'PageAgentCore',
+		custom_ui: '自定义 UI',
 	},
 }

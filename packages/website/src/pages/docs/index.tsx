@@ -3,6 +3,7 @@ import { Route, Switch } from 'wouter'
 
 import Header from '../../components/Header'
 import DocsLayout from './Layout'
+import CustomUIDocs from './advanced/custom-ui/page'
 import PageAgentCoreDocs from './advanced/page-agent-core/page'
 // Advanced
 import PageAgentDocs from './advanced/page-agent/page'
@@ -111,6 +112,11 @@ export default function DocsRouter() {
 			<Route path="/advanced/page-agent-core">
 				<DocsPage>
 					<PageAgentCoreDocs />
+				</DocsPage>
+			</Route>
+			<Route path="/advanced/custom-ui">
+				<DocsPage>
+					<CustomUIDocs />
 				</DocsPage>
 			</Route>
 

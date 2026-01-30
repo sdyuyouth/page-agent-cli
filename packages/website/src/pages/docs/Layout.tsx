@@ -56,6 +56,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 			items: [
 				{ title: t('nav.page_agent'), path: '/advanced/page-agent' },
 				{ title: t('nav.page_agent_core'), path: '/advanced/page-agent-core' },
+				{ title: t('nav.custom_ui'), path: '/advanced/custom-ui' },
 			],
 		},
 	]
