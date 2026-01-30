@@ -1,11 +1,9 @@
-import { useTranslation } from 'react-i18next'
-
 import CodeEditor from '@/components/CodeEditor'
 import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '@/constants'
+import { useLanguage } from '@/i18n/context'
 
 export default function QuickStart() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<div>

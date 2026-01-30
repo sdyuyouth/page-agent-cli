@@ -1,11 +1,9 @@
-import { useTranslation } from 'react-i18next'
-
 import CodeEditor from '@/components/CodeEditor'
 import { APIDivider, APIReference } from '@/components/ui/api-reference'
+import { useLanguage } from '@/i18n/context'
 
 export default function CustomUIDocs() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<div>

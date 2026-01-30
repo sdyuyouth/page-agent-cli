@@ -1,12 +1,11 @@
-import { useTranslation } from 'react-i18next'
 import { siGithub } from 'simple-icons'
 
 import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
+import { useLanguage } from '@/i18n/context'
 
 export default function ChromeExtension() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<div>

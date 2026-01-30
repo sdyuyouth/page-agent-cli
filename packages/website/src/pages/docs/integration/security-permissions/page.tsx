@@ -1,10 +1,8 @@
-import { useTranslation } from 'react-i18next'
-
 import BetaNotice from '@/components/BetaNotice'
+import { useLanguage } from '@/i18n/context'
 
 export default function SecurityPermissions() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<div>

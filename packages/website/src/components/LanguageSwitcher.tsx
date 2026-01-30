@@ -1,22 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+
+import { useLanguage } from '@/i18n/context'
 
 export default function LanguageSwitcher() {
-	const { i18n, t } = useTranslation('common')
+	const { language, isZh, setLanguage } = useLanguage()
 	const [isOpen, setIsOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement>(null)
 
-	const currentLang = i18n.language
-
 	const languages = [
-		{ code: 'zh-CN', label: '中文' },
-		{ code: 'en-US', label: 'English' },
+		{ code: 'zh-CN' as const, label: '中文' },
+		{ code: 'en-US' as const, label: 'English' },
 	]
 
-	const currentLanguage = languages.find((lang) => lang.code === currentLang) || languages[0]
+	const currentLanguage = languages.find((lang) => lang.code === language) || languages[0]
 
-	const handleLanguageChange = (langCode: string) => {
-		i18n.changeLanguage(langCode)
+	const handleLanguageChange = (langCode: 'zh-CN' | 'en-US') => {
+		setLanguage(langCode)
 		setIsOpen(false)
 	}
 
@@ -42,7 +41,7 @@ export default function LanguageSwitcher() {
 			<button
 				onClick={() => setIsOpen(!isOpen)}
 				className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300"
-				aria-label={t('language.switch_label')}
+				aria-label={isZh ? '切换语言' : 'Switch language'}
 				aria-expanded={isOpen}
 				aria-haspopup="true"
 			>
@@ -83,14 +82,14 @@ export default function LanguageSwitcher() {
 							key={lang.code}
 							onClick={() => handleLanguageChange(lang.code)}
 							className={`w-full flex items-center gap-2 px-4 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-								currentLang === lang.code
+								language === lang.code
 									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
 									: 'text-gray-700 dark:text-gray-300'
 							}`}
 							role="menuitem"
 						>
 							<span>{lang.label}</span>
-							{currentLang === lang.code && (
+							{language === lang.code && (
 								<svg
 									className="w-4 h-4 ml-auto"
 									fill="none"

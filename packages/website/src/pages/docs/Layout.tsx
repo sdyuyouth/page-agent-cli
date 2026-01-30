@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
-import { useTranslation } from 'react-i18next'
 import { siGooglechrome } from 'simple-icons'
 import { Link, useLocation } from 'wouter'
 
 import { SparklesText } from '@/components/ui/sparkles-text'
+import { useLanguage } from '@/i18n/context'
 
 interface DocsLayoutProps {
 	children: ReactNode
@@ -20,46 +20,52 @@ interface NavSection {
 }
 
 export default function DocsLayout({ children }: DocsLayoutProps) {
-	const { t } = useTranslation('common')
+	const { isZh } = useLanguage()
 	const [location] = useLocation()
 
 	const navigationSections: NavSection[] = [
 		{
-			title: t('nav.introduction'),
+			title: isZh ? '介绍' : 'Introduction',
 			items: [
-				{ title: t('nav.overview'), path: '/introduction/overview' },
-				{ title: t('nav.quick_start'), path: '/introduction/quick-start' },
-				{ title: t('nav.limitations'), path: '/introduction/limitations' },
+				{ title: isZh ? '概览' : 'Overview', path: '/introduction/overview' },
+				{ title: isZh ? '快速开始' : 'Quick Start', path: '/introduction/quick-start' },
+				{ title: isZh ? '使用限制' : 'Limitations', path: '/introduction/limitations' },
 			],
 		},
 		{
-			title: t('nav.features'),
+			title: isZh ? '功能特性' : 'Features',
 			items: [
-				{ title: t('nav.models'), path: '/features/models' },
-				{ title: t('nav.custom_tools'), path: '/features/custom-tools' },
-				{ title: t('nav.knowledge_injection'), path: '/features/custom-instructions' },
-				{ title: t('nav.data_masking'), path: '/features/data-masking' },
-				{ title: t('nav.chrome_extension'), path: '/features/chrome-extension' },
+				{ title: isZh ? '模型' : 'Models', path: '/features/models' },
+				{ title: isZh ? '自定义工具' : 'Custom Tools', path: '/features/custom-tools' },
+				{ title: isZh ? '知识注入' : 'Instructions', path: '/features/custom-instructions' },
+				{ title: isZh ? '数据脱敏' : 'Data Masking', path: '/features/data-masking' },
+				{ title: isZh ? 'Chrome 扩展' : 'Chrome Extension', path: '/features/chrome-extension' },
 			],
 		},
 		{
-			title: t('nav.integration'),
+			title: isZh ? '集成指南' : 'Integration',
 			items: [
-				{ title: t('nav.third_party_agent'), path: '/integration/third-party-agent' },
-				{ title: t('nav.cdn_setup'), path: '/integration/cdn-setup' },
 				{
-					title: '🚧 ' + t('nav.security_permissions'),
+					title: isZh ? '接入第三方 Agent' : 'Third-party Agent',
+					path: '/integration/third-party-agent',
+				},
+				{ title: isZh ? 'CDN 引入' : 'CDN Setup', path: '/integration/cdn-setup' },
+				{
+					title: '🚧 ' + (isZh ? '安全与权限' : 'Security & Permissions'),
 					path: '/integration/security-permissions',
 				},
-				{ title: '🚧 ' + t('nav.best_practices'), path: '/integration/best-practices' },
+				{
+					title: '🚧 ' + (isZh ? '最佳实践' : 'Best Practices'),
+					path: '/integration/best-practices',
+				},
 			],
 		},
 		{
-			title: t('nav.advanced'),
+			title: isZh ? '高级' : 'Advanced',
 			items: [
-				{ title: t('nav.page_agent'), path: '/advanced/page-agent' },
-				{ title: t('nav.page_agent_core'), path: '/advanced/page-agent-core' },
-				{ title: t('nav.custom_ui'), path: '/advanced/custom-ui' },
+				{ title: 'PageAgent', path: '/advanced/page-agent' },
+				{ title: 'PageAgentCore', path: '/advanced/page-agent-core' },
+				{ title: isZh ? '自定义 UI' : 'Custom UI', path: '/advanced/custom-ui' },
 			],
 		},
 	]

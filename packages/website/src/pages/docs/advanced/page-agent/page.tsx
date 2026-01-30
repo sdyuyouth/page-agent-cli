@@ -1,12 +1,11 @@
-import { useTranslation } from 'react-i18next'
 import { Link } from 'wouter'
 
 import CodeEditor from '@/components/CodeEditor'
 import { APIReference, TypeRef } from '@/components/ui/api-reference'
+import { useLanguage } from '@/i18n/context'
 
 export default function PageAgentDocs() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<div>

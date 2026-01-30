@@ -1,11 +1,9 @@
-import { useTranslation } from 'react-i18next'
-
 import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
+import { useLanguage } from '@/i18n/context'
 
 export default function CustomTools() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<div>

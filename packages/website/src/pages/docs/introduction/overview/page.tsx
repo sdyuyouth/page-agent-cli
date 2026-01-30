@@ -1,8 +1,7 @@
-import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/i18n/context'
 
 export default function Overview() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<article>

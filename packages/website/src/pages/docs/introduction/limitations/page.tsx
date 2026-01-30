@@ -1,8 +1,7 @@
-import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/i18n/context'
 
 export default function LimitationsPage() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 
 	return (
 		<div className="max-w-4xl mx-auto">

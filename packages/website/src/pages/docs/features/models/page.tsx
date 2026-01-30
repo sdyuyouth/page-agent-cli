@@ -1,6 +1,5 @@
-import { useTranslation } from 'react-i18next'
-
 import CodeEditor from '@/components/CodeEditor'
+import { useLanguage } from '@/i18n/context'
 
 // Recommended models: lightweight with excellent tool call capabilities
 const MODELS = {
@@ -28,8 +27,7 @@ const MODELS = {
 }
 
 export default function Models() {
-	const { i18n } = useTranslation()
-	const isZh = i18n.language === 'zh-CN'
+	const { isZh } = useLanguage()
 	const allModels = [...MODELS.recommended, ...MODELS.verified]
 
 	return (

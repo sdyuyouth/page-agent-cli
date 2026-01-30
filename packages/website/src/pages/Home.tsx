@@ -1,7 +1,6 @@
 /* eslint-disable react-dom/no-dangerously-set-innerhtml */
 import { Bot, Box, MessageSquare, PlayCircle, Shield, Sparkles, Users, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'wouter'
 
 import Footer from '../components/Footer'
@@ -18,6 +17,7 @@ import {
 	DEMO_BASE_URL,
 	DEMO_MODEL,
 } from '../constants'
+import { useLanguage } from '../i18n/context'
 
 function getInjection(useCN?: boolean) {
 	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL
@@ -40,8 +40,7 @@ function getInjection(useCN?: boolean) {
 }
 
 export default function HomePage() {
-	const { i18n } = useTranslation('common')
-	const isZh = i18n.language === 'zh-CN'
+	const { language, isZh } = useLanguage()
 
 	const defaultTask = isZh
 		? '从导航栏中进入文档页，打开"快速开始"相关的文档，帮我总结成 markdown'
@@ -71,7 +70,7 @@ export default function HomePage() {
 			win.pageAgent = new PageAgent({
 				// 把 react 根元素排除掉，挂了很多冒泡时间导致假阳
 				interactiveBlacklist: [document.getElementById('root')!],
-				language: i18n.language as any,
+				language: language,
 
 				instructions: {
 					system: 'You are a helpful assistant on PageAgent website.',
