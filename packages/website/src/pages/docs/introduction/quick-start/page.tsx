@@ -29,7 +29,7 @@ export default function QuickStart() {
 						</span>
 					</div>
 					<CodeEditor
-						code={`<script src="${isZh ? CDN_DEMO_CN_URL : CDN_DEMO_URL}" crossorigin="true"></script>`}
+						code={`<script src="DEMO_CDN_URL" crossorigin="true"></script>`}
 						language="html"
 					/>
 					<table className="w-full border-collapse text-sm">

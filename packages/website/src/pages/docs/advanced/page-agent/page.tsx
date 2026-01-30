@@ -193,9 +193,7 @@ agent.panel.dispose()`}
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="bg-gray-50 dark:bg-gray-800/50">
-								<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300">
-									{isZh ? '特性' : 'Feature'}
-								</th>
+								<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300"></th>
 								<th className="px-4 py-3 text-center font-medium text-gray-600 dark:text-gray-300">
 									PageAgent
 								</th>

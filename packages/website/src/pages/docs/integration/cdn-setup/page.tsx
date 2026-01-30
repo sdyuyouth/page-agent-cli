@@ -30,7 +30,7 @@ export default function CdnSetup() {
 
 				<CodeEditor
 					className="mb-3"
-					code={`<script src="${CDN_DEMO_URL}" crossorigin="true"></script>`}
+					code={`<script src="DEMO_CDN_URL" crossorigin="true"></script>`}
 				/>
 
 				<div className="bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 rounded-lg mb-4 text-sm">

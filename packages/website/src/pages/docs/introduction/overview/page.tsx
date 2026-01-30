@@ -117,9 +117,7 @@ export default function Overview() {
 					<table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
 						<thead>
 							<tr className="bg-gray-50 dark:bg-gray-800">
-								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left">
-									{isZh ? '特性' : 'Feature'}
-								</th>
+								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left"></th>
 								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left">
 									page-agent
 								</th>

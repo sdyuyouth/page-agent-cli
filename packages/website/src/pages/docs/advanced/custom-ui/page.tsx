@@ -50,8 +50,8 @@ export default function CustomUIDocs() {
 				<h2 className="text-2xl font-semibold mb-4">{isZh ? '两个事件流' : 'Two Event Streams'}</h2>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? 'PageAgentCore 提供两种不同性质的事件流，服务于不同的 UI 需求：'
-						: 'PageAgentCore provides two distinct event streams for different UI needs:'}
+						? 'PageAgentCore 提供两种不同性质的事件流，方便 UI 渲染：'
+						: 'PageAgentCore provides two distinct event streams for UI rendering:'}
 				</p>
 
 				{/* Comparison Table */}
@@ -59,9 +59,7 @@ export default function CustomUIDocs() {
 					<table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
 						<thead>
 							<tr className="bg-gray-100 dark:bg-gray-800">
-								<th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">
-									{isZh ? '特性' : 'Feature'}
-								</th>
+								<th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left"></th>
 								<th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">
 									Historical Events
 								</th>
@@ -90,7 +88,7 @@ export default function CustomUIDocs() {
 									{isZh ? '持久化到 agent.history' : 'Persisted in agent.history'}
 								</td>
 								<td className="border border-gray-300 dark:border-gray-600 px-4 py-2">
-									{isZh ? '瞬态，无存储' : 'Transient, not stored'}
+									{isZh ? '瞬态' : 'Transient'}
 								</td>
 							</tr>
 							<tr>

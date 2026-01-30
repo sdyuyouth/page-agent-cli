@@ -101,7 +101,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 																	<path d={siGooglechrome.path} fill="currentColor" />
 																</svg>
 																<SparklesText
-																	className="text-[length:inherit] font-[inherit]"
+																	className="text-[length:inherit] font-[inherit] font-medium"
 																	sparklesCount={3}
 																>
 																	{item.title}
@@ -123,7 +123,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 
 				{/* Main Content */}
 				<main className="flex-1 min-w-0" id="main-content" role="main">
-					<div className="prose prose-lg dark:prose-invert max-w-none">{children}</div>
+					<div className="prose dark:prose-invert max-w-none">{children}</div>
 				</main>
 			</div>
 		</div>

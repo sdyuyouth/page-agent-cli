@@ -32,22 +32,22 @@ import { PageAgent, tool } from 'page-agent'
 
 // override internal tool
 const customTools = {
-	ask_user: tool({
-		description:
-			'Ask the user or parent model a question and wait for their answer. Use this if you need more information or clarification.',
-		inputSchema: zod.object({
-			question: zod.string(),
-		}),
-		execute: async function (this: PageAgent, input) {
-			const answer = await do_some_thing(input.question)
-			return "✅ Received user answer: " + answer
-		},
-	})
+  ask_user: tool({
+    description:
+      'Ask the user or parent model a question and wait for their answer. Use this if you need more information or clarification.',
+    inputSchema: zod.object({
+      question: zod.string(),
+    }),
+    execute: async function (this: PageAgent, input) {
+      const answer = await do_some_thing(input.question)
+      return "✅ Received user answer: " + answer
+    },
+  })
 }
 
 // remove internal tool
 const customTools = {
-    ask_user: null // never ask user questions
+  scroll: null, // never scroll
 }
 	
 const pageAgent = new PageAgent({customTools})

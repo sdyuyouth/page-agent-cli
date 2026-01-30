@@ -71,7 +71,43 @@ html.dark,
 body {
 	background: var(--background);
 	color: var(--foreground);
-	font-family: Arial, Helvetica, sans-serif;
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		Roboto,
+		'Noto Sans',
+		'Liberation Sans',
+		sans-serif,
+		'Apple Color Emoji',
+		'Segoe UI Emoji';
+}
+
+/* 文档正文排版优化 */
+.prose {
+	letter-spacing: 0.01em;
+	font-weight: 380;
+}
+
+.prose p {
+	line-height: 1.6;
+}
+
+/* 标题使用中等字重（相对细体更重，但比默认 bold 更轻） */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+	font-weight: 480;
+}
+
+/* strong/b 也用中等字重 */
+.prose strong,
+.prose b {
+	font-weight: 480;
 }
 
 /* 确保文档页面标题在暗色模式下可见 - 只针对 prose 内的标题 */
