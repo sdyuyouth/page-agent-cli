@@ -40,11 +40,16 @@ function getInjection(useCN?: boolean) {
 }
 
 export default function HomePage() {
-	const { t, i18n } = useTranslation(['home', 'common'])
-	const [task, setTask] = useState(() => t('home:hero.default_task'))
+	const { i18n } = useTranslation('common')
+	const isZh = i18n.language === 'zh-CN'
+
+	const defaultTask = isZh
+		? '从导航栏中进入文档页，打开"快速开始"相关的文档，帮我总结成 markdown'
+		: 'Goto docs in navigation bar, find Quick-Start section, and summarize in markdown'
+
+	const [task, setTask] = useState(() => defaultTask)
 
 	// Update task when language changes
-	const defaultTask = t('home:hero.default_task')
 	useEffect(() => {
 		setTask(defaultTask)
 	}, [defaultTask])
@@ -131,7 +136,7 @@ export default function HomePage() {
 									aria-hidden="true"
 								></span>
 								<AnimatedGradientText colorFrom="#3b82f6" colorTo="#8b5cf6">
-									{t('home:hero.badge')}
+									GUI Agent in your webpage
 								</AnimatedGradientText>
 							</div>
 
@@ -139,20 +144,24 @@ export default function HomePage() {
 								id="hero-heading"
 								className="text-5xl lg:text-7xl font-bold mb-8 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent pb-1"
 							>
-								{t('home:hero.title_line1')}
+								{isZh ? '让你的 Web 应用' : 'The AI Operator'}
 								<br />
-								{t('home:hero.title_line2')}
+								{isZh ? '拥有 AI 操作员' : 'Living in Your Web App'}
 							</h1>
 
 							<p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
 								<Highlighter action="underline" color="#8b5cf6" strokeWidth={2}>
 									<span className="bg-linear-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">
-										{t('home:hero.subtitle_emoji')}
+										{isZh ? '🪄一行代码' : '🪄One line of code'}
 									</span>
 								</Highlighter>
-								{t('home:hero.subtitle_main')}
+								{isZh
+									? '，为你的网站添加 GUI Agent。'
+									: ' adds intelligent GUI Agents to your website.'}
 								<br />
-								{t('home:hero.subtitle_detail')}
+								{isZh
+									? '用户/答疑机器人给出文字指示，AI 帮你操作页面。'
+									: 'Users give natural language commands, AI handles the rest.'}
 							</p>
 
 							{/* Try It Now Section - Tab Card */}
@@ -173,7 +182,7 @@ export default function HomePage() {
 														: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
 												}`}
 											>
-												{t('home:hero.tab_try')}
+												{isZh ? '🚀 立即尝试' : '🚀 Try It Now'}
 											</button>
 											<button
 												onClick={() => setActiveTab('other')}
@@ -183,7 +192,7 @@ export default function HomePage() {
 														: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
 												}`}
 											>
-												{t('home:hero.tab_other')}
+												{isZh ? '🌐 其他网页尝试' : '🌐 Try on Other Sites'}
 											</button>
 										</div>
 
@@ -195,7 +204,11 @@ export default function HomePage() {
 														<input
 															value={task}
 															onChange={(e) => setTask(e.target.value)}
-															placeholder={t('home:hero.input_placeholder')}
+															placeholder={
+																isZh
+																	? '输入您想要 AI 执行的任务...'
+																	: 'Describe what you want AI to do...'
+															}
 															className="w-full px-4 py-3 pr-20 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm mb-0"
 															data-page-agent-not-interactive
 														/>
@@ -206,7 +219,7 @@ export default function HomePage() {
 															className="absolute right-2 top-2 px-5 py-1.5 bg-linear-to-r from-blue-600 to-purple-600 text-white font-medium rounded-md hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
 															data-page-agent-not-interactive
 														>
-															{t('home:hero.execute_button')}
+															{isZh ? '执行' : 'Run'}
 														</button>
 													</div>
 												</div>
@@ -220,15 +233,17 @@ export default function HomePage() {
 														<div className="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg">
 															<p className="text-gray-700 dark:text-gray-300 text-sm mb-3">
 																<span className="font-semibold">
-																	{t('home:try_other.step1_title')}
+																	{isZh ? '步骤 1:' : 'Step 1:'}
 																</span>{' '}
-																{t('home:try_other.step1_content')}
+																{isZh ? '显示收藏夹栏' : 'Show your bookmarks bar'}
 															</p>
 															<div className="flex items-center justify-center gap-2">
 																<kbd className="px-2 py-1 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded text-xs font-mono">
 																	Ctrl + Shift + B
 																</kbd>
-																<span className="text-gray-500 dark:text-gray-400">或</span>
+																<span className="text-gray-500 dark:text-gray-400">
+																	{isZh ? '或' : 'or'}
+																</span>
 																<kbd className="px-2 py-1 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded text-xs font-mono">
 																	⌘ + Shift + B
 																</kbd>
@@ -239,9 +254,11 @@ export default function HomePage() {
 														<div className="bg-green-50 dark:bg-gray-700 p-4 rounded-lg">
 															<p className="text-gray-700 dark:text-gray-300 text-sm mb-3">
 																<span className="font-semibold">
-																	{t('home:try_other.step2_title')}
+																	{isZh ? '步骤 2:' : 'Step 2:'}
 																</span>{' '}
-																{t('home:try_other.step2_content')}
+																{isZh
+																	? '拖拽下面按钮到收藏夹栏'
+																	: 'Drag this button to your bookmarks'}
 															</p>
 															<div className="flex items-center justify-center gap-3">
 																<select
@@ -252,9 +269,11 @@ export default function HomePage() {
 																	className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200"
 																>
 																	<option value="international">
-																		{t('home:try_other.cdn_international')}
+																		{isZh ? '国际' : 'International'}
 																	</option>
-																	<option value="china">{t('home:try_other.cdn_china')}</option>
+																	<option value="china">
+																		{isZh ? '国内镜像' : 'China Mirror'}
+																	</option>
 																</select>
 																<div
 																	dangerouslySetInnerHTML={{
@@ -268,9 +287,11 @@ export default function HomePage() {
 														<div className="bg-purple-50 dark:bg-gray-700 p-4 rounded-lg">
 															<p className="text-gray-700 dark:text-gray-300 text-sm">
 																<span className="font-semibold">
-																	{t('home:try_other.step3_title')}
+																	{isZh ? '步骤 3:' : 'Step 3:'}
 																</span>{' '}
-																{t('home:try_other.step3_content')}
+																{isZh
+																	? '在其他网站点击收藏夹中的按钮即可使用'
+																	: 'Click the bookmark on any site to activate'}
 															</p>
 														</div>
 													</div>
@@ -278,37 +299,47 @@ export default function HomePage() {
 													{/* 右侧：注意事项 */}
 													<div className="bg-yellow-50 dark:bg-gray-700 p-4 rounded-lg">
 														<h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">
-															{t('home:try_other.notice_title')}
+															{isZh ? '⚠️ 注意' : '⚠️ Heads Up'}
 														</h4>
 														<ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-																{t('home:try_other.notice_items.item1')}
+																{isZh
+																	? '仅做技术评估，链接定期失效'
+																	: 'Demo only—link may expire without notice'}
 															</li>
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-																{t('home:try_other.notice_items.item2')}
+																{isZh
+																	? '使用 DeepSeek 模型，参考 DeepSeek 用户协议和隐私政策'
+																	: 'This free demo uses DeepSeek API (see their terms and privacy policy)'}
 															</li>
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-																{t('home:try_other.notice_items.item3')}
+																{isZh
+																	? '部分网站屏蔽了链接嵌入，将无反应'
+																	: 'Some sites block script injection (CSP policies)'}
 															</li>
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-																{t('home:try_other.notice_items.item4')}
+																{isZh
+																	? '仅支持单页应用，页面跳转后需要重新注入'
+																	: 'Works on single-page apps only—reload required after navigation'}
 															</li>
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-																{t('home:try_other.notice_items.item5')}
+																{isZh
+																	? '仅识别文本，不识别图像，不支持拖拽等复杂交互'
+																	: 'Text-only understanding—no image recognition or drag-and-drop'}
 															</li>
 															<li className="flex items-start text-left">
 																<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-																{t('home:try_other.notice_items.item6_prefix')}{' '}
+																{isZh ? '详细使用限制参照' : 'Full limitations in'}{' '}
 																<Link
 																	href="/docs/introduction/limitations"
 																	className="text-blue-600 dark:text-blue-400 hover:underline"
 																>
-																	{t('home:try_other.notice_items.item6_link')}
+																	{isZh ? '《文档》' : 'Docs'}
 																</Link>
 															</li>
 														</ul>
@@ -329,28 +360,28 @@ export default function HomePage() {
 										className="w-2 h-2 bg-green-500 rounded-full mr-2"
 										aria-hidden="true"
 									></span>
-									{t('home:benefits.no_backend')}
+									{isZh ? '纯前端方案' : 'Pure Front-end Solution'}
 								</li>
 								<li className="flex items-center">
 									<span
 										className="w-2 h-2 bg-green-500 rounded-full mr-2"
 										aria-hidden="true"
 									></span>
-									{t('home:benefits.private_model')}
+									{isZh ? '支持私有模型' : 'Your Own Models'}
 								</li>
 								<li className="flex items-center">
 									<span
 										className="w-2 h-2 bg-green-500 rounded-full mr-2"
 										aria-hidden="true"
 									></span>
-									{t('home:benefits.data_masking')}
+									{isZh ? '无痛脱敏' : 'Built-in Privacy'}
 								</li>
 								<li className="flex items-center">
 									<span
 										className="w-2 h-2 bg-green-500 rounded-full mr-2"
 										aria-hidden="true"
 									></span>
-									{t('home:benefits.open_source')}
+									{isZh ? 'MIT 开源' : 'MIT Open Source'}
 								</li>
 							</ul>
 						</div>
@@ -376,10 +407,12 @@ export default function HomePage() {
 									<Box className="w-7 h-7 text-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-									{t('home:features.in_page.title')}
+									{isZh ? '纯页面内方案' : 'In-page Solution'}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-									{t('home:features.in_page.desc')}
+									{isZh
+										? '完全运行在你的页面内。不需要浏览器插件、不需要无头浏览器，不需要后端。'
+										: 'Runs entirely within your page. No browser extensions, no headless browsers, and no backend required.'}
 								</p>
 							</article>
 
@@ -395,10 +428,12 @@ export default function HomePage() {
 									<Zap className="w-7 h-7 text-white fill-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-									{t('home:features.zero_backend.title')}
+									{isZh ? '零后端部署' : 'Zero Backend Setup'}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-									{t('home:features.zero_backend.desc')}
+									{isZh
+										? '前端脚本引入，自定义 LLM 接入点。从 OpenAI 到 qwen3，完全由你掌控。'
+										: 'Just drop in a script. Works with any LLM provider—OpenAI, Anthropic, or your own models.'}
 								</p>
 							</article>
 
@@ -414,10 +449,12 @@ export default function HomePage() {
 									<MessageSquare className="w-7 h-7 text-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-									{t('home:features.accessible.title')}
+									{isZh ? '普惠智能交互' : 'Natural Language UI'}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-									{t('home:features.accessible.desc')}
+									{isZh
+										? '为复杂 B端系统、管理后台提供自然语言入口。让每个用户都能轻松上手。'
+										: 'Transform complex admin panels into chat interfaces. Make powerful tools accessible to everyone, not just experts.'}
 								</p>
 							</article>
 
@@ -433,10 +470,12 @@ export default function HomePage() {
 									<Shield className="w-7 h-7 text-white" strokeWidth={2.5} />
 								</div>
 								<h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-									{t('home:features.secure_integration.title')}
+									{isZh ? '安全可控集成' : 'Secure by Design'}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-									{t('home:features.secure_integration.desc')}
+									{isZh
+										? '支持操作黑白名单、数据脱敏保护。注入自定义知识库，让 AI 按你的规则工作。'
+										: 'Control what AI can access with allowlists, data masking, and custom knowledge injection. Your rules, your data.'}
 								</p>
 							</article>
 						</div>
@@ -451,10 +490,12 @@ export default function HomePage() {
 								className="text-4xl lg:text-5xl mb-6"
 								colors={{ first: '#3b82f6', second: '#8b5cf6' }}
 							>
-								{t('home:use_cases.section_title')}
+								{isZh ? '应用场景' : 'Where It Shines'}
 							</SparklesText>
 							<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-								{t('home:use_cases.section_subtitle')}
+								{isZh
+									? '从简单的表单填写到复杂的业务流程，AI 都能理解并执行'
+									: 'From simple forms to complex workflows, AI understands and executes'}
 							</p>
 						</div>
 
@@ -468,10 +509,12 @@ export default function HomePage() {
 
 									<div>
 										<h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-											{t('home:use_cases.case1.title')}
+											{isZh ? '对接答疑机器人' : 'Supercharge Support Bots'}
 										</h3>
 										<p className="text-gray-600 dark:text-gray-300">
-											{t('home:use_cases.case1.desc')}
+											{isZh
+												? '把你的答疑助手变成全能Agent。客服机器人不再只说「请先点击设置按钮然后点击...」，而是直接帮用户现场操作。'
+												: 'Stop telling users where to click—let AI do it for them. Turn your chatbot from a guide into an operator that actually completes tasks.'}
 										</p>
 									</div>
 								</div>
@@ -485,10 +528,12 @@ export default function HomePage() {
 									</div>
 									<div>
 										<h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-											{t('home:use_cases.case2.title')}
+											{isZh ? '交互升级/智能化改造' : 'Modernize Legacy Apps'}
 										</h3>
 										<p className="text-gray-600 dark:text-gray-300">
-											{t('home:use_cases.case2.desc')}
+											{isZh
+												? '一行代码，老应用变身Agent，产品专家帮用户操作复杂 B 端软件。降低人工支持成本，提高用户满意度。'
+												: 'Add AI superpowers to old software without rebuilding. One script tag transforms complex enterprise tools into chat-driven interfaces.'}
 										</p>
 									</div>
 								</div>
@@ -502,10 +547,12 @@ export default function HomePage() {
 									</div>
 									<div>
 										<h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-											{t('home:use_cases.case3.title')}
+											{isZh ? '产品教学' : 'Interactive Walkthroughs'}
 										</h3>
 										<p className="text-gray-600 dark:text-gray-300">
-											{t('home:use_cases.case3.desc')}
+											{isZh
+												? '向用户演示交互过程，边做边教。例如让AI演示「如何提交报销申请」的完整操作流程。'
+												: "Show, don't tell. Let AI demonstrate workflows in real-time—perfect for onboarding or training new users on complex systems."}
 										</p>
 									</div>
 								</div>
@@ -519,10 +566,12 @@ export default function HomePage() {
 									</div>
 									<div>
 										<h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-											{t('home:use_cases.case4.title')}
+											{isZh ? '无障碍支持' : 'Accessibility First'}
 										</h3>
 										<p className="text-gray-600 dark:text-gray-300">
-											{t('home:use_cases.case4.desc')}
+											{isZh
+												? '为视障用户、老年用户提供自然语言交互，对接屏幕阅读器或语音助理，让软件人人可用。'
+												: 'Make web apps accessible through natural language. Perfect for screen readers, voice control, or users who find traditional interfaces challenging.'}
 										</p>
 									</div>
 								</div>

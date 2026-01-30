@@ -3,22 +3,14 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 
 import commonEn from './locales/en-US/common'
-import docsEn from './locales/en-US/docs'
-import homeEn from './locales/en-US/home'
 import commonZh from './locales/zh-CN/common'
-import docsZh from './locales/zh-CN/docs'
-import homeZh from './locales/zh-CN/home'
 
 const resources = {
 	'zh-CN': {
 		common: commonZh,
-		home: homeZh,
-		docs: docsZh,
 	},
 	'en-US': {
 		common: commonEn,
-		home: homeEn,
-		docs: docsEn,
 	},
 }
 

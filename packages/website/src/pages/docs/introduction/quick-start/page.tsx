@@ -4,16 +4,18 @@ import CodeEditor from '@/components/CodeEditor'
 import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '@/constants'
 
 export default function QuickStart() {
-	const { t, i18n } = useTranslation('docs')
+	const { i18n } = useTranslation()
 	const isZh = i18n.language === 'zh-CN'
 
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">{t('quick_start.title')}</h1>
+			<h1 className="text-4xl font-bold mb-6">Quick Start</h1>
 
-			<p className=" mb-6 leading-relaxed">{t('quick_start.subtitle')}</p>
+			<p className=" mb-6 leading-relaxed">
+				{isZh ? '几分钟内完成 page-agent 的集成。' : 'Integrate page-agent in minutes.'}
+			</p>
 
-			<h2 className="text-2xl font-bold mb-3">{t('quick_start.installation')}</h2>
+			<h2 className="text-2xl font-bold mb-3">{isZh ? '安装步骤' : 'Installation Steps'}</h2>
 
 			<div className="space-y-4 mb-6">
 				{/* Demo CDN - One Line */}
@@ -67,7 +69,7 @@ import { PageAgent } from 'page-agent'`}
 
 				<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-purple-900 dark:text-purple-300">
-						{t('quick_start.step2_title')}
+						{isZh ? '2. 初始化配置' : '2. Initialize Configuration'}
 					</h3>
 					<CodeEditor
 						code={`const agent = new PageAgent({
@@ -82,7 +84,7 @@ import { PageAgent } from 'page-agent'`}
 
 				<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2 text-orange-900 dark:text-orange-300">
-						{t('quick_start.step3_title')}
+						{isZh ? '3. 开始使用' : '3. Start Using'}
 					</h3>
 					<CodeEditor
 						code={`// ${isZh ? '程序化执行自然语言指令' : 'Execute natural language instructions programmatically'}

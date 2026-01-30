@@ -1,13 +1,20 @@
+import { useTranslation } from 'react-i18next'
+
 import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
 
 export default function BestPractices() {
+	const { i18n } = useTranslation()
+	const isZh = i18n.language === 'zh-CN'
+
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">最佳实践</h1>
+			<h1 className="text-4xl font-bold mb-6">{isZh ? '最佳实践' : 'Best Practices'}</h1>
 			<BetaNotice />
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-				使用 page-agent 的最佳实践和常见问题解决方案。
+				{isZh
+					? '使用 page-agent 的最佳实践和常见问题解决方案。'
+					: 'Best practices and common solutions for using page-agent.'}
 			</p>
 			<CodeEditor code={`// TODO`} />
 		</div>

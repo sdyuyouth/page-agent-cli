@@ -4,21 +4,26 @@ import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
 
 export default function CustomTools() {
-	const { t } = useTranslation('docs')
+	const { i18n } = useTranslation()
+	const isZh = i18n.language === 'zh-CN'
 
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">{t('custom_tools.title')}</h1>
+			<h1 className="text-4xl font-bold mb-6">{isZh ? '自定义工具' : 'Custom Tools'}</h1>
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-				{t('custom_tools.subtitle')}
+				{isZh
+					? '通过注册自定义工具，扩展 AI Agent 的能力边界。使用 Zod 定义严格的输入接口，让 AI 安全调用你的业务逻辑。'
+					: 'Extend AI Agent capabilities by registering custom tools. Use Zod to define strict input schemas for safe business logic calls.'}
 			</p>
 
 			<div className="space-y-8">
 				<section>
-					<h2 className="text-2xl font-bold mb-4">{t('custom_tools.registration')}</h2>
+					<h2 className="text-2xl font-bold mb-4">{isZh ? '工具注册' : 'Tool Registration'}</h2>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
-						{t('custom_tools.registration_desc')}
+						{isZh
+							? '每个自定义工具需要定义四个核心属性：name、description、input schema 和 execute 函数。'
+							: 'Each custom tool requires four core properties: name, description, input schema, and execute function.'}
 					</p>
 
 					<CodeEditor
@@ -52,12 +57,14 @@ const pageAgent = new PageAgent({customTools})
 				</section>
 
 				<section>
-					<h2 className="text-2xl font-bold mb-4">{t('custom_tools.page_filter')}</h2>
+					<h2 className="text-2xl font-bold mb-4">{isZh ? '页面过滤器' : 'Page Filter'}</h2>
 
 					<BetaNotice />
 
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
-						{t('custom_tools.page_filter_desc')}
+						{isZh
+							? '通过 pageFilter 属性控制工具在哪些页面可见，提升安全性和用户体验。'
+							: 'Control tool visibility on specific pages via the pageFilter property to enhance security and UX.'}
 					</p>
 
 					<CodeEditor
@@ -84,16 +91,28 @@ const pageAgent = new PageAgent({customTools})
 				</section>
 
 				<section>
-					<h2 className="text-2xl font-bold mb-4">{t('custom_tools.best_practices')}</h2>
+					<h2 className="text-2xl font-bold mb-4">{isZh ? '最佳实践' : 'Best Practices'}</h2>
 					<div className="space-y-4">
 						<div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
 							<h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-300 mb-2">
-								{t('custom_tools.bp_performance')}
+								{isZh ? '⚡ 性能优化' : '⚡ Performance Optimization'}
 							</h3>
 							<ul className="text-gray-600 dark:text-gray-300 space-y-1 text-sm">
-								<li>{t('custom_tools.bp_1')}</li>
-								<li>{t('custom_tools.bp_2')}</li>
-								<li>{t('custom_tools.bp_3')}</li>
+								<li>
+									{isZh
+										? '• 使用 pageFilter 减少不必要的工具加载'
+										: '• Use pageFilter to reduce unnecessary tool loading'}
+								</li>
+								<li>
+									{isZh
+										? '• 在 execute 函数中实现适当的缓存机制'
+										: '• Implement appropriate caching in execute functions'}
+								</li>
+								<li>
+									{isZh
+										? '• 避免在工具中执行耗时的同步操作'
+										: '• Avoid long-running sync operations in tools'}
+								</li>
 							</ul>
 						</div>
 					</div>
