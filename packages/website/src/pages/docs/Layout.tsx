@@ -1,6 +1,9 @@
 import { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { siGooglechrome } from 'simple-icons'
 import { Link, useLocation } from 'wouter'
+
+import { SparklesText } from '@/components/ui/sparkles-text'
 
 interface DocsLayoutProps {
 	children: ReactNode
@@ -76,6 +79,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 									<ul className="space-y-2" role="list">
 										{section.items.map((item) => {
 											const isActive = location === item.path
+											const isChromeExtension = item.path === '/features/chrome-extension'
 											return (
 												<li key={item.path}>
 													<Link
@@ -87,7 +91,25 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 														}`}
 														aria-current={isActive ? 'page' : undefined}
 													>
-														{item.title}
+														{isChromeExtension ? (
+															<span className="flex items-center gap-1.5">
+																<svg
+																	className="w-3.5 h-3.5 shrink-0"
+																	viewBox="0 0 24 24"
+																	aria-hidden="true"
+																>
+																	<path d={siGooglechrome.path} fill="currentColor" />
+																</svg>
+																<SparklesText
+																	className="text-[length:inherit] font-[inherit]"
+																	sparklesCount={3}
+																>
+																	{item.title}
+																</SparklesText>
+															</span>
+														) : (
+															item.title
+														)}
 													</Link>
 												</li>
 											)
