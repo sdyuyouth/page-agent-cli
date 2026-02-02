@@ -5,6 +5,12 @@ import { TabsController } from './TabsController'
 import SYSTEM_PROMPT from './system_prompt.md?raw'
 import { createTabTools } from './tabTools'
 
+/** Detect user language from browser settings */
+function detectLanguage(): 'en-US' | 'zh-CN' {
+	const lang = navigator.language || navigator.languages?.[0] || 'en-US'
+	return lang.startsWith('zh') ? 'zh-CN' : 'en-US'
+}
+
 /**
  * MultiPageAgent
  * - use with extension
@@ -17,8 +23,9 @@ export class MultiPageAgent extends PageAgentCore {
 		const pageController = new RemotePageController(tabsController)
 		const customTools = createTabTools(tabsController)
 
-		// system prompt
-		const targetLanguage = config.language === 'zh-CN' ? '中文' : 'English'
+		// system prompt - auto-detect language if not specified
+		const language = config.language ?? detectLanguage()
+		const targetLanguage = language === 'zh-CN' ? '中文' : 'English'
 		const systemPrompt = SYSTEM_PROMPT.replace(
 			/Default working language: \*\*.*?\*\*/,
 			`Default working language: **${targetLanguage}**`
