@@ -88,6 +88,7 @@ export function useAgent(): UseAgentResult {
 	}, [])
 
 	const configure = useCallback(async (newConfig: LLMConfig) => {
+		await chrome.storage.local.set({ llmConfig: newConfig })
 		setConfig(newConfig)
 	}, [])
 
