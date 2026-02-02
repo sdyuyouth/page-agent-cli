@@ -126,6 +126,16 @@ If your lame AI assistant does not support [AGENTS.md](https://agents.md/). Add 
     LLM_BASE_URL=https://api.your-llm-provider.com/v1
     ```
 
+- **Ollama example** (tested on 0.15 + qwen3:14b, RTX3090 24GB):
+
+    ```env
+    LLM_BASE_URL="http://localhost:11434/v1"
+    LLM_API_KEY="NA"
+    LLM_MODEL_NAME="qwen3:14b"
+    ```
+
+    > ⚠️ Add `*` to `OLLAMA_ORIGINS` (403). Models < 10B unlikely strong enough. Requires tool_call support. Set context length > 15k (default 4k will NOT work): `$env:OLLAMA_CONTEXT_LENGTH=64000; ollama serve`
+
 - Restart the dev server to load new env vars
 - If not provided, the demo will the free testing proxy by default
 

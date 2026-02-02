@@ -136,8 +136,8 @@ const pageAgent = new PageAgent({
 // Self-hosted models (e.g., Ollama)
 const pageAgent = new PageAgent({
   baseURL: 'http://localhost:11434/v1',
-  apiKey: 'N/A',  // Ollama typically accepts any value
-  model: 'qwen3:latest'
+  apiKey: 'NA',
+  model: 'qwen3:14b'
 });
 
 // Free testing endpoint
@@ -148,6 +148,51 @@ const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm
 const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 `}
 				/>
+			</section>
+
+			{/* Ollama Section */}
+			<section className="mb-10">
+				<h2 className="text-2xl font-semibold mb-4">Ollama</h2>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '已在 Ollama 0.15 + qwen3:14b (RTX3090 24GB) 上测试通过。'
+						: 'Tested on Ollama 0.15 with qwen3:14b (RTX3090 24GB).'}
+				</p>
+				<CodeEditor
+					code={`LLM_BASE_URL="http://localhost:11434/v1"
+LLM_API_KEY="NA"
+LLM_MODEL_NAME="qwen3:14b"`}
+				/>
+				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+					<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
+						{isZh ? '⚠️ 注意事项' : '⚠️ Important Notes'}
+					</h3>
+					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
+						<li>
+							{isZh
+								? '确保 OLLAMA_ORIGINS 设置为 * 以避免 403 错误'
+								: 'Add * to OLLAMA_ORIGINS to avoid 403 errors'}
+						</li>
+						<li>
+							{isZh
+								? '小于 10B 参数的模型通常效果不佳'
+								: 'Models smaller than 10B are unlikely to be strong enough'}
+						</li>
+						<li>{isZh ? '需要支持 tool_call 的模型' : 'Requires tool_call capable models'}</li>
+						<li>
+							{isZh
+								? '确保上下文长度大于输入 token 数，否则 Ollama 会静默截断 prompt。普通页面约需 15k token，随步骤增加。默认 4k 上下文长度无法正常工作'
+								: 'Ensure context length exceeds input tokens, or Ollama will silently truncate prompts. ~15k tokens for a typical page, increases with steps. Default 4k context length will NOT work'}
+							<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
+								<li>
+									<code className="text-xs bg-gray-200 dark:bg-gray-700 px-1 rounded">
+										$env:OLLAMA_CONTEXT_LENGTH=64000; ollama serve
+									</code>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
 			</section>
 		</div>
 	)
