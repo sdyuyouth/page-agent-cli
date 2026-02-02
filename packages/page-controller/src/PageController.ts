@@ -194,7 +194,7 @@ export class PageController extends EventTarget {
 			interactiveBlacklist: blacklist,
 		})
 
-		this.simplifiedHTML = dom.flatTreeToString(this.flatTree, this.config.include_attributes)
+		this.simplifiedHTML = dom.flatTreeToString(this.flatTree, this.config.includeAttributes)
 
 		this.selectorMap.clear()
 		this.selectorMap = dom.getSelectorMap(this.flatTree)

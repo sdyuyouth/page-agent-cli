@@ -10,7 +10,7 @@ import {
 export interface DomConfig {
 	interactiveBlacklist?: (Element | (() => Element))[]
 	interactiveWhitelist?: (Element | (() => Element))[]
-	include_attributes?: string[]
+	includeAttributes?: string[]
 	highlightOpacity?: number
 	highlightLabelOpacity?: number
 }
@@ -117,7 +117,7 @@ interface TreeNode {
  *
  * @todo 数据脱敏过滤器
  */
-export function flatTreeToString(flatTree: FlatDomTree, include_attributes?: string[]): string {
+export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: string[]): string {
 	const DEFAULT_INCLUDE_ATTRIBUTES = [
 		'title',
 		'type',
@@ -146,7 +146,7 @@ export function flatTreeToString(flatTree: FlatDomTree, include_attributes?: str
 		'aria-owns',
 	]
 
-	const includeAttrs = [...(include_attributes || []), ...DEFAULT_INCLUDE_ATTRIBUTES]
+	const includeAttrs = [...(includeAttributes || []), ...DEFAULT_INCLUDE_ATTRIBUTES]
 
 	// Helper function to cap text length
 	const capTextLength = (text: string, maxLength: number): string => {

@@ -307,7 +307,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Elements to force include for interaction',
 						},
 						{
-							name: 'include_attributes',
+							name: 'includeAttributes',
 							type: 'string[]',
 							description: isZh
 								? '在 DOM 提取中包含的额外属性'
