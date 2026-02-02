@@ -82,7 +82,12 @@ export default function App() {
 				</div>
 				<div className="flex items-center gap-3">
 					<StatusDot status={status} />
-					<Button variant="ghost" size="icon-sm" onClick={() => setShowConfig(true)}>
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onClick={() => setShowConfig(true)}
+						className="cursor-pointer"
+					>
 						<Settings className="size-3.5" />
 					</Button>
 				</div>
@@ -142,7 +147,7 @@ export default function App() {
 								variant="default"
 								onClick={() => handleSubmit()}
 								disabled={!inputValue.trim()}
-								className="size-7"
+								className="size-7 cursor-pointer"
 							>
 								<Send className="size-3" />
 							</InputGroupButton>

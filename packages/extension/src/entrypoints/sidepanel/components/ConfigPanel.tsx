@@ -1,5 +1,5 @@
 import type { LLMConfig } from '@page-agent/llms'
-import { Copy, Loader2 } from 'lucide-react'
+import { Copy, CornerUpLeft, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
@@ -19,6 +19,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [saving, setSaving] = useState(false)
 	const [userAuthToken, setUserAuthToken] = useState<string>('')
 	const [copied, setCopied] = useState(false)
+	const [showToken, setShowToken] = useState(false)
+	const [showApiKey, setShowApiKey] = useState(false)
 
 	// Update local state when config prop changes
 	useEffect(() => {
@@ -69,8 +71,18 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	}
 
 	return (
-		<div className="flex flex-col gap-4 p-4">
-			<h2 className="text-base font-semibold">Settings</h2>
+		<div className="flex flex-col gap-4 p-4 relative">
+			<div className="flex items-center justify-between">
+				<h2 className="text-base font-semibold">Settings</h2>
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					onClick={onClose}
+					className="absolute top-2 right-3 cursor-pointer"
+				>
+					<CornerUpLeft className="size-3.5" />
+				</Button>
+			</div>
 
 			{/* User Auth Token Section */}
 			<div className="flex flex-col gap-1.5 p-3 bg-muted/50 rounded-md border">
@@ -81,9 +93,24 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				<div className="flex gap-2 items-center">
 					<Input
 						readOnly
-						value={userAuthToken || 'Loading...'}
+						value={
+							userAuthToken
+								? showToken
+									? userAuthToken
+									: `${userAuthToken.slice(0, 4)}${'•'.repeat(userAuthToken.length - 8)}${userAuthToken.slice(-4)}`
+								: 'Loading...'
+						}
 						className="text-xs h-8 font-mono bg-background"
 					/>
+					<Button
+						variant="outline"
+						size="icon"
+						className="h-8 w-8 shrink-0 cursor-pointer"
+						onClick={() => setShowToken(!showToken)}
+						disabled={!userAuthToken}
+					>
+						{showToken ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+					</Button>
 					<Button
 						variant="outline"
 						size="icon"
@@ -118,20 +145,34 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">API Key</label>
-				<Input
-					type="password"
-					placeholder="sk-..."
-					value={apiKey}
-					onChange={(e) => setApiKey(e.target.value)}
-					className="text-xs h-8"
-				/>
+				<div className="flex gap-2 items-center">
+					<Input
+						type={showApiKey ? 'text' : 'password'}
+						placeholder="sk-..."
+						value={apiKey}
+						onChange={(e) => setApiKey(e.target.value)}
+						className="text-xs h-8"
+					/>
+					<Button
+						variant="outline"
+						size="icon"
+						className="h-8 w-8 shrink-0 cursor-pointer"
+						onClick={() => setShowApiKey(!showApiKey)}
+					>
+						{showApiKey ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+					</Button>
+				</div>
 			</div>
 
 			<div className="flex gap-2 mt-2">
-				<Button variant="outline" onClick={onClose} className="flex-1 h-8 text-xs">
+				<Button variant="outline" onClick={onClose} className="flex-1 h-8 text-xs cursor-pointer">
 					Cancel
 				</Button>
-				<Button onClick={handleSave} disabled={saving} className="flex-1 h-8 text-xs">
+				<Button
+					onClick={handleSave}
+					disabled={saving}
+					className="flex-1 h-8 text-xs cursor-pointer"
+				>
 					{saving ? <Loader2 className="size-3 animate-spin" /> : 'Save'}
 				</Button>
 			</div>
