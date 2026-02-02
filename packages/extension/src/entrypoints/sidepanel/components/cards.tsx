@@ -315,9 +315,7 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 				<ResultCard
 					success={input?.success ?? true}
 					text={input?.text || event.action.output || ''}
-				>
-					<RawSection rawRequest={event.rawRequest} rawResponse={event.rawResponse} />
-				</ResultCard>
+				/>
 			</>
 		)
 	}
