@@ -7,9 +7,8 @@ import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-import extPkg from '../../../../package.json'
-
-const CORE_VERSION = extPkg.dependencies['@page-agent/core']
+declare const __EXT_VERSION__: string
+declare const __CORE_VERSION__: string
 
 interface ConfigPanelProps {
 	config: LLMConfig | null
@@ -220,10 +219,10 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 				<div className="flex flex-col items-end">
 					<span>
-						Extension <span className="font-mono">v{extPkg.version}</span>
+						Extension <span className="font-mono">v{__EXT_VERSION__}</span>
 					</span>
 					<span>
-						PageAgent <span className="font-mono">v{CORE_VERSION}</span>
+						PageAgent <span className="font-mono">v{__CORE_VERSION__}</span>
 					</span>
 				</div>
 			</div>

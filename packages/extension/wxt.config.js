@@ -1,9 +1,11 @@
 import tailwindcss from '@tailwindcss/vite'
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, readFileSync } from 'node:fs'
 import { defineConfig } from 'wxt'
 
 const chromeProfile = '.wxt/chrome-data'
 mkdirSync(chromeProfile, { recursive: true })
+
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -16,6 +18,10 @@ export default defineConfig({
 	},
 	vite: () => ({
 		plugins: [tailwindcss()],
+		define: {
+			__EXT_VERSION__: JSON.stringify(pkg.version),
+			__CORE_VERSION__: JSON.stringify(pkg.dependencies['@page-agent/core']),
+		},
 		optimizeDeps: {
 			force: true,
 		},
