@@ -1,10 +1,15 @@
 import type { LLMConfig } from '@page-agent/llms'
-import { Copy, CornerUpLeft, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Copy, CornerUpLeft, Eye, EyeOff, HatGlasses, Home, Loader2, Scale } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { siGithub } from 'simple-icons'
 
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+
+import extPkg from '../../../../package.json'
+
+const CORE_VERSION = extPkg.dependencies['@page-agent/core']
 
 interface ConfigPanelProps {
 	config: LLMConfig | null
@@ -175,6 +180,67 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				>
 					{saving ? <Loader2 className="size-3 animate-spin" /> : 'Save'}
 				</Button>
+			</div>
+
+			{/* Footer */}
+			<div className="mt-4 mb-4 pt-4 border-t border-border/50 flex gap-2 justify-between text-[10px] text-muted-foreground">
+				<div className="flex flex-col justify-between">
+					<a
+						href="https://github.com/alibaba/page-agent"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-1 hover:text-foreground"
+					>
+						<svg role="img" viewBox="0 0 24 24" className="size-3 fill-current">
+							<path d={siGithub.path} />
+						</svg>
+						<span>Source Code</span>
+					</a>
+
+					<a
+						href="https://alibaba.github.io/page-agent/"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-1 hover:text-foreground"
+					>
+						<Home className="size-3" />
+						<span>Home Page</span>
+					</a>
+
+					<a
+						href="https://github.com/alibaba/page-agent/blob/main/packages/extension/PRIVACY.md"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-1 hover:text-foreground"
+					>
+						<HatGlasses className="size-3" />
+						<span>Privacy Policy</span>
+					</a>
+				</div>
+
+				<div className="flex flex-col items-end">
+					<span>
+						Extension <span className="font-mono">v{extPkg.version}</span>
+					</span>
+					<span>
+						PageAgent <span className="font-mono">v{CORE_VERSION}</span>
+					</span>
+				</div>
+			</div>
+
+			{/* attribute */}
+			<div className="text-[10px] text-muted-foreground bg-background fixed bottom-0 w-full flex justify-around">
+				<span className="leading-loose">
+					Built with ♥️ by{' '}
+					<a
+						href="https://github.com/gaomeng1900"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline hover:text-foreground"
+					>
+						@Simon
+					</a>
+				</span>
 			</div>
 		</div>
 	)

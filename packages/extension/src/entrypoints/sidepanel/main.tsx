@@ -6,6 +6,16 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 
 import '@/assets/index.css'
 
+// Sync dark mode with system preference
+const syncDarkMode = () => {
+	document.documentElement.classList.toggle(
+		'dark',
+		matchMedia('(prefers-color-scheme: dark)').matches
+	)
+}
+syncDarkMode()
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncDarkMode)
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
 		<ErrorBoundary>
