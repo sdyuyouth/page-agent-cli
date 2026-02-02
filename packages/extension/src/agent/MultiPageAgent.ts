@@ -12,9 +12,17 @@ import { createTabTools } from './tabTools'
  */
 export class MultiPageAgent extends PageAgentCore {
 	constructor(config: Omit<PageAgentConfig, 'pageController'>) {
+		// multi page controller
 		const tabsController = new TabsController()
 		const pageController = new RemotePageController(tabsController)
 		const customTools = createTabTools(tabsController)
+
+		// system prompt
+		const targetLanguage = config.language === 'zh-CN' ? '中文' : 'English'
+		const systemPrompt = SYSTEM_PROMPT.replace(
+			/Default working language: \*\*.*?\*\*/,
+			`Default working language: **${targetLanguage}**`
+		)
 
 		/**
 		 * When the agent is in side-panel and user closed the side-panel.
@@ -29,7 +37,7 @@ export class MultiPageAgent extends PageAgentCore {
 			...config,
 			pageController: pageController as any,
 			customTools: customTools,
-			customSystemPrompt: SYSTEM_PROMPT,
+			customSystemPrompt: systemPrompt,
 
 			onBeforeTask: async (agent) => {
 				await tabsController.init(agent.task)

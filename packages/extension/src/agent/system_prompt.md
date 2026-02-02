@@ -10,7 +10,7 @@ You excel at following tasks:
 </intro>
 
 <language_settings>
-- Default working language: **中文**
+- Default working language: **English**
 - Use the language that user is using. Return in user's language.
 </language_settings>
 
