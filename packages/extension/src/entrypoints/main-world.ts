@@ -15,19 +15,13 @@ export type Execute = (
 ) => Promise<ExecutionResult>
 
 export default defineUnlistedScript(() => {
-	const w = window as any
-
 	let _lastId = 0
 	function getId() {
 		_lastId += 1
 		return _lastId
 	}
 
-	w.PAGE_AGENT_EXT_INSTALLED = true
-	w.PAGE_AGENT_EXT_VERSION = __EXT_VERSION__
-	w.PAGE_AGENT_EXT_CORE_VERSION = __CORE_VERSION__
-
-	w.execute = async (task: string, llmConfig: LLMConfig, hooks?: ExecuteHooks) => {
+	const execute: Execute = async (task, llmConfig, hooks) => {
 		if (typeof task !== 'string') throw new Error('Task must be a string')
 		if (task.trim().length === 0) throw new Error('Task cannot be empty')
 		if (!llmConfig) throw new Error('LLM config is required')
@@ -95,7 +89,7 @@ export default defineUnlistedScript(() => {
 		return promise
 	}
 
-	w.dispose = () => {
+	const dispose = () => {
 		const id = getId()
 
 		window.postMessage(
@@ -106,5 +100,12 @@ export default defineUnlistedScript(() => {
 			},
 			'*'
 		)
+	}
+
+	;(window as any).PAGE_AGENT_EXT_VERSION = __EXT_VERSION__
+	;(window as any).PAGE_AGENT_EXT = {
+		version: __EXT_VERSION__,
+		execute,
+		dispose,
 	}
 })

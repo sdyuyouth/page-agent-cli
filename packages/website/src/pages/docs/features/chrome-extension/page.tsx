@@ -103,13 +103,13 @@ export default function ChromeExtension() {
 							isZh
 								? `// 1. 用户安装扩展并在扩展设置中配置 auth token
 // 2. 你的页面读取相同的 token 并存入 localStorage
-// 3. Token 匹配后，扩展会暴露 window.execute() 和 window.dispose()
+// 3. Token 匹配后，扩展会暴露 window.PAGE_AGENT_EXT 对象
 
 // ⚠️ 请在扩展弹窗中查看你的 auth token，然后填入下方
 localStorage.setItem('PageAgentExtUserAuthToken', '<从扩展中获取的-token>')`
 								: `// 1. User installs extension and sets an auth token in extension settings
 // 2. Your page reads the same token and stores it in localStorage
-// 3. After token match, extension exposes window.execute() and window.dispose()
+// 3. After token match, extension exposes window.PAGE_AGENT_EXT object
 
 // ⚠️ Check your extension popup for the auth token
 localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')`
@@ -122,7 +122,39 @@ localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')
 				<section>
 					<h2 className="text-2xl font-bold mb-4">{isZh ? 'API 参考' : 'API Reference'}</h2>
 
-					<h3 className="text-xl font-semibold mb-3">window.execute(task, llmConfig, hooks?)</h3>
+					{/* AI Assistant Instructions */}
+					<section className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+						<h3 className="text-lg font-semibold text-purple-900 dark:text-purple-300 mb-2">
+							🤖 {isZh ? '给 AI 编程助手的文档' : 'Instructions for Your AI Assistant'}
+						</h3>
+						<p className="text-gray-600 dark:text-gray-300 mb-3 text-sm">
+							{isZh
+								? '如果你在使用 AI 编程助手（如 Cursor、GitHub Copilot），可以将以下文档链接提供给它，让它更好地理解和使用 Page Agent 扩展 API：'
+								: 'If you are using an AI coding assistant (like Cursor, GitHub Copilot), share these documentation links with it for better understanding of Page Agent Extension API:'}
+						</p>
+						<div className="space-y-2">
+							<a
+								href="https://github.com/alibaba/page-agent/blob/main/packages/extension/docs/extension_api.md"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="block text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+							>
+								📄 {isZh ? '英文版 API 文档' : 'API Documentation (English)'}
+							</a>
+							<a
+								href="https://github.com/alibaba/page-agent/blob/main/packages/extension/docs/extension_api_zh.md"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="block text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+							>
+								📄 {isZh ? '中文版 API 文档' : 'API Documentation (Chinese)'}
+							</a>
+						</div>
+					</section>
+
+					<h3 className="text-xl font-semibold my-3">
+						PAGE_AGENT_EXT.execute(task, llmConfig, hooks?)
+					</h3>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
 							? '使用 LLM 配置执行任务。返回一个 Promise，在任务完成时 resolve。可选的 hooks 参数用于监听任务执行过程中的事件。'
@@ -133,7 +165,7 @@ localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')
 						code={
 							isZh
 								? `// 使用 LLM 配置和 hooks 执行任务
-const result = await window.execute(
+const result = await window.PAGE_AGENT_EXT.execute(
 	'在 GitHub 上搜索 "page-agent" 并打开第一个结果',
 	{
 		baseURL: 'https://api.openai.com/v1',
@@ -150,7 +182,7 @@ const result = await window.execute(
 
 console.log(result) // 任务执行结果`
 								: `// Execute a task with LLM configuration and hooks
-const result = await window.execute(
+const result = await window.PAGE_AGENT_EXT.execute(
 	'Search for "page-agent" on GitHub and open the first result',
 	{
 		baseURL: 'https://api.openai.com/v1',
@@ -170,7 +202,7 @@ console.log(result) // Task execution result`
 						language="javascript"
 					/>
 
-					<h3 className="text-xl font-semibold mt-6 mb-3">window.dispose()</h3>
+					<h3 className="text-xl font-semibold mt-6 mb-3">PAGE_AGENT_EXT.dispose()</h3>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
 							? '停止当前正在运行的任务。停止后 Agent 可以重新使用。'
@@ -181,9 +213,9 @@ console.log(result) // Task execution result`
 						code={
 							isZh
 								? `// 停止当前任务
-window.dispose()`
+window.PAGE_AGENT_EXT.dispose()`
 								: `// Stop current task execution
-window.dispose()`
+window.PAGE_AGENT_EXT.dispose()`
 						}
 						language="javascript"
 					/>
