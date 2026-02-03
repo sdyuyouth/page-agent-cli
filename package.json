@@ -49,7 +49,7 @@
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-react-dom": "^2.7.2",
         "eslint-plugin-react-hooks": "^7.0.1",
-        "eslint-plugin-react-refresh": "^0.4.26",
+        "eslint-plugin-react-refresh": "^0.5.0",
         "eslint-plugin-react-x": "^2.7.2",
         "globals": "^17.0.0",
         "husky": "^9.1.7",
