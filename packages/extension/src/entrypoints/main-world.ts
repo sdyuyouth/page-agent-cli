@@ -23,6 +23,10 @@ export default defineUnlistedScript(() => {
 		return _lastId
 	}
 
+	w.PAGE_AGENT_EXT_INSTALLED = true
+	w.PAGE_AGENT_EXT_VERSION = __EXT_VERSION__
+	w.PAGE_AGENT_EXT_CORE_VERSION = __CORE_VERSION__
+
 	w.execute = async (task: string, llmConfig: LLMConfig, hooks?: ExecuteHooks) => {
 		if (typeof task !== 'string') throw new Error('Task must be a string')
 		if (task.trim().length === 0) throw new Error('Task cannot be empty')

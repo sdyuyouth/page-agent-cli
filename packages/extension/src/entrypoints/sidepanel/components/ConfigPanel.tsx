@@ -7,9 +7,6 @@ import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-declare const __EXT_VERSION__: string
-declare const __CORE_VERSION__: string
-
 interface ConfigPanelProps {
 	config: LLMConfig | null
 	onSave: (config: LLMConfig) => Promise<void>
