@@ -33,7 +33,6 @@ import type {
   AgentStatus,
   ExecutionResult,
   HistoricalEvent,
-  LLMConfig,
 } from '@page-agent/core'
 
 // 等待插件注入（最多 1 秒）
@@ -48,18 +47,13 @@ async function waitForExtension(timeout = 1000): Promise<boolean> {
 
 // 使用
 if (await waitForExtension()) {
-  const result = await window.PAGE_AGENT_EXT!.execute(
-    '点击登录按钮',
-    {
-      baseURL: 'https://api.openai.com/v1',
-      apiKey: 'your-api-key',
-      model: 'gpt-5.2',
-    },
-    {
-      onStatusChange: (status) => console.log('状态:', status),
-      onActivity: (activity) => console.log('活动:', activity),
-    }
-  )
+  const result = await window.PAGE_AGENT_EXT!.execute('点击登录按钮', {
+    baseURL: 'https://api.openai.com/v1',
+    apiKey: 'your-api-key',
+    model: 'gpt-5.2',
+    onStatusChange: (status) => console.log('状态:', status),
+    onActivity: (activity) => console.log('活动:', activity),
+  })
   console.log('结果:', result)
 }
 ```
@@ -76,7 +70,7 @@ if (await waitForExtension()) {
 
 主 API 命名空间对象，包含：
 
-#### `PAGE_AGENT_EXT.execute(task, llmConfig, hooks?)`
+#### `PAGE_AGENT_EXT.execute(task, config)`
 
 执行 Agent 任务。
 
@@ -85,8 +79,7 @@ if (await waitForExtension()) {
 | 名称 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `task` | `string` | 是 | 任务描述 |
-| `llmConfig` | `LLMConfig` | 是 | LLM 配置 |
-| `hooks` | `ExecuteHooks` | 否 | 事件回调 |
+| `config` | `ExecuteConfig` | 是 | 执行配置（LLM 设置、选项和事件回调） |
 
 **返回：** `Promise<ExecutionResult>`
 
@@ -104,21 +97,26 @@ import type {
   AgentStatus,
   ExecutionResult,
   HistoricalEvent,
-  LLMConfig,
 } from '@page-agent/core'
 
-export interface ExecuteHooks {
+export interface ExecuteConfig {
+  baseURL: string
+  apiKey: string
+  model: string
+
+  /**
+   * 是否将初始标签页（运行此脚本的页面）包含在任务中。
+   * @default true
+   */
+  includeInitialTab?: boolean
+
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
   onDispose?: () => void
 }
 
-export type Execute = (
-  task: string,
-  llmConfig: LLMConfig,
-  hooks?: ExecuteHooks
-) => Promise<ExecutionResult>
+export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
 ```
 
 ### AgentStatus
@@ -164,16 +162,6 @@ type HistoricalEvent =
   | { type: 'error'; message: string; rawResponse?: unknown }
 ```
 
-### LLMConfig
-
-```typescript
-interface LLMConfig {
-  baseURL: string   // 例如 'https://api.openai.com/v1'
-  apiKey: string
-  model: string     // 例如 'gpt-5.2'
-}
-```
-
 ### ExecutionResult
 
 ```typescript
@@ -205,44 +193,63 @@ if (result.success) {
 }
 ```
 
+### 排除初始标签页
+
+默认情况下，Agent 会将初始标签页（运行脚本的页面）包含在任务中。设置 `includeInitialTab: false` 可以排除它：
+
+```typescript
+const result = await window.PAGE_AGENT_EXT!.execute(
+  '打开新标签页并在 GitHub 上搜索 page-agent',
+  {
+    baseURL: 'https://api.openai.com/v1',
+    apiKey: process.env.OPENAI_API_KEY!,
+    model: 'gpt-5.2',
+    includeInitialTab: false,  // Agent 只会打开新标签页
+  }
+)
+```
+
 ### 使用事件回调
 
 ```typescript
-await window.PAGE_AGENT_EXT!.execute(
-  '导航到设置页面',
-  llmConfig,
-  {
-    onStatusChange: (status) => {
-      updateUI({ agentStatus: status })
-    },
-    onActivity: (activity) => {
-      switch (activity.type) {
-        case 'thinking':
-          showSpinner('Agent 正在思考...')
-          break
-        case 'executing':
-          showSpinner(`正在执行: ${activity.tool}`)
-          break
-        case 'executed':
-          log(`${activity.tool} 完成，耗时 ${activity.duration}ms`)
-          break
-        case 'error':
-          showError(activity.message)
-          break
-      }
-    },
-    onHistoryUpdate: (history) => {
-      renderHistory(history)
-    },
-  }
-)
+await window.PAGE_AGENT_EXT!.execute('导航到设置页面', {
+  baseURL: 'https://api.openai.com/v1',
+  apiKey: process.env.OPENAI_API_KEY!,
+  model: 'gpt-5.2',
+  onStatusChange: (status) => {
+    updateUI({ agentStatus: status })
+  },
+  onActivity: (activity) => {
+    switch (activity.type) {
+      case 'thinking':
+        showSpinner('Agent 正在思考...')
+        break
+      case 'executing':
+        showSpinner(`正在执行: ${activity.tool}`)
+        break
+      case 'executed':
+        log(`${activity.tool} 完成，耗时 ${activity.duration}ms`)
+        break
+      case 'error':
+        showError(activity.message)
+        break
+    }
+  },
+  onHistoryUpdate: (history) => {
+    renderHistory(history)
+  },
+})
 ```
 
 ### 停止执行
 
 ```typescript
 // 启动任务
-window.PAGE_AGENT_EXT!.execute('滚动浏览所有页面', llmConfig)
+window.PAGE_AGENT_EXT!.execute('滚动浏览所有页面', {
+  baseURL: 'https://api.openai.com/v1',
+  apiKey: process.env.OPENAI_API_KEY!,
+  model: 'gpt-5.2',
+})
 
 // 稍后停止
 window.PAGE_AGENT_EXT!.dispose()
@@ -258,24 +265,25 @@ import type {
   AgentStatus,
   ExecutionResult,
   HistoricalEvent,
-  LLMConfig,
 } from '@page-agent/core'
+
+interface ExecuteConfig {
+  baseURL: string
+  apiKey: string
+  model: string
+  includeInitialTab?: boolean
+  onStatusChange?: (status: AgentStatus) => void
+  onActivity?: (activity: AgentActivity) => void
+  onHistoryUpdate?: (history: HistoricalEvent[]) => void
+  onDispose?: () => void
+}
 
 declare global {
   interface Window {
     PAGE_AGENT_EXT_VERSION?: string
     PAGE_AGENT_EXT?: {
       version: string
-      execute: (
-        task: string,
-        llmConfig: LLMConfig,
-        hooks?: {
-          onStatusChange?: (status: AgentStatus) => void
-          onActivity?: (activity: AgentActivity) => void
-          onHistoryUpdate?: (history: HistoricalEvent[]) => void
-          onDispose?: () => void
-        }
-      ) => Promise<ExecutionResult>
+      execute: (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
       dispose: () => void
     }
   }

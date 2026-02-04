@@ -33,7 +33,6 @@ import type {
   AgentStatus,
   ExecutionResult,
   HistoricalEvent,
-  LLMConfig,
 } from '@page-agent/core'
 
 // Wait for extension injection (up to 1 second)
@@ -48,18 +47,13 @@ async function waitForExtension(timeout = 1000): Promise<boolean> {
 
 // Usage
 if (await waitForExtension()) {
-  const result = await window.PAGE_AGENT_EXT!.execute(
-    'Click the login button',
-    {
-      baseURL: 'https://api.openai.com/v1',
-      apiKey: 'your-api-key',
-      model: 'gpt-5.2',
-    },
-    {
-      onStatusChange: (status) => console.log('Status:', status),
-      onActivity: (activity) => console.log('Activity:', activity),
-    }
-  )
+  const result = await window.PAGE_AGENT_EXT!.execute('Click the login button', {
+    baseURL: 'https://api.openai.com/v1',
+    apiKey: 'your-api-key',
+    model: 'gpt-5.2',
+    onStatusChange: (status) => console.log('Status:', status),
+    onActivity: (activity) => console.log('Activity:', activity),
+  })
   console.log('Result:', result)
 }
 ```
@@ -76,7 +70,7 @@ Extension version string (e.g., `"1.0.0"`). This is exposed separately to allow 
 
 Main API namespace object containing:
 
-#### `PAGE_AGENT_EXT.execute(task, llmConfig, hooks?)`
+#### `PAGE_AGENT_EXT.execute(task, config)`
 
 Execute an agent task.
 
@@ -85,8 +79,7 @@ Execute an agent task.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `task` | `string` | Yes | Task description |
-| `llmConfig` | `LLMConfig` | Yes | LLM configuration |
-| `hooks` | `ExecuteHooks` | No | Event callbacks |
+| `config` | `ExecuteConfig` | Yes | Execution configuration (LLM settings, options, and event callbacks) |
 
 **Returns:** `Promise<ExecutionResult>`
 
@@ -104,21 +97,26 @@ import type {
   AgentStatus,
   ExecutionResult,
   HistoricalEvent,
-  LLMConfig,
 } from '@page-agent/core'
 
-export interface ExecuteHooks {
+export interface ExecuteConfig {
+  baseURL: string
+  apiKey: string
+  model: string
+
+  /**
+   * Whether to include the initial tab (that holds this main world script) in the task.
+   * @default true
+   */
+  includeInitialTab?: boolean
+
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
   onDispose?: () => void
 }
 
-export type Execute = (
-  task: string,
-  llmConfig: LLMConfig,
-  hooks?: ExecuteHooks
-) => Promise<ExecutionResult>
+export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
 ```
 
 ### AgentStatus
@@ -164,16 +162,6 @@ type HistoricalEvent =
   | { type: 'error'; message: string; rawResponse?: unknown }
 ```
 
-### LLMConfig
-
-```typescript
-interface LLMConfig {
-  baseURL: string   // e.g. 'https://api.openai.com/v1'
-  apiKey: string
-  model: string     // e.g. 'gpt-5.2'
-}
-```
-
 ### ExecutionResult
 
 ```typescript
@@ -205,44 +193,63 @@ if (result.success) {
 }
 ```
 
-### With Event Hooks
+### Exclude Initial Tab
+
+By default, the agent includes the initial tab (where the script runs) in the task. Set `includeInitialTab: false` to exclude it:
 
 ```typescript
-await window.PAGE_AGENT_EXT!.execute(
-  'Navigate to the settings page',
-  llmConfig,
+const result = await window.PAGE_AGENT_EXT!.execute(
+  'Open a new tab and search for page-agent on GitHub',
   {
-    onStatusChange: (status) => {
-      updateUI({ agentStatus: status })
-    },
-    onActivity: (activity) => {
-      switch (activity.type) {
-        case 'thinking':
-          showSpinner('Agent is thinking...')
-          break
-        case 'executing':
-          showSpinner(`Executing: ${activity.tool}`)
-          break
-        case 'executed':
-          log(`${activity.tool} completed in ${activity.duration}ms`)
-          break
-        case 'error':
-          showError(activity.message)
-          break
-      }
-    },
-    onHistoryUpdate: (history) => {
-      renderHistory(history)
-    },
+    baseURL: 'https://api.openai.com/v1',
+    apiKey: process.env.OPENAI_API_KEY!,
+    model: 'gpt-5.2',
+    includeInitialTab: false,  // Agent will open new tabs only
   }
 )
+```
+
+### With Event Callbacks
+
+```typescript
+await window.PAGE_AGENT_EXT!.execute('Navigate to the settings page', {
+  baseURL: 'https://api.openai.com/v1',
+  apiKey: process.env.OPENAI_API_KEY!,
+  model: 'gpt-5.2',
+  onStatusChange: (status) => {
+    updateUI({ agentStatus: status })
+  },
+  onActivity: (activity) => {
+    switch (activity.type) {
+      case 'thinking':
+        showSpinner('Agent is thinking...')
+        break
+      case 'executing':
+        showSpinner(`Executing: ${activity.tool}`)
+        break
+      case 'executed':
+        log(`${activity.tool} completed in ${activity.duration}ms`)
+        break
+      case 'error':
+        showError(activity.message)
+        break
+    }
+  },
+  onHistoryUpdate: (history) => {
+    renderHistory(history)
+  },
+})
 ```
 
 ### Stop Execution
 
 ```typescript
 // Start a task
-window.PAGE_AGENT_EXT!.execute('Scroll through all pages', llmConfig)
+window.PAGE_AGENT_EXT!.execute('Scroll through all pages', {
+  baseURL: 'https://api.openai.com/v1',
+  apiKey: process.env.OPENAI_API_KEY!,
+  model: 'gpt-5.2',
+})
 
 // Later, stop it
 window.PAGE_AGENT_EXT!.dispose()
@@ -258,24 +265,25 @@ import type {
   AgentStatus,
   ExecutionResult,
   HistoricalEvent,
-  LLMConfig,
 } from '@page-agent/core'
+
+interface ExecuteConfig {
+  baseURL: string
+  apiKey: string
+  model: string
+  includeInitialTab?: boolean
+  onStatusChange?: (status: AgentStatus) => void
+  onActivity?: (activity: AgentActivity) => void
+  onHistoryUpdate?: (history: HistoricalEvent[]) => void
+  onDispose?: () => void
+}
 
 declare global {
   interface Window {
     PAGE_AGENT_EXT_VERSION?: string
     PAGE_AGENT_EXT?: {
       version: string
-      execute: (
-        task: string,
-        llmConfig: LLMConfig,
-        hooks?: {
-          onStatusChange?: (status: AgentStatus) => void
-          onActivity?: (activity: AgentActivity) => void
-          onHistoryUpdate?: (history: HistoricalEvent[]) => void
-          onDispose?: () => void
-        }
-      ) => Promise<ExecutionResult>
+      execute: (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
       dispose: () => void
     }
   }

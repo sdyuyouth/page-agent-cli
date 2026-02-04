@@ -69,11 +69,11 @@ async function exposeAgentToPage() {
 				}
 
 				try {
-					const { task, llmConfig } = payload
+					const { task, config } = payload
 
 					// create when used
 
-					multiPageAgent = new MultiPageAgent(llmConfig)
+					multiPageAgent = new MultiPageAgent(config)
 
 					// events
 

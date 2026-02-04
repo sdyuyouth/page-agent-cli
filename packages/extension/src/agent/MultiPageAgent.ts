@@ -17,7 +17,7 @@ function detectLanguage(): 'en-US' | 'zh-CN' {
  * - can be used from a side panel or a content script
  */
 export class MultiPageAgent extends PageAgentCore {
-	constructor(config: Omit<PageAgentConfig, 'pageController'>) {
+	constructor(config: Omit<PageAgentConfig, 'pageController'> & { includeInitialTab?: boolean }) {
 		// multi page controller
 		const tabsController = new TabsController()
 		const pageController = new RemotePageController(tabsController)
@@ -30,6 +30,9 @@ export class MultiPageAgent extends PageAgentCore {
 			/Default working language: \*\*.*?\*\*/,
 			`Default working language: **${targetLanguage}**`
 		)
+
+		// include initial tab for controlling
+		const includeInitialTab = config.includeInitialTab ?? true
 
 		/**
 		 * When the agent is in side-panel and user closed the side-panel.
@@ -47,7 +50,7 @@ export class MultiPageAgent extends PageAgentCore {
 			customSystemPrompt: systemPrompt,
 
 			onBeforeTask: async (agent) => {
-				await tabsController.init(agent.task)
+				await tabsController.init(agent.task, includeInitialTab)
 
 				heartBeatInterval = window.setInterval(() => {
 					chrome.storage.local.set({

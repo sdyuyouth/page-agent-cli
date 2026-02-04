@@ -152,27 +152,24 @@ localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')
 						</div>
 					</section>
 
-					<h3 className="text-xl font-semibold my-3">
-						PAGE_AGENT_EXT.execute(task, llmConfig, hooks?)
-					</h3>
+					<h3 className="text-xl font-semibold my-3">PAGE_AGENT_EXT.execute(task, config)</h3>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
-							? '使用 LLM 配置执行任务。返回一个 Promise，在任务完成时 resolve。可选的 hooks 参数用于监听任务执行过程中的事件。'
-							: 'Execute a task with LLM configuration. Returns a Promise that resolves when the task completes. Optional hooks parameter for listening to events during task execution.'}
+							? '使用配置执行任务。返回一个 Promise，在任务完成时 resolve。config 参数包含 LLM 设置、选项和事件回调。'
+							: 'Execute a task with configuration. Returns a Promise that resolves when the task completes. Config includes LLM settings, options, and event callbacks.'}
 					</p>
 
 					<CodeEditor
 						code={
 							isZh
-								? `// 使用 LLM 配置和 hooks 执行任务
+								? `// 使用配置执行任务
 const result = await window.PAGE_AGENT_EXT.execute(
 	'在 GitHub 上搜索 "page-agent" 并打开第一个结果',
 	{
 		baseURL: 'https://api.openai.com/v1',
 		apiKey: 'your-api-key',
-		model: 'gpt-5-2'
-	},
-	{
+		model: 'gpt-5-2',
+		// includeInitialTab: false, // 设为 false 排除初始标签页
 		onStatusChange: status => console.log('状态变化:', status),
 		onActivity: activity => console.log('活动:', activity),
 		onHistoryUpdate: history => console.log('历史更新:', history),
@@ -181,15 +178,14 @@ const result = await window.PAGE_AGENT_EXT.execute(
 )
 
 console.log(result) // 任务执行结果`
-								: `// Execute a task with LLM configuration and hooks
+								: `// Execute a task with configuration
 const result = await window.PAGE_AGENT_EXT.execute(
 	'Search for "page-agent" on GitHub and open the first result',
 	{
 		baseURL: 'https://api.openai.com/v1',
 		apiKey: 'your-api-key',
-		model: 'gpt-5-2'
-	},
-	{
+		model: 'gpt-5-2',
+		// includeInitialTab: false, // Set to false to exclude initial tab
 		onStatusChange: status => console.log('Status change:', status),
 		onActivity: activity => console.log('Activity:', activity),
 		onHistoryUpdate: history => console.log('History update:', history),
@@ -221,41 +217,26 @@ window.PAGE_AGENT_EXT.dispose()`
 					/>
 				</section>
 
-				{/* LLM Config */}
+				{/* ExecuteConfig */}
 				<section>
-					<h2 className="text-2xl font-bold mb-4">{isZh ? 'LLM 配置' : 'LLM Configuration'}</h2>
-
-					<CodeEditor
-						code={
-							isZh
-								? `interface LLMConfig {
-	baseURL: string   // LLM API 端点
-	apiKey: string    // API 密钥
-	model: string     // 模型名称
-}`
-								: `interface LLMConfig {
-	baseURL: string   // LLM API endpoint
-	apiKey: string    // API key
-	model: string     // Model name
-}`
-						}
-						language="typescript"
-					/>
-				</section>
-
-				{/* Execute Hooks */}
-				<section>
-					<h2 className="text-2xl font-bold mb-4">{isZh ? 'Execute Hooks' : 'Execute Hooks'}</h2>
+					<h2 className="text-2xl font-bold mb-4">{isZh ? '执行配置' : 'Execute Configuration'}</h2>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
-							? '通过 hooks 参数，你可以监听任务执行过程中的各种事件，实现实时更新 UI、日志记录等功能。'
-							: 'With hooks parameter, you can listen to various events during task execution for real-time UI updates, logging, and more.'}
+							? 'config 参数包含 LLM 设置、选项和事件回调，用于控制任务执行行为。'
+							: 'The config parameter includes LLM settings, options, and event callbacks to control task execution behavior.'}
 					</p>
 
 					<CodeEditor
 						code={
 							isZh
-								? `interface ExecuteHooks {
+								? `interface ExecuteConfig {
+	baseURL: string   // LLM API 端点
+	apiKey: string    // API 密钥
+	model: string     // 模型名称
+
+	// 是否将初始标签页包含在任务中，默认 true
+	includeInitialTab?: boolean
+
 	// Agent 状态变化时调用（idle, running, error, completed 等）
 	onStatusChange?: (status: AgentStatus) => void
 
@@ -268,7 +249,14 @@ window.PAGE_AGENT_EXT.dispose()`
 	// Agent 被停止时调用
 	onDispose?: () => void
 }`
-								: `interface ExecuteHooks {
+								: `interface ExecuteConfig {
+	baseURL: string   // LLM API endpoint
+	apiKey: string    // API key
+	model: string     // Model name
+
+	// Whether to include the initial tab in the task, default true
+	includeInitialTab?: boolean
+
 	// Called when agent status changes (idle, running, error, completed, etc.)
 	onStatusChange?: (status: AgentStatus) => void
 

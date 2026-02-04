@@ -12,7 +12,7 @@ export class TabsController extends EventTarget {
 	private task: string = ''
 	private windowId: number | null = null
 
-	async init(task: string) {
+	async init(task: string, includeInitialTab: boolean = true) {
 		this.task = task
 		this.tabs = []
 		this.currentTabId = null
@@ -26,15 +26,17 @@ export class TabsController extends EventTarget {
 		})
 
 		this.initialTabId = result.tabId
-		this.currentTabId = result.tabId
-
-		this.tabs.push({
-			id: result.tabId,
-			isInitial: true,
-		})
 
 		if (!this.initialTabId) {
 			throw new Error('Failed to get initial tab ID')
+		}
+
+		if (includeInitialTab) {
+			this.currentTabId = this.initialTabId
+			this.tabs.push({
+				id: result.tabId,
+				isInitial: true,
+			})
 		}
 
 		await this.updateCurrentTabId(this.currentTabId)
@@ -230,6 +232,10 @@ export class TabsController extends EventTarget {
 				`| ${tab.id} | ${url} | ${title} | ${this.currentTabId === tab.id ? '✅' : ''} |`
 			)
 		}
+		if (!this.tabs.length) {
+			summaries.push('\nNo tabs available. Open a tab if needed.')
+		}
+
 		return summaries.join('\n')
 	}
 

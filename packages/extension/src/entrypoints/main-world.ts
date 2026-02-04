@@ -1,18 +1,23 @@
 import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
-import type { LLMConfig } from '@page-agent/llms'
 
-export interface ExecuteHooks {
+export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
+
+export interface ExecuteConfig {
+	baseURL: string
+	apiKey: string
+	model: string
+
+	/**
+	 * Whether to include the initial tab (that holds this main world script) in the task.
+	 * @default true
+	 */
+	includeInitialTab?: boolean
+
 	onStatusChange?: (status: AgentStatus) => void
 	onActivity?: (activity: AgentActivity) => void
 	onHistoryUpdate?: (history: HistoricalEvent[]) => void
 	onDispose?: () => void
 }
-
-export type Execute = (
-	task: string,
-	llmConfig: LLMConfig,
-	hooks?: ExecuteHooks
-) => Promise<ExecutionResult>
 
 export default defineUnlistedScript(() => {
 	let _lastId = 0
@@ -21,13 +26,13 @@ export default defineUnlistedScript(() => {
 		return _lastId
 	}
 
-	const execute: Execute = async (task, llmConfig, hooks) => {
+	const execute: Execute = async (task, config) => {
 		if (typeof task !== 'string') throw new Error('Task must be a string')
 		if (task.trim().length === 0) throw new Error('Task cannot be empty')
-		if (!llmConfig) throw new Error('LLM config is required')
-		if (!llmConfig.baseURL) throw new Error('LLM config must have a baseURL')
-		if (!llmConfig.apiKey) throw new Error('LLM config must have an apiKey')
-		if (!llmConfig.model) throw new Error('LLM config must have a model')
+		if (!config) throw new Error('Config is required')
+		if (!config.baseURL) throw new Error('Config must have a baseURL')
+		if (!config.apiKey) throw new Error('Config must have an apiKey')
+		if (!config.model) throw new Error('Config must have a model')
 
 		const id = getId()
 
@@ -40,29 +45,30 @@ export default defineUnlistedScript(() => {
 
 				// events
 
-				if (data.action === 'status_change_event' && hooks?.onStatusChange) {
-					hooks.onStatusChange(data.payload)
+				if (data.action === 'status_change_event' && config.onStatusChange) {
+					config.onStatusChange(data.payload)
 					return
 				}
 
-				if (data.action === 'activity_event' && hooks?.onActivity) {
-					hooks.onActivity(data.payload)
+				if (data.action === 'activity_event' && config.onActivity) {
+					config.onActivity(data.payload)
 					return
 				}
 
-				if (data.action === 'history_change_event' && hooks?.onHistoryUpdate) {
-					hooks.onHistoryUpdate(data.payload)
+				if (data.action === 'history_change_event' && config.onHistoryUpdate) {
+					config.onHistoryUpdate(data.payload)
 					return
 				}
 
-				if (data.action === 'dispose_event' && hooks?.onDispose) {
-					hooks.onDispose()
+				if (data.action === 'dispose_event' && config.onDispose) {
+					config.onDispose()
+					window.removeEventListener('message', handleMessage)
 					return
 				}
-
-				// result
 
 				if (data.action !== 'execute_result') return
+
+				// execute_result
 
 				window.removeEventListener('message', handleMessage)
 
@@ -73,6 +79,7 @@ export default defineUnlistedScript(() => {
 				}
 			}
 
+			// @note will be removed on dispose or result
 			window.addEventListener('message', handleMessage)
 		})
 
@@ -81,7 +88,15 @@ export default defineUnlistedScript(() => {
 				channel: 'PAGE_AGENT_EXT_REQUEST',
 				id,
 				action: 'execute',
-				payload: { task, llmConfig },
+				payload: {
+					task,
+					config: {
+						baseURL: config.baseURL,
+						apiKey: config.apiKey,
+						model: config.model,
+						includeInitialTab: config.includeInitialTab,
+					},
+				},
 			},
 			'*'
 		)
