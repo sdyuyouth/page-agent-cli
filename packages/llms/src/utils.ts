@@ -74,6 +74,10 @@ export function modelPatch(body: Record<string, any>) {
 		} else if (modelName.startsWith('gpt-51')) {
 			debug('Applying GPT-51 patch: disable reasoning')
 			body.reasoning_effort = 'none'
+		} else if (modelName.startsWith('gpt-5-mini')) {
+			debug('Applying GPT-5-mini patch: set reasoning effort to low, temperature to 1')
+			body.reasoning_effort = 'low'
+			body.temperature = 1
 		} else if (modelName.startsWith('gpt-5')) {
 			debug('Applying GPT-5 patch: set reasoning effort to low')
 			body.reasoning_effort = 'low'
