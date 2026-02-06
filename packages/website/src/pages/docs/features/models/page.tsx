@@ -1,34 +1,39 @@
 import CodeEditor from '@/components/CodeEditor'
 import { useLanguage } from '@/i18n/context'
 
-// Recommended models: lightweight with excellent tool call capabilities
-const MODELS = {
-	recommended: [
-		'gpt-4.1-mini',
-		'claude-haiku-4.5',
-		'gemini-3-flash',
-		'deepseek-3.2',
-		'gpt-5.2',
-		'qwen-3-max',
-	],
-	verified: [
-		'qwen-3-plus',
-		'gpt-4.1',
-		'gpt-5',
-		'gpt-5-mini',
-		'grok-4',
-		'grok-code-fast',
-		'claude-sonnet-3.5',
-		'claude-sonnet-4.5',
-		'claude-opus-4.5',
-		'gemini-2.5',
-		'gemini-3-pro',
-	],
+const BASELINE = new Set([
+	'gpt-5.1',
+	'claude-haiku-4.5',
+	'gemini-3-flash',
+	'deepseek-3.2',
+	'qwen-3-max',
+])
+
+// Models grouped by brand, newest first
+const MODEL_GROUPS: Record<string, string[]> = {
+	OpenAI: ['gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
+	Anthropic: ['claude-opus-4.5', 'claude-sonnet-4.5', 'claude-haiku-4.5', 'claude-sonnet-3.5'],
+	Google: ['gemini-3-pro', 'gemini-3-flash', 'gemini-2.5'],
+	Qwen: ['qwen-3-max', 'qwen-3-plus', 'qwen3:14b (ollama)'],
+	DeepSeek: ['deepseek-3.2'],
+	xAI: ['grok-4', 'grok-code-fast'],
 }
+
+const ModelBadge = ({ model, baseline }: { model: string; baseline?: boolean }) => (
+	<div
+		className={`px-3 py-1.5 rounded-md text-sm font-medium font-mono transition-colors ${
+			baseline
+				? 'bg-emerald-500 text-white shadow-sm'
+				: 'bg-white/80 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600'
+		}`}
+	>
+		{model}
+		{baseline && <span className="ml-1">⭐</span>}
+	</div>
+)
 
 export default function Models() {
 	const { isZh } = useLanguage()
-	const allModels = [...MODELS.recommended, ...MODELS.verified]
 
 	return (
 		<div className="max-w-4xl">
@@ -45,26 +50,20 @@ export default function Models() {
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '推荐使用 ToolCall 能力强的轻量级模型。'
-						: 'Recommended: Lightweight models with strong ToolCall capabilities.'}
+						: 'Recommended: Fast, lightweight models with strong ToolCall capabilities.'}
 				</p>
 				<div className="bg-linear-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30 rounded-xl p-6 border border-emerald-200/50 dark:border-emerald-800/50">
-					<div className="flex flex-wrap gap-2">
-						{allModels.map((model) => {
-							const isRecommended = MODELS.recommended.includes(model)
-							return (
-								<div
-									key={model}
-									className={`px-3 py-1.5 rounded-md text-sm font-medium font-mono transition-colors ${
-										isRecommended
-											? 'bg-emerald-500 text-white shadow-sm'
-											: 'bg-white/80 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600'
-									}`}
-								>
-									{model}
-									{isRecommended && <span className="ml-1">⭐</span>}
-								</div>
-							)
-						})}
+					<div className="space-y-3">
+						{Object.entries(MODEL_GROUPS).map(([brand, models]) => (
+							<div key={brand} className="flex flex-wrap items-center gap-2">
+								<span className="text-xs font-semibold text-gray-500 dark:text-gray-400 w-20 shrink-0">
+									{brand}
+								</span>
+								{models.map((model) => (
+									<ModelBadge key={model} model={model} baseline={BASELINE.has(model)} />
+								))}
+							</div>
+						))}
 					</div>
 					<p className="text-xs text-gray-600 dark:text-gray-400 mt-5">⭐ baseline models</p>
 				</div>
