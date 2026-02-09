@@ -362,11 +362,6 @@ export default function TroubleshootingPage() {
 			{/* Header */}
 			<div className="mb-10">
 				<h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">Troubleshooting</h1>
-				{/* <p className="text-lg text-gray-600 dark:text-gray-300">
-					{isZh
-						? '遇到问题了？按症状查找解决方案。'
-						: 'Running into issues? Find solutions by symptom.'}
-				</p> */}
 			</div>
 
 			{/* Two-column: content + TOC */}

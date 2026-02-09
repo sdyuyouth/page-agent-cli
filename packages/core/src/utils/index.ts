@@ -1,3 +1,5 @@
+import chalk from 'chalk'
+
 export { normalizeResponse } from './autoFixer'
 
 /**
@@ -84,4 +86,20 @@ export function uid() {
 	const id = randomID(ids)
 	ids.push(id)
 	return id
+}
+
+/**
+ * Simple assertion function that throws an error if the condition is falsy
+ * @param condition - The condition to assert
+ * @param message - Optional error message
+ * @throws Error if condition is falsy
+ */
+export function assert(condition: unknown, message?: string, silent?: boolean): asserts condition {
+	if (!condition) {
+		const errorMessage = message ?? 'Assertion failed'
+
+		if (!silent) console.error(chalk.red(`❌ assert: ${errorMessage}`))
+
+		throw new Error(errorMessage)
+	}
 }

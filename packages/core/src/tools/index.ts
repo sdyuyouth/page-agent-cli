@@ -2,7 +2,7 @@
  * Internal tools for PageAgent.
  * @note Adapted from browser-use
  */
-import zod, { type z } from 'zod'
+import * as zod from 'zod'
 
 import type { PageAgentCore } from '../PageAgentCore'
 import { waitFor } from '../utils'
@@ -13,7 +13,7 @@ import { waitFor } from '../utils'
 export interface PageAgentTool<TParams = any> {
 	// name: string
 	description: string
-	inputSchema: z.ZodType<TParams>
+	inputSchema: zod.ZodType<TParams>
 	execute: (this: PageAgentCore, args: TParams) => Promise<string>
 }
 

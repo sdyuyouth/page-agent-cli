@@ -5,13 +5,13 @@
 import { InvokeError, LLM, type Tool } from '@page-agent/llms'
 import type { PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
-import zod from 'zod'
+import * as zod from 'zod'
 
 import { type PageAgentConfig } from './config'
 import { DEFAULT_MAX_STEPS } from './config/constants'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
-import {
+import type {
 	AgentActivity,
 	AgentReflection,
 	AgentStatus,
@@ -21,8 +21,7 @@ import {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { normalizeResponse, trimLines, uid, waitFor } from './utils'
-import { assert } from './utils/assert'
+import { assert, normalizeResponse, trimLines, uid, waitFor } from './utils'
 
 export { type PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
@@ -209,20 +208,20 @@ export class PageAgentCore extends EventTarget {
 			lastURL: '',
 		}
 
-		try {
-			let step = 0
+		let step = 0
 
-			while (true) {
+		while (true) {
+			try {
+				console.group(`step: ${step}`)
+
 				await this.#generateObservations(step)
 
 				await onBeforeStep?.(this, step)
 
-				console.group(`step: ${step}`)
-
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
 
-				// Thinking
+				// status
 				console.log(chalk.blue('Thinking...'))
 				this.#emitActivity({ type: 'thinking' })
 
@@ -270,22 +269,13 @@ export class PageAgentCore extends EventTarget {
 
 				//
 
+				await onAfterStep?.(this, this.history)
+
 				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
 
-				await onAfterStep?.(this, this.history)
+				// finish task if done
 
-				step++
-				if (step > this.config.maxSteps) {
-					this.#onDone(false)
-					const result: ExecutionResult = {
-						success: false,
-						data: 'Step count exceeded maximum limit',
-						history: this.history,
-					}
-					await onAfterTask?.(this, result)
-					return result
-				}
 				if (actionName === 'done') {
 					const success = action.input?.success ?? false
 					const text = action.input?.text || 'no text provided'
@@ -299,19 +289,32 @@ export class PageAgentCore extends EventTarget {
 					await onAfterTask?.(this, result)
 					return result
 				}
+			} catch (error: unknown) {
+				console.groupEnd() // to prevent nested groups
+				console.error('Task failed', error)
+				const errorMessage = String(error)
+				this.#emitActivity({ type: 'error', message: errorMessage })
+				this.#onDone(false)
+				const result: ExecutionResult = {
+					success: false,
+					data: errorMessage,
+					history: this.history,
+				}
+				await onAfterTask?.(this, result)
+				return result
 			}
-		} catch (error: unknown) {
-			console.error('Task failed', error)
-			const errorMessage = String(error)
-			this.#emitActivity({ type: 'error', message: errorMessage })
-			this.#onDone(false)
-			const result: ExecutionResult = {
-				success: false,
-				data: errorMessage,
-				history: this.history,
+
+			step++
+			if (step > this.config.maxSteps) {
+				this.#onDone(false)
+				const result: ExecutionResult = {
+					success: false,
+					data: 'Step count exceeded maximum limit',
+					history: this.history,
+				}
+				await onAfterTask?.(this, result)
+				return result
 			}
-			await onAfterTask?.(this, result)
-			return result
 		}
 	}
 

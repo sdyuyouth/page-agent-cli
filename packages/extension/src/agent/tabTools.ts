@@ -6,7 +6,7 @@
  * - switch_to_tab: Switch to an existing tab
  * - close_tab: Close a tab (optionally switch to another)
  */
-import zod from 'zod'
+import * as zod from 'zod'
 
 import type { TabsController } from './TabsController'
 

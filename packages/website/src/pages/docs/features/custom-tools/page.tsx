@@ -25,7 +25,7 @@ export default function CustomTools() {
 					</p>
 
 					<CodeEditor
-						code={`import zod from 'zod'
+						code={`import * as zod from 'zod'
 import { PageAgent, tool } from 'page-agent'
 
 // override internal tool
