@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 import CodeEditor from '@/components/CodeEditor'
 import { useLanguage } from '@/i18n/context'
 
@@ -6,22 +8,30 @@ const BASELINE = new Set([
 	'claude-haiku-4.5',
 	'gemini-3-flash',
 	'deepseek-3.2',
-	'qwen-3-max',
+	'qwen3-coder-next',
 ])
 
 // Models grouped by brand, newest first
 const MODEL_GROUPS: Record<string, string[]> = {
 	OpenAI: ['gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
-	Anthropic: ['claude-opus-4.5', 'claude-sonnet-4.5', 'claude-haiku-4.5', 'claude-sonnet-3.5'],
 	Google: ['gemini-3-pro', 'gemini-3-flash', 'gemini-2.5'],
-	Qwen: ['qwen-3-max', 'qwen-3-plus', 'qwen3:14b (ollama)'],
+	Qwen: ['qwen3-coder-next', 'qwen-3-max', 'qwen-3-plus', 'qwen3:14b (ollama)'],
 	DeepSeek: ['deepseek-3.2'],
-	xAI: ['grok-4', 'grok-code-fast'],
+	Anthropic: [
+		'claude-opus-4.6',
+		'claude-opus-4.5',
+		'claude-sonnet-4.5',
+		'claude-haiku-4.5',
+		'claude-sonnet-3.5',
+	],
+	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
+	MoonshotAI: ['kimi-k2.5'],
+	'Z.AI': ['glm-4.7'],
 }
 
 const ModelBadge = ({ model, baseline }: { model: string; baseline?: boolean }) => (
 	<div
-		className={`px-3 py-1.5 rounded-md text-sm font-medium font-mono transition-colors ${
+		className={`px-3 py-1.5 rounded-md text-xs font-medium font-mono transition-colors ${
 			baseline
 				? 'bg-emerald-500 text-white shadow-sm'
 				: 'bg-white/80 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600'
@@ -53,19 +63,20 @@ export default function Models() {
 						: 'Recommended: Fast, lightweight models with strong ToolCall capabilities.'}
 				</p>
 				<div className="bg-linear-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30 rounded-xl p-6 border border-emerald-200/50 dark:border-emerald-800/50">
-					<div className="space-y-3">
+					<div className="grid grid-cols-[5rem_1fr] gap-x-3 gap-y-3 items-start">
 						{Object.entries(MODEL_GROUPS).map(([brand, models]) => (
-							<div key={brand} className="flex flex-wrap items-center gap-2">
-								<span className="text-xs font-semibold text-gray-500 dark:text-gray-400 w-20 shrink-0">
+							<Fragment key={brand}>
+								<span className="text-xs font-semibold text-gray-500 dark:text-gray-400 pt-2">
 									{brand}
 								</span>
-								{models.map((model) => (
-									<ModelBadge key={model} model={model} baseline={BASELINE.has(model)} />
-								))}
-							</div>
+								<div className="flex flex-wrap gap-2">
+									{models.map((model) => (
+										<ModelBadge key={model} model={model} baseline={BASELINE.has(model)} />
+									))}
+								</div>
+							</Fragment>
 						))}
 					</div>
-					<p className="text-xs text-gray-600 dark:text-gray-400 mt-5">⭐ baseline models</p>
 				</div>
 			</section>
 

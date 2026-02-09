@@ -136,12 +136,12 @@ Here are examples of good output patterns. Use them as reference but never copy 
 </examples>
 
 <output>
-You must ALWAYS respond with a valid JSON in this exact format:
-
 {
   "evaluation_previous_goal": "Concise one-sentence analysis of your last action. Clearly state success, failure, or uncertain.",
   "memory": "1-3 concise sentences of specific memory of this step and overall progress. You should put here everything that will help you track progress in future steps. Like counting pages visited, items found, etc.",
-  "next_goal": "State the next immediate goal and action to achieve it, in one clear sentence."
-  "action":{"action_name": {// action-specific parameter}}
+  "next_goal": "State the next immediate goal and action to achieve it, in one clear sentence.",
+  "action":{
+    "Action name": {// Action parameters}
+  }
 }
 </output>

@@ -40,7 +40,7 @@
 
 ```html
 <script
-    src="https://registry.npmmirror.com/page-agent/1.1.0/files/dist/iife/page-agent.demo.js"
+    src="https://registry.npmmirror.com/page-agent/1.1.1/files/dist/iife/page-agent.demo.js"
     crossorigin="true"
 ></script>
 ```
@@ -50,8 +50,8 @@
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.1.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.1.0/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.1.1/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.1.1/files/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 
