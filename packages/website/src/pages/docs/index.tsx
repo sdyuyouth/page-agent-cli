@@ -20,6 +20,7 @@ import Limitations from './introduction/limitations/page'
 // Introduction
 import Overview from './introduction/overview/page'
 import QuickStart from './introduction/quick-start/page'
+import Troubleshooting from './introduction/troubleshooting/page'
 
 function DocsPage({ children }: { children: React.ReactNode }) {
 	return (
@@ -49,6 +50,11 @@ export default function DocsRouter() {
 			<Route path="/introduction/limitations">
 				<DocsPage>
 					<Limitations />
+				</DocsPage>
+			</Route>
+			<Route path="/introduction/troubleshooting">
+				<DocsPage>
+					<Troubleshooting />
 				</DocsPage>
 			</Route>
 

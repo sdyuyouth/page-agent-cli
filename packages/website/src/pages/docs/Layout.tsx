@@ -31,6 +31,10 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: isZh ? '快速开始' : 'Quick Start', path: '/introduction/quick-start' },
 				{ title: isZh ? '使用限制' : 'Limitations', path: '/introduction/limitations' },
 				{
+					title: isZh ? '故障排查' : 'Troubleshooting',
+					path: '/introduction/troubleshooting',
+				},
+				{
 					title: '🚧 ' + (isZh ? '最佳实践' : 'Best Practices'),
 					path: '/integration/best-practices',
 				},
