@@ -31,7 +31,7 @@ tools.set(
 	'done',
 	tool({
 		description:
-			'Complete task - provide a summary of results for the user. Set success=True if task completed successfully, false otherwise. Text should be your response to the user summarizing results.',
+			'Complete task. Text is your final response to the user — keep it concise unless the user explicitly asks for detail.',
 		inputSchema: zod.object({
 			text: zod.string(),
 			success: zod.boolean().default(true),
@@ -47,8 +47,7 @@ tools.set(
 tools.set(
 	'wait',
 	tool({
-		description:
-			'Wait for x seconds. default 1s (max 10 seconds, min 1 second). This can be used to wait until the page or data is fully loaded.',
+		description: 'Wait for x seconds. Can be used to wait until the page or data is fully loaded.',
 		inputSchema: zod.object({
 			seconds: zod.number().min(1).max(10).default(1),
 		}),
@@ -106,7 +105,7 @@ tools.set(
 tools.set(
 	'input_text',
 	tool({
-		description: 'Click and input text into a input interactive element',
+		description: 'Click and type text into an interactive input element',
 		inputSchema: zod.object({
 			index: zod.int().min(0),
 			text: zod.string(),
@@ -140,8 +139,7 @@ tools.set(
 tools.set(
 	'scroll',
 	tool({
-		description:
-			'Scroll the page by specified number of pages (set down=True to scroll down, down=False to scroll up, num_pages=number of pages to scroll like 0.5 for half page, 1.0 for one page, etc.). Optional index parameter to scroll within a specific element or its scroll container (works well for dropdowns and custom UI components). Optional pixels parameter to scroll by a specific number of pixels instead of pages.',
+		description: 'Scroll the page vertically. Use index for scroll elements (dropdowns/custom UI).',
 		inputSchema: zod.object({
 			down: zod.boolean().default(true),
 			num_pages: zod.number().min(0).max(10).optional().default(0.1),
@@ -158,11 +156,14 @@ tools.set(
 	})
 )
 
+/**
+ * @todo Tables need a dedicated parser to extract structured data. This tool is useless.
+ */
 tools.set(
 	'scroll_horizontally',
 	tool({
 		description:
-			'Scroll the page or element horizontally (set right=True to scroll right, right=False to scroll left, pixels=number of pixels to scroll). Optional index parameter to scroll within a specific element or its scroll container (works well for wide tables).',
+			'Scroll the page horizontally, or within a specific element by index. Useful for wide tables.',
 		inputSchema: zod.object({
 			right: zod.boolean().default(true),
 			pixels: zod.number().int().min(0),
@@ -190,8 +191,6 @@ tools.set(
 	})
 )
 
-// @todo get_dropdown_options
-// @todo select_dropdown_option
 // @todo send_keys
 // @todo upload_file
 // @todo go_back

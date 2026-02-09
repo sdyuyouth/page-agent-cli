@@ -347,7 +347,7 @@ export class PageAgentCore extends EventTarget {
 		})
 
 		return {
-			description: 'You MUST call this tool every step. Outputs your reflections and next action.',
+			description: 'You MUST call this tool every step!',
 			inputSchema: macroToolSchema as zod.ZodType<MacroToolInput>,
 			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
 				// abort

@@ -128,7 +128,6 @@ Exhibit the following reasoning patterns to successfully achieve the <user_reque
 Here are examples of good output patterns. Use them as reference but never copy them directly.
 
 <evaluation_examples>
-- Positive Examples:
 "evaluation_previous_goal": "Successfully navigated to the product page and found the target information. Verdict: Success"
 "evaluation_previous_goal": "Clicked the login button and user authentication form appeared. Verdict: Success"
 </evaluation_examples>
@@ -139,7 +138,6 @@ Here are examples of good output patterns. Use them as reference but never copy 
 
 <next_goal_examples>
 "next_goal": "Click on the 'Add to Cart' button to proceed with the purchase flow."
-"next_goal": "Extract details from the first item on the page."
 </next_goal_examples>
 </examples>
 
