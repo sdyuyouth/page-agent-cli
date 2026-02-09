@@ -377,13 +377,6 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Execute a task and return result. Contains success, data, and history fields.',
 						},
 						{
-							name: 'pushObservation(content: string)',
-							type: 'void',
-							description: isZh
-								? '向历史流推送一个观察事件，会在下一步时被 LLM 看到'
-								: 'Push an observation to history stream, will be seen by LLM in next step',
-						},
-						{
 							name: 'dispose(reason?: string)',
 							type: 'void',
 							description: isZh

@@ -67,6 +67,7 @@ export class PageAgentCore extends EventTarget {
 
 	#llm: LLM
 	#abortController = new AbortController()
+	#observations: string[] = []
 
 	/** PageController for DOM operations */
 	pageController: PageController
@@ -165,12 +166,13 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	/**
-	 * Push a persistent observation to the history event stream.
-	 * This will be visible in <agent_history> and remain in memory across steps.
+	 * Push a observation message to the history event stream.
+	 * This will be visible in <agent_history> and remain persistent in memory across steps.
+	 * @experimental @internal
+	 * @note history change will be emitted before next step starts
 	 */
 	pushObservation(content: string): void {
-		this.history.push({ type: 'observation', content })
-		this.#emitHistoryChange()
+		this.#observations.push(content)
 	}
 
 	async execute(task: string): Promise<ExecutionResult> {
@@ -214,7 +216,15 @@ export class PageAgentCore extends EventTarget {
 			try {
 				console.group(`step: ${step}`)
 
-				await this.#generateObservations(step)
+				await this.#systemObservations(step)
+
+				if (this.#observations.length > 0) {
+					for (const content of this.#observations) {
+						this.history.push({ type: 'observation', content })
+					}
+					this.#observations = []
+					this.#emitHistoryChange()
+				}
 
 				await onBeforeStep?.(this, step)
 
@@ -468,13 +478,13 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	/**
-	 * Generate observations before each step
+	 * Generate system observations before each step
 	 * - URL change detection
 	 * - Too many steps warning
 	 * @todo loop detection
 	 * @todo console error
 	 */
-	async #generateObservations(stepCount: number): Promise<void> {
+	async #systemObservations(stepCount: number): Promise<void> {
 		// Detect URL change
 		const currentURL = await this.pageController.getCurrentUrl()
 		if (currentURL !== this.states.lastURL) {
