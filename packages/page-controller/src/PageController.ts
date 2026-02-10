@@ -248,7 +248,7 @@ export class PageController extends EventTarget {
 			if (element instanceof HTMLAnchorElement && element.target === '_blank') {
 				return {
 					success: true,
-					message: `✅ Clicked element (${elemText ?? index}). ⚠️ Link opens in a new tab. You are not capable of reading new tabs.`,
+					message: `✅ Clicked element (${elemText ?? index}). ⚠️ Link opened in a new tab.`,
 				}
 			}
 
