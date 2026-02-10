@@ -49,6 +49,9 @@ export class LLM extends EventTarget {
 	): Promise<InvokeResult> {
 		return await withRetry(
 			async () => {
+				// in case user aborted before invoking
+				if (abortSignal.aborted) throw new Error('AbortError')
+
 				const result = await this.client.invoke(messages, tools, abortSignal, options)
 
 				return result

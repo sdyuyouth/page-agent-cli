@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 import { InvokeError, LLM, type Tool } from '@page-agent/llms'
-import type { PageController } from '@page-agent/page-controller'
+import type { BrowserState, PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import * as zod from 'zod'
 
@@ -31,6 +31,15 @@ export type * from './types'
  * AI agent for browser automation.
  *
  * @remarks
+ * ## Re-act Agent Loop
+ * - step
+ *    - observe (gather information about current environment and context)
+ *    - think (LLM calling)
+ *      - reflection (evaluate history, generate memory, short-term planning)
+ *      - action (give the action to approach the next goal)
+ *    - act (execute the action)
+ * - loop
+ *
  * ## Event System
  * - `statuschange` - Agent status transitions (idle → running → completed/error)
  * - `historychange` - History events updated (persistent, part of agent memory)
@@ -72,12 +81,14 @@ export class PageAgentCore extends EventTarget {
 	#abortController = new AbortController()
 	#observations: string[] = []
 
-	/** internal states of a single task execution */
+	/** internal states during a single task execution */
 	#states = {
 		/** Accumulated wait time in seconds */
 		totalWaitTime: 0,
-		/** Last known URL for detecting navigation */
+		/** For detecting navigation */
 		lastURL: '',
+		/** Browser state */
+		browserState: null as BrowserState | null,
 	}
 
 	constructor(config: PageAgentConfig & { pageController: PageController }) {
@@ -202,7 +213,7 @@ export class PageAgentCore extends EventTarget {
 		this.#emitHistoryChange()
 
 		// Reset internal states
-		this.#states = { totalWaitTime: 0, lastURL: '' }
+		this.#states = { totalWaitTime: 0, lastURL: '', browserState: null }
 
 		let step = 0
 
@@ -212,16 +223,14 @@ export class PageAgentCore extends EventTarget {
 
 				await onBeforeStep?.(this, step)
 
+				// observe (update browser state and other observations)
+
+				console.log(chalk.blue.bold('👀 Observing...'))
+
+				this.#states.browserState = await this.pageController.getBrowserState()
 				await this.#handleObservations(step)
 
-				// abort
-				if (this.#abortController.signal.aborted) throw new Error('AbortError')
-
-				// status
-				console.log(chalk.blue('Thinking...'))
-				this.#emitActivity({ type: 'thinking' })
-
-				// invoke LLM
+				// assemble prompts
 
 				const messages = [
 					{ role: 'system' as const, content: this.#getSystemPrompt() },
@@ -229,6 +238,11 @@ export class PageAgentCore extends EventTarget {
 				]
 
 				const tools = { AgentOutput: this.#packMacroTool() }
+
+				// invoke LLM
+
+				console.log(chalk.blue.bold('🧠 Thinking...'))
+				this.#emitActivity({ type: 'thinking' })
 
 				const result = await this.#llm.invoke(messages, tools, this.#abortController.signal, {
 					toolChoiceName: 'AgentOutput',
@@ -267,7 +281,6 @@ export class PageAgentCore extends EventTarget {
 
 				await onAfterStep?.(this, this.history)
 
-				console.log(chalk.green('Step finished:'), actionName)
 				console.groupEnd()
 
 				// finish task if done
@@ -435,10 +448,10 @@ export class PageAgentCore extends EventTarget {
 		if (!instructions) return ''
 
 		const systemInstructions = instructions.system?.trim()
-		const url = await this.pageController.getCurrentUrl()
 		let pageInstructions: string | undefined
 
-		if (instructions.getPageInstructions) {
+		const url = this.#states.browserState?.url || ''
+		if (instructions.getPageInstructions && url) {
 			try {
 				pageInstructions = instructions.getPageInstructions(url)?.trim()
 			} catch (error) {
@@ -479,7 +492,7 @@ export class PageAgentCore extends EventTarget {
 		}
 
 		// Detect URL change
-		const currentURL = await this.pageController.getCurrentUrl()
+		const currentURL = this.#states.browserState?.url || ''
 		if (currentURL !== this.#states.lastURL) {
 			this.pushObservation(`Page navigated to → ${currentURL}`)
 			this.#states.lastURL = currentURL
@@ -502,6 +515,7 @@ export class PageAgentCore extends EventTarget {
 		if (this.#observations.length > 0) {
 			for (const content of this.#observations) {
 				this.history.push({ type: 'observation', content })
+				console.log(chalk.cyan('Observation:'), content)
 			}
 			this.#observations = []
 			this.#emitHistoryChange()
@@ -509,6 +523,8 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	async #assembleUserPrompt(): Promise<string> {
+		const browserState = this.#states.browserState!
+
 		let prompt = ''
 
 		// <instructions> (optional)
@@ -561,8 +577,6 @@ export class PageAgentCore extends EventTarget {
 		prompt += '</agent_history>\n\n'
 
 		// <browser_state>
-
-		const browserState = await this.pageController.getBrowserState()
 
 		let pageContent = browserState.content
 		if (this.config.transformPageContent) {
