@@ -49,14 +49,16 @@ export type * from './types'
  *    - Types: thinking, executing, executed, retrying, error
  */
 export class PageAgentCore extends EventTarget {
-	config: PageAgentConfig & { maxSteps: number }
-	id = uid()
-	tools: typeof tools
+	readonly id = uid()
+	readonly config: PageAgentConfig & { maxSteps: number }
+	readonly tools: typeof tools
+	/** PageController for DOM operations */
+	readonly pageController: PageController
+
 	task = ''
 	taskId = ''
-
-	/** Agent execution status */
-	#status: AgentStatus = 'idle'
+	/** History events */
+	history: HistoricalEvent[] = []
 
 	/**
 	 * Callback for when agent needs user input (ask_user tool)
@@ -65,23 +67,18 @@ export class PageAgentCore extends EventTarget {
 	 */
 	onAskUser?: (question: string) => Promise<string>
 
+	#status: AgentStatus = 'idle'
 	#llm: LLM
 	#abortController = new AbortController()
 	#observations: string[] = []
 
-	/** PageController for DOM operations */
-	pageController: PageController
-
-	/** Runtime states for tracking across steps */
+	/** internal states of a single task execution */
 	states = {
-		/** Accumulated wait time in seconds, used by wait tool */
+		/** Accumulated wait time in seconds */
 		totalWaitTime: 0,
 		/** Last known URL for detecting navigation */
 		lastURL: '',
 	}
-
-	/** History events */
-	history: HistoricalEvent[] = []
 
 	constructor(config: PageAgentConfig & { pageController: PageController }) {
 		super()
