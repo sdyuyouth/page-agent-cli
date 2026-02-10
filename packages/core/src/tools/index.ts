@@ -38,7 +38,6 @@ tools.set(
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			// @note main loop will handle this one
-			// this.onDone(input.text, input.success)
 			return Promise.resolve('Task completed')
 		},
 	})
@@ -52,18 +51,11 @@ tools.set(
 			seconds: zod.number().min(1).max(10).default(1),
 		}),
 		execute: async function (this: PageAgentCore, input) {
+			// try to subtract LLM calling time from the actual wait time
 			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
 			const actualWaitTime = Math.max(0, input.seconds - (Date.now() - lastTimeUpdate) / 1000)
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
 			await waitFor(actualWaitTime)
-
-			this.states.totalWaitTime += input.seconds
-
-			if (this.states.totalWaitTime >= 3) {
-				this.pushObservation(
-					`You have waited ${this.states.totalWaitTime} seconds accumulatively. Do NOT wait any longer unless you have a good reason.`
-				)
-			}
 
 			return `✅ Waited for ${input.seconds} seconds.`
 		},

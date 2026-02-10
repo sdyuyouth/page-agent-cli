@@ -73,7 +73,7 @@ export class PageAgentCore extends EventTarget {
 	#observations: string[] = []
 
 	/** internal states of a single task execution */
-	states = {
+	#states = {
 		/** Accumulated wait time in seconds */
 		totalWaitTime: 0,
 		/** Last known URL for detecting navigation */
@@ -201,11 +201,8 @@ export class PageAgentCore extends EventTarget {
 		this.#setStatus('running')
 		this.#emitHistoryChange()
 
-		// Reset states
-		this.states = {
-			totalWaitTime: 0,
-			lastURL: '',
-		}
+		// Reset internal states
+		this.#states = { totalWaitTime: 0, lastURL: '' }
 
 		let step = 0
 
@@ -213,17 +210,9 @@ export class PageAgentCore extends EventTarget {
 			try {
 				console.group(`step: ${step}`)
 
-				await this.#systemObservations(step)
-
-				if (this.#observations.length > 0) {
-					for (const content of this.#observations) {
-						this.history.push({ type: 'observation', content })
-					}
-					this.#observations = []
-					this.#emitHistoryChange()
-				}
-
 				await onBeforeStep?.(this, step)
+
+				await this.#handleObservations(step)
 
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
@@ -405,9 +394,11 @@ export class PageAgentCore extends EventTarget {
 					duration,
 				})
 
-				// Reset wait time for non-wait tools
-				if (toolName !== 'wait') {
-					this.states.totalWaitTime = 0
+				// counting wait time
+				if (toolName === 'wait') {
+					this.#states.totalWaitTime += toolInput?.seconds || 0
+				} else {
+					this.#states.totalWaitTime = 0
 				}
 
 				// Return structured result
@@ -476,22 +467,27 @@ export class PageAgentCore extends EventTarget {
 
 	/**
 	 * Generate system observations before each step
-	 * - URL change detection
-	 * - Too many steps warning
 	 * @todo loop detection
 	 * @todo console error
 	 */
-	async #systemObservations(stepCount: number): Promise<void> {
+	async #handleObservations(step: number): Promise<void> {
+		// Accumulated wait time warning
+		if (this.#states.totalWaitTime >= 3) {
+			this.pushObservation(
+				`You have waited ${this.#states.totalWaitTime} seconds accumulatively. DO NOT wait any longer unless you have a good reason.`
+			)
+		}
+
 		// Detect URL change
 		const currentURL = await this.pageController.getCurrentUrl()
-		if (currentURL !== this.states.lastURL) {
+		if (currentURL !== this.#states.lastURL) {
 			this.pushObservation(`Page navigated to → ${currentURL}`)
-			this.states.lastURL = currentURL
+			this.#states.lastURL = currentURL
 			await waitFor(0.5) // wait for page to stabilize
 		}
 
-		// Warn about remaining steps
-		const remaining = this.config.maxSteps - stepCount
+		// Remaining steps warning
+		const remaining = this.config.maxSteps - step
 		if (remaining === 5) {
 			this.pushObservation(
 				`⚠️ Only ${remaining} steps remaining. Consider wrapping up or calling done with partial results.`
@@ -500,6 +496,15 @@ export class PageAgentCore extends EventTarget {
 			this.pushObservation(
 				`⚠️ Critical: Only ${remaining} steps left! You must finish the task or call done immediately.`
 			)
+		}
+
+		// Push observations to history and emit
+		if (this.#observations.length > 0) {
+			for (const content of this.#observations) {
+				this.history.push({ type: 'observation', content })
+			}
+			this.#observations = []
+			this.#emitHistoryChange()
 		}
 	}
 
