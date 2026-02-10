@@ -105,3 +105,19 @@ export function handleTabControlMessage(
 			return
 	}
 }
+
+export function setupTabChangeEvents() {
+	chrome.tabs.onCreated.addListener((tab) => {
+		console.debug('[Background] Tab created', tab)
+		chrome.runtime.sendMessage({ type: 'TAB_CHANGE', action: 'created', payload: { tab } })
+	})
+
+	chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+		console.debug('[Background] Tab removed', tabId, removeInfo)
+		chrome.runtime.sendMessage({
+			type: 'TAB_CHANGE',
+			action: 'removed',
+			payload: { tabId, removeInfo },
+		})
+	})
+}
