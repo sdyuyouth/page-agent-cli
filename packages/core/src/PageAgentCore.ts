@@ -28,7 +28,7 @@ export { tool, type PageAgentTool } from './tools'
 export type * from './types'
 
 /**
- * AI agent for browser DOM automation.
+ * AI agent for browser automation.
  *
  * @remarks
  * ## Event System
