@@ -21,7 +21,7 @@ import type {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { assert, normalizeResponse, trimLines, uid, waitFor } from './utils'
+import { assert, normalizeResponse, uid, waitFor } from './utils'
 
 export { type PageAgentConfig }
 export { tool, type PageAgentTool } from './tools'
@@ -428,7 +428,7 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	/**
-	 * Get instructions from config and format as XML block
+	 * Get instructions from config
 	 */
 	async #getInstructions(): Promise<string> {
 		const { instructions } = this.config
@@ -512,6 +512,7 @@ export class PageAgentCore extends EventTarget {
 		let prompt = ''
 
 		// <instructions> (optional)
+
 		prompt += await this.#getInstructions()
 
 		// <agent_state>
@@ -521,38 +522,36 @@ export class PageAgentCore extends EventTarget {
 
 		const stepCount = this.history.filter((e) => e.type === 'step').length
 
-		prompt += `<agent_state>
-			<user_request>
-			${this.task}
-			</user_request>
-			<step_info>
-			Step ${stepCount + 1} of ${this.config.maxSteps} max possible steps
-			Current date and time: ${new Date().toLocaleString()}
-			</step_info>
-			</agent_state>
-		`
+		prompt += '<agent_state>\n'
+		prompt += '<user_request>\n'
+		prompt += `${this.task}\n`
+		prompt += '</user_request>\n'
+		prompt += '<step_info>\n'
+		prompt += `Step ${stepCount + 1} of ${this.config.maxSteps} max possible steps\n`
+		prompt += `Current time: ${new Date().toLocaleString()}\n`
+		prompt += '</step_info>\n'
+		prompt += '</agent_state>\n\n'
 
 		// <agent_history>
 		//  - <step_N> for steps
 		//  - <sys> for observations and system messages
 
-		prompt += '\n<agent_history>\n'
+		prompt += '<agent_history>\n'
 
 		let stepIndex = 0
 		for (const event of this.history) {
 			if (event.type === 'step') {
 				stepIndex++
-				prompt += `<step_${stepIndex}>
-				Evaluation of Previous Step: ${event.reflection.evaluation_previous_goal}
-				Memory: ${event.reflection.memory}
-				Next Goal: ${event.reflection.next_goal}
-				Action Results: ${event.action.output}
-				</step_${stepIndex}>
-			`
+				prompt += `<step_${stepIndex}>\n`
+				prompt += `Evaluation of Previous Step: ${event.reflection.evaluation_previous_goal}\n`
+				prompt += `Memory: ${event.reflection.memory}\n`
+				prompt += `Next Goal: ${event.reflection.next_goal}\n`
+				prompt += `Action Results: ${event.action.output}\n`
+				prompt += `</step_${stepIndex}>\n`
 			} else if (event.type === 'observation') {
 				prompt += `<sys>${event.content}</sys>\n`
 			} else if (event.type === 'user_takeover') {
-				prompt += `<sys>User took over control and made changes to the page.</sys>\n`
+				prompt += `<sys>User took over control and made changes to the page</sys>\n`
 			} else if (event.type === 'error') {
 				// Error events are mainly for panel rendering, not included in LLM context
 				// to avoid polluting the agent's reasoning with transient errors
@@ -563,9 +562,20 @@ export class PageAgentCore extends EventTarget {
 
 		// <browser_state>
 
-		prompt += await this.#getBrowserState()
+		const browserState = await this.pageController.getBrowserState()
 
-		return trimLines(prompt)
+		let pageContent = browserState.content
+		if (this.config.transformPageContent) {
+			pageContent = await this.config.transformPageContent(pageContent)
+		}
+
+		prompt += '<browser_state>\n'
+		prompt += browserState.header + '\n'
+		prompt += pageContent + '\n'
+		prompt += browserState.footer + '\n\n'
+		prompt += '</browser_state>\n\n'
+
+		return prompt
 	}
 
 	#onDone(success = true) {
@@ -573,23 +583,6 @@ export class PageAgentCore extends EventTarget {
 		this.pageController.hideMask() // No await - fire and forget
 		this.#setStatus(success ? 'completed' : 'error')
 		this.#abortController.abort()
-	}
-
-	async #getBrowserState(): Promise<string> {
-		const state = await this.pageController.getBrowserState()
-
-		let content = state.content
-		if (this.config.transformPageContent) {
-			content = await this.config.transformPageContent(content)
-		}
-
-		return trimLines(`<browser_state>
-			${state.header}
-			${content}
-			${state.footer}
-			
-			</browser_state>
-		`)
 	}
 
 	dispose() {

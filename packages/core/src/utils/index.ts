@@ -39,15 +39,6 @@ export function truncate(text: string, maxLength: number): string {
 
 //
 
-export function trimLines(text: string): string {
-	return text
-		.split('\n')
-		.map((line) => line.trim())
-		.join('\n')
-}
-
-//
-
 export function randomID(existingIDs?: string[]): string {
 	let id = Math.random().toString(36).substring(2, 11)
 
