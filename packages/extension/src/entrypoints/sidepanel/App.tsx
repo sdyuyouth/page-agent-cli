@@ -1,4 +1,4 @@
-import { Send, Settings, Square } from 'lucide-react'
+import { History, Send, Settings, Square } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -8,19 +8,46 @@ import {
 	InputGroupButton,
 	InputGroupTextarea,
 } from '@/components/ui/input-group'
+import { saveSession } from '@/lib/db'
 
 import { useAgent } from '../../agent/useAgent'
 import { ConfigPanel } from './components/ConfigPanel'
+import { HistoryDetail } from './components/HistoryDetail'
+import { HistoryList } from './components/HistoryList'
 import { ActivityCard, EventCard } from './components/cards'
 import { EmptyState, Logo, StatusDot } from './components/misc'
 
+type View =
+	| { name: 'chat' }
+	| { name: 'config' }
+	| { name: 'history' }
+	| { name: 'history-detail'; sessionId: string }
+
 export default function App() {
-	const [showConfig, setShowConfig] = useState(false)
+	const [view, setView] = useState<View>({ name: 'chat' })
 	const [inputValue, setInputValue] = useState('')
 	const historyRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
 	const { status, history, activity, currentTask, config, execute, stop, configure } = useAgent()
+
+	// Persist session when task finishes
+	const prevStatusRef = useRef(status)
+	useEffect(() => {
+		const prev = prevStatusRef.current
+		prevStatusRef.current = status
+
+		if (
+			prev === 'running' &&
+			(status === 'completed' || status === 'error') &&
+			history.length > 0 &&
+			currentTask
+		) {
+			saveSession({ task: currentTask, history, status }).catch((err) =>
+				console.error('[SidePanel] Failed to save session:', err)
+			)
+		}
+	}, [status, history, currentTask])
 
 	// Auto-scroll to bottom on new events
 	useEffect(() => {
@@ -56,18 +83,35 @@ export default function App() {
 		}
 	}
 
-	if (showConfig) {
+	// --- View routing ---
+
+	if (view.name === 'config') {
 		return (
 			<ConfigPanel
 				config={config}
 				onSave={async (newConfig) => {
 					await configure(newConfig)
-					setShowConfig(false)
+					setView({ name: 'chat' })
 				}}
-				onClose={() => setShowConfig(false)}
+				onClose={() => setView({ name: 'chat' })}
 			/>
 		)
 	}
+
+	if (view.name === 'history') {
+		return (
+			<HistoryList
+				onSelect={(id) => setView({ name: 'history-detail', sessionId: id })}
+				onBack={() => setView({ name: 'chat' })}
+			/>
+		)
+	}
+
+	if (view.name === 'history-detail') {
+		return <HistoryDetail sessionId={view.sessionId} onBack={() => setView({ name: 'history' })} />
+	}
+
+	// --- Chat view ---
 
 	const isRunning = status === 'running'
 	const showEmptyState = !currentTask && history.length === 0 && !isRunning
@@ -85,7 +129,15 @@ export default function App() {
 					<Button
 						variant="ghost"
 						size="icon-sm"
-						onClick={() => setShowConfig(true)}
+						onClick={() => setView({ name: 'history' })}
+						className="cursor-pointer"
+					>
+						<History className="size-3.5" />
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onClick={() => setView({ name: 'config' })}
 						className="cursor-pointer"
 					>
 						<Settings className="size-3.5" />
