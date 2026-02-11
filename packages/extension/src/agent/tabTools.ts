@@ -31,8 +31,11 @@ export function createTabTools(tabsController: TabsController): Record<string, T
 			}),
 			execute: async (input: unknown) => {
 				const { url } = input as { url: string }
-				const result = await tabsController.openNewTab(url)
-				return result.message
+				try {
+					return await tabsController.openNewTab(url)
+				} catch (error) {
+					return `❌ Failed: ${error instanceof Error ? error.message : String(error)}`
+				}
 			},
 		},
 
@@ -44,7 +47,11 @@ export function createTabTools(tabsController: TabsController): Record<string, T
 			}),
 			execute: async (input: unknown) => {
 				const { tab_id } = input as { tab_id: number }
-				return (await tabsController.switchToTab(tab_id)).message
+				try {
+					return await tabsController.switchToTab(tab_id)
+				} catch (error) {
+					return `❌ Failed: ${error instanceof Error ? error.message : String(error)}`
+				}
 			},
 		},
 
@@ -56,7 +63,11 @@ export function createTabTools(tabsController: TabsController): Record<string, T
 			}),
 			execute: async (input: unknown) => {
 				const { tab_id } = input as { tab_id: number }
-				return (await tabsController.closeTab(tab_id)).message
+				try {
+					return await tabsController.closeTab(tab_id)
+				} catch (error) {
+					return `❌ Failed: ${error instanceof Error ? error.message : String(error)}`
+				}
 			},
 		},
 	}

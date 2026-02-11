@@ -1,3 +1,20 @@
+const PREFIX = '[TabsController]'
+
+function debug(...messages: any[]) {
+	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
+}
+
+function sendMessage(message: {
+	type: 'TAB_CONTROL'
+	action: TabAction
+	payload?: any
+}): Promise<any> {
+	return chrome.runtime.sendMessage(message).catch((error) => {
+		console.error(PREFIX, message.action, error)
+		return null
+	})
+}
+
 /**
  * Controller for managing browser tabs.
  * - live in the agent env (extension page or content script)
@@ -13,6 +30,8 @@ export class TabsController extends EventTarget {
 	private windowId: number | null = null
 
 	async init(task: string, includeInitialTab: boolean = true) {
+		debug('init', task, includeInitialTab)
+
 		this.task = task
 		this.tabs = []
 		this.currentTabId = null
@@ -20,7 +39,7 @@ export class TabsController extends EventTarget {
 		this.initialTabId = null
 		this.windowId = null
 
-		const result = await chrome.runtime.sendMessage({
+		const result = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'get_active_tab',
 		})
@@ -33,9 +52,20 @@ export class TabsController extends EventTarget {
 
 		if (includeInitialTab) {
 			this.currentTabId = this.initialTabId
+
+			// update tab status immediately
+			const info = await sendMessage({
+				type: 'TAB_CONTROL',
+				action: 'get_tab_info',
+				payload: { tabId: this.initialTabId },
+			})
+
 			this.tabs.push({
 				id: result.tabId,
 				isInitial: true,
+				url: info.url,
+				title: info.title,
+				status: info.status,
 			})
 		}
 
@@ -70,6 +100,14 @@ export class TabsController extends EventTarget {
 						}
 					}
 				}
+			} else if (message.action === 'updated') {
+				const { tabId, tab } = message.payload as { tabId: number; tab: chrome.tabs.Tab }
+				const targetTab = this.tabs.find((t) => t.id === tabId)
+				if (targetTab) {
+					targetTab.url = tab.url
+					targetTab.title = tab.title
+					targetTab.status = tab.status
+				}
 			}
 		}
 
@@ -80,8 +118,10 @@ export class TabsController extends EventTarget {
 		})
 	}
 
-	async openNewTab(url: string): Promise<{ success: boolean; tabId: number; message: string }> {
-		const result = await chrome.runtime.sendMessage({
+	async openNewTab(url: string): Promise<string> {
+		debug('openNewTab', url)
+
+		const result = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'open_new_tab',
 			payload: { url },
@@ -104,7 +144,7 @@ export class TabsController extends EventTarget {
 		await this.switchToTab(tabId)
 
 		if (!this.tabGroupId) {
-			const result = await chrome.runtime.sendMessage({
+			const result = await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'create_tab_group',
 				payload: { tabIds: [tabId], windowId: this.windowId },
@@ -118,7 +158,7 @@ export class TabsController extends EventTarget {
 
 			this.tabGroupId = groupId
 
-			await chrome.runtime.sendMessage({
+			await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'update_tab_group',
 				payload: {
@@ -131,57 +171,43 @@ export class TabsController extends EventTarget {
 				},
 			})
 		} else {
-			await chrome.runtime.sendMessage({
+			await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'add_tab_to_group',
 				payload: { tabId: result.tabId, groupId: this.tabGroupId },
 			})
 		}
 
-		// wait for the new tab to be fully loaded
-		// @todo
-		await new Promise((resolve) => setTimeout(resolve, 500))
+		await this.waitUntilTabLoaded(tabId)
 
-		return {
-			success: true,
-			tabId,
-			message: `Opened new tab ID ${tabId} with URL ${url}`,
-		}
+		return `✅ Opened new tab ID ${tabId} with URL ${url}`
 	}
 
-	async switchToTab(tabId: number): Promise<{ success: boolean; message: string }> {
+	async switchToTab(tabId: number): Promise<string> {
+		debug('switchToTab', tabId)
+
 		const targetTab = this.tabs.find((t) => t.id === tabId)
 		if (!targetTab) {
-			return {
-				success: false,
-				message: `Tab ID ${tabId} not found in tab list.`,
-			}
+			throw new Error(`Tab ID ${tabId} not found in tab list.`)
 		}
 
 		await this.updateCurrentTabId(tabId)
 
-		return {
-			success: true,
-			message: `Switched to tab ID ${tabId}.`,
-		}
+		return `✅ Switched to tab ID ${tabId}.`
 	}
 
-	async closeTab(tabId: number): Promise<{ success: boolean; message: string }> {
+	async closeTab(tabId: number): Promise<string> {
+		debug('closeTab', tabId)
+
 		const targetTab = this.tabs.find((t) => t.id === tabId)
 		if (!targetTab) {
-			return {
-				success: false,
-				message: `Tab ID ${tabId} not found in tab list.`,
-			}
+			throw new Error(`Tab ID ${tabId} not found in tab list.`)
 		}
 		if (targetTab.isInitial) {
-			return {
-				success: false,
-				message: `Cannot close the initial tab ID ${tabId}.`,
-			}
+			throw new Error(`Cannot close the initial tab ID ${tabId}.`)
 		}
 
-		const result = await chrome.runtime.sendMessage({
+		const result = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'close_tab',
 			payload: { tabId },
@@ -198,29 +224,39 @@ export class TabsController extends EventTarget {
 				}
 			}
 
-			return {
-				success: true,
-				message: `Closed tab ID ${tabId}.`,
-			}
+			return `✅ Closed tab ID ${tabId}.`
 		} else {
-			return {
-				success: false,
-				message: `Failed to close tab ID ${tabId}: ${result.error}`,
-			}
+			throw new Error(`Failed to close tab ID ${tabId}: ${result.error}`)
 		}
 	}
 
 	async updateCurrentTabId(tabId: number | null) {
+		debug('updateCurrentTabId', tabId)
+
 		this.currentTabId = tabId
 		await chrome.storage.local.set({ currentTabId: tabId })
 	}
 
 	async getTabInfo(tabId: number): Promise<{ title: string; url: string }> {
-		const result = await chrome.runtime.sendMessage({
+		// use cached tab info if available
+		const tabMeta = this.tabs.find((t) => t.id === tabId)
+		if (tabMeta && tabMeta.url && tabMeta.title) {
+			return { title: tabMeta.title, url: tabMeta.url }
+		}
+
+		// otherwise, pull the latest tab info from the background script
+		debug('getTabInfo: pulling from background script', tabId)
+		const result = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'get_tab_info',
 			payload: { tabId },
 		})
+
+		if (tabMeta) {
+			tabMeta.url = result.url
+			tabMeta.title = result.title
+		}
+
 		return result
 	}
 
@@ -237,6 +273,17 @@ export class TabsController extends EventTarget {
 		}
 
 		return summaries.join('\n')
+	}
+
+	async waitUntilTabLoaded(tabId: number): Promise<void> {
+		const tab = this.tabs.find((t) => t.id === tabId)
+		if (!tab) throw new Error(`Tab ID ${tabId} not found in tab list.`)
+
+		if (tab.status === 'unloaded') throw new Error(`Tab ID ${tabId} is unloaded.`)
+		if (tab.status === 'complete') return
+
+		debug('waitUntilTabLoaded', tabId)
+		await waitUntil(() => tab.status === 'complete', 4_000)
 	}
 
 	dispose() {
@@ -257,6 +304,9 @@ export type TabAction =
 interface TabMeta {
 	id: number
 	isInitial: boolean
+	url?: string
+	title?: string
+	status?: 'loading' | 'unloaded' | 'complete'
 }
 
 const TAB_GROUP_COLORS = [
@@ -274,4 +324,34 @@ type TabGroupColor = (typeof TAB_GROUP_COLORS)[number]
 
 function randomColor(): TabGroupColor {
 	return TAB_GROUP_COLORS[Math.floor(Math.random() * TAB_GROUP_COLORS.length)]
+}
+
+/**
+ * Wait until condition becomes true
+ * @returns Returns when condition becomes true, throws otherwise
+ * @param timeoutMS Timeout in milliseconds, default 1 minutes, throws error on timeout
+ * @param error Error object to reject on timeout. If not provided, will resolve with false
+ */
+export async function waitUntil(
+	check: () => boolean | Promise<boolean>,
+	timeoutMS = 60_000,
+	error?: string
+): Promise<boolean> {
+	if (await check()) return true
+
+	return new Promise((resolve, reject) => {
+		const start = Date.now()
+		const poll = async () => {
+			if (await check()) return resolve(true)
+			if (Date.now() - start > timeoutMS) {
+				if (error) {
+					return reject(new Error(error))
+				} else {
+					return resolve(false)
+				}
+			}
+			setTimeout(poll, 100)
+		}
+		setTimeout(poll, 100)
+	})
 }

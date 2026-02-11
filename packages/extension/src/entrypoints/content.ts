@@ -6,7 +6,7 @@ const DEBUG_PREFIX = '[Content]'
 
 export default defineContentScript({
 	matches: ['<all_urls>'],
-	runAt: 'document_idle',
+	runAt: 'document_end',
 
 	main() {
 		console.debug(`${DEBUG_PREFIX} Loaded on ${window.location.href}`)

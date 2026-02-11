@@ -12,10 +12,14 @@ export function initPageController() {
 		.then((response) => {
 			return (response as { tabId: number | null }).tabId
 		})
+		.catch((error) => {
+			console.error('[RemotePageController.ContentScript]: Failed to get my tab id', error)
+			return null
+		})
 
 	function getPC(): PageController {
 		if (!pageController) {
-			pageController = new PageController({ enableMask: false })
+			pageController = new PageController({ enableMask: false, viewportExpansion: 400 })
 		}
 		return pageController
 	}

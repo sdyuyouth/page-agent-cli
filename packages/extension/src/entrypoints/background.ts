@@ -4,6 +4,10 @@ import { handleTabControlMessage, setupTabChangeEvents } from '@/agent/TabsContr
 export default defineBackground(() => {
 	console.log('[Background] Service Worker started')
 
+	// tab change events
+
+	setupTabChangeEvents()
+
 	// generate user auth token
 
 	chrome.storage.local.get('PageAgentExtUserAuthToken').then((result) => {
@@ -12,10 +16,6 @@ export default defineBackground(() => {
 		const userAuthToken = crypto.randomUUID()
 		chrome.storage.local.set({ PageAgentExtUserAuthToken: userAuthToken })
 	})
-
-	// setup
-
-	chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {})
 
 	// message proxy
 
@@ -30,7 +30,7 @@ export default defineBackground(() => {
 		}
 	})
 
-	// tab change events
+	// setup
 
-	setupTabChangeEvents()
+	chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {})
 })
