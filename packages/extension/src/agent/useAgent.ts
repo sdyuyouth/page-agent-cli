@@ -75,7 +75,7 @@ export function useAgent(): UseAgentResult {
 
 	const execute = useCallback(async (task: string) => {
 		const agent = agentRef.current
-		console.log('Fire task:', task, agent)
+		console.log('🚀 [useAgent] start executing task:', task)
 		if (!agent) throw new Error('Agent not initialized')
 
 		setCurrentTask(task)

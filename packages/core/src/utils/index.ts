@@ -2,28 +2,6 @@ import chalk from 'chalk'
 
 export { normalizeResponse } from './autoFixer'
 
-/**
- * Wait until condition becomes true
- * @returns Returns when condition becomes true, throws otherwise
- * @param timeout Timeout in milliseconds, default 0 means no timeout, throws error on timeout
- */
-export async function waitUntil(check: () => boolean, timeout = 60 * 60_1000): Promise<boolean> {
-	if (check()) return true
-
-	return new Promise((resolve, reject) => {
-		const start = Date.now()
-		const interval = setInterval(() => {
-			if (check()) {
-				clearInterval(interval)
-				resolve(true)
-			} else if (Date.now() - start > timeout) {
-				clearInterval(interval)
-				reject(new Error('Timeout waiting for condition to become true'))
-			}
-		}, 100)
-	})
-}
-
 export async function waitFor(seconds: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
 }

@@ -223,7 +223,7 @@ export class PageAgentCore extends EventTarget {
 
 				await onBeforeStep?.(this, step)
 
-				// observe (update browser state and other observations)
+				// observe
 
 				console.log(chalk.blue.bold('👀 Observing...'))
 
@@ -249,7 +249,7 @@ export class PageAgentCore extends EventTarget {
 					normalizeResponse,
 				})
 
-				// assemble history event
+				// assemble history
 
 				const macroResult = result.toolResult as MacroToolResult
 				const input = macroResult.input
@@ -362,7 +362,7 @@ export class PageAgentCore extends EventTarget {
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
 
-				console.log(chalk.blue.bold('MacroTool execute'), input)
+				console.log(chalk.blue.bold('MacroTool input'), input)
 				const action = input.action
 
 				const toolName = Object.keys(action)[0]
@@ -383,7 +383,7 @@ export class PageAgentCore extends EventTarget {
 
 				// Find the corresponding tool
 				const tool = tools.get(toolName)
-				assert(tool, `Tool ${toolName} not found. (@note should have been caught before this!!!)`)
+				assert(tool, `Tool ${toolName} not found`)
 
 				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
 
