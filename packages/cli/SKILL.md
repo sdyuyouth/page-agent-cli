@@ -69,6 +69,14 @@ page-agent-cli --json click 3
 { "success": true, "data": "Clicked element 3" }
 ```
 
+### `hover <index>`
+Move the pointer over the element at `<index>` without clicking or focusing it.
+Useful for hover menus, tooltips, and lazy-revealed controls.
+
+```bash
+page-agent-cli --json hover 4
+```
+
 ### `input <index> <text>`
 Type `<text>` into the input element at `<index>`.
 

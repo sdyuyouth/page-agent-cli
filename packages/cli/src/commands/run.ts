@@ -38,6 +38,7 @@ function makeDynamicController(tabsCtrl: CdpTabsController): IPageController {
 		showMask: async (): Promise<void> => (await pc()).showMask(),
 		hideMask: async (): Promise<void> => (await pc()).hideMask(),
 		clickElement: async (index: number): Promise<ActionResult> => (await pc()).clickElement(index),
+		hoverElement: async (index: number): Promise<ActionResult> => (await pc()).hoverElement(index),
 		inputText: async (index: number, text: string): Promise<ActionResult> =>
 			(await pc()).inputText(index, text),
 		selectOption: async (index: number, option: string): Promise<ActionResult> =>

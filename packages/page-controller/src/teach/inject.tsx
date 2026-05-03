@@ -18,6 +18,7 @@ interface PageAgentPc {
 	getIndexedElementRef(index: number): HTMLElement | null
 	findIndexForInteractiveTarget(target: EventTarget): number | null
 	clickElement(index: number): Promise<{ success: boolean; message: string }>
+	hoverElement(index: number): Promise<{ success: boolean; message: string }>
 	inputText(index: number, text: string): Promise<{ success: boolean; message: string }>
 	selectOption(index: number, optionText: string): Promise<{ success: boolean; message: string }>
 	hideMask(): Promise<void>
@@ -35,7 +36,7 @@ function ensureHost(): HTMLDivElement {
 
 function getPcForApp(): PageAgentPc {
 	const pc = window.__pageAgentPC as PageAgentPc | undefined
-	if (!pc?.getIndexedElementRef || !pc.findIndexForInteractiveTarget) {
+	if (!pc?.getIndexedElementRef || !pc.findIndexForInteractiveTarget || !pc.hoverElement) {
 		throw new Error('window.__pageAgentPC 缺少教学所需方法，请确认页面已注入 Page Agent 主脚本')
 	}
 	return pc

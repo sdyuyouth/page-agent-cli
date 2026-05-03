@@ -9,6 +9,7 @@
 import {
 	clickElement,
 	getElementByIndex,
+	hoverElement as hoverElementOnDom,
 	inputTextElement,
 	scrollHorizontally,
 	scrollVertically,
@@ -59,6 +60,7 @@ export interface IPageController {
 	showMask(): Promise<void>
 	hideMask(): Promise<void>
 	clickElement(index: number): Promise<ActionResult>
+	hoverElement(index: number): Promise<ActionResult>
 	inputText(index: number, text: string): Promise<ActionResult>
 	selectOption(index: number, optionText: string): Promise<ActionResult>
 	scroll(options: {
@@ -298,6 +300,28 @@ export class PageController extends EventTarget implements IPageController {
 			return {
 				success: false,
 				message: `❌ Failed to click element: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Hover over an element by index without clicking or focusing it.
+	 */
+	async hoverElement(index: number): Promise<ActionResult> {
+		try {
+			this.assertIndexed()
+			const element = getElementByIndex(this.selectorMap, index)
+			const elemText = this.elementTextMap.get(index)
+			await hoverElementOnDom(element)
+
+			return {
+				success: true,
+				message: `✅ Hovered element (${elemText ?? index}).`,
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to hover element: ${error}`,
 			}
 		}
 	}

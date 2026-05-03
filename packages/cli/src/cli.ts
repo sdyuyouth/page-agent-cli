@@ -14,6 +14,7 @@ import { Command } from 'commander'
 import { registerClick } from './commands/click.js'
 import { registerEval } from './commands/eval.js'
 import { registerGoto } from './commands/goto.js'
+import { registerHover } from './commands/hover.js'
 import { registerInput } from './commands/input.js'
 import { startRepl } from './commands/repl.js'
 import { registerRun } from './commands/run.js'
@@ -45,7 +46,7 @@ function buildProgram(): Command {
 				'Quick start:',
 				'  1. google-chrome --remote-debugging-port=9222',
 				'  2. page-agent-cli --json state            # observe',
-				'  3. page-agent-cli --json click <index>    # act',
+				'  3. page-agent-cli --json click <index>    # act (or hover <index> without click)',
 				'  4. page-agent-cli --json state            # observe again',
 				'',
 				'For full task delegation use:',
@@ -111,6 +112,7 @@ Exit codes:
 
 	registerState(program)
 	registerClick(program)
+	registerHover(program)
 	registerInput(program)
 	registerScroll(program)
 	registerSelect(program)

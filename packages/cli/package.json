@@ -1,7 +1,7 @@
 {
     "name": "@page-agent/cli",
     "private": false,
-    "version": "1.8.1",
+    "version": "1.8.2",
     "type": "module",
     "description": "CLI harness for page-agent — control any browser tab via CDP without MCP",
     "keywords": [

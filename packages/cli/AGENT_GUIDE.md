@@ -59,6 +59,7 @@
 │        │                                                   │
 │        ▼                                                   │
 │ 3. --json click <index>          ← 行动                    │
+│   --json hover <index>  （悬停菜单/tooltip，不点击）        │
 │   --json input <index> "text"                              │
 │   --json scroll --pages 1                                  │
 │        │                                                   │
@@ -156,7 +157,7 @@ page-agent-cli --json --target $TID eval "
 
 ### 4.5 视觉反馈
 
-CLI 默认会在 click / input / select / scroll 操作前后 **显示鼠标指示器和点击涟漪动画**，与浏览器扩展观感一致。`state` 命令则会用方框+索引高亮所有可交互元素。
+CLI 默认会在 click / hover / input / select / scroll 操作前后 **显示鼠标指示器和点击涟漪动画**（hover 无点击涟漪），与浏览器扩展观感一致。`state` 命令则会用方框+索引高亮所有可交互元素。
 
 如果你跑 headless / 脚本测试不需要这些：
 

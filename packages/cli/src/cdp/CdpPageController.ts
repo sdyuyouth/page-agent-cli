@@ -269,6 +269,10 @@ export class CdpPageController implements IPageController {
 		return this._call<ActionResult>(`clickElement(${index})`)
 	}
 
+	async hoverElement(index: number): Promise<ActionResult> {
+		return this._call<ActionResult>(`hoverElement(${index})`)
+	}
+
 	async inputText(index: number, text: string): Promise<ActionResult> {
 		return this._call<ActionResult>(`inputText(${index}, ${JSON.stringify(text)})`)
 	}

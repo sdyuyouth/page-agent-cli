@@ -220,6 +220,8 @@ function actionLabel(a: TeachStep['action']): string {
 	switch (a) {
 		case 'click':
 			return '点击'
+		case 'hover':
+			return '悬停'
 		case 'input':
 			return '输入'
 		case 'select':
@@ -261,6 +263,7 @@ interface Pc {
 	getIndexedElementRef(index: number): HTMLElement | null
 	findIndexForInteractiveTarget(target: EventTarget): number | null
 	clickElement(index: number): Promise<{ success: boolean; message: string }>
+	hoverElement(index: number): Promise<{ success: boolean; message: string }>
 	inputText(index: number, text: string): Promise<{ success: boolean; message: string }>
 	selectOption(index: number, optionText: string): Promise<{ success: boolean; message: string }>
 	hideMask(): Promise<void>
@@ -310,6 +313,22 @@ const lab: Record<string, string> = {
 	fontSize: '11px',
 }
 
+/** Operate-tab action (subset of TeachAction; excludes state_refresh). */
+type AssistUiAction = 'click' | 'hover' | 'input' | 'select' | 'upload'
+
+function coerceAssistUiAction(raw: unknown): AssistUiAction {
+	if (
+		raw === 'hover' ||
+		raw === 'click' ||
+		raw === 'input' ||
+		raw === 'select' ||
+		raw === 'upload'
+	) {
+		return raw
+	}
+	return 'click'
+}
+
 export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () => Pc }) {
 	const pc = getPc()
 	const [reason] = useState(init.restored?.reason ?? init.reason ?? '')
@@ -336,8 +355,8 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 		init.restored?.assist?.selectedIndex ?? null
 	)
 	const [userNote, setUserNote] = useState(init.restored?.assist?.userNote ?? '')
-	const [assistAction, setAssistAction] = useState<'click' | 'input' | 'select' | 'upload'>(
-		(init.restored?.assist?.assistAction as 'click' | 'input' | 'select' | 'upload') ?? 'click'
+	const [assistAction, setAssistAction] = useState<AssistUiAction>(() =>
+		coerceAssistUiAction(init.restored?.assist?.assistAction)
 	)
 	const [assistValue, setAssistValue] = useState(init.restored?.assist?.assistValue ?? '')
 	const [inputContent, setInputContent] = useState(init.restored?.assist?.assistInputContent ?? '')
@@ -745,6 +764,10 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 				const r = await pc.clickElement(selectedIndex)
 				execOk = r.success
 				execMessage = r.message
+			} else if (assistAction === 'hover') {
+				const r = await pc.hoverElement(selectedIndex)
+				execOk = r.success
+				execMessage = r.message
 			} else if (assistAction === 'input') {
 				const r = await pc.inputText(selectedIndex, inputContent)
 				execOk = r.success
@@ -767,7 +790,12 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 			...stepTargetMeta,
 			action: assistAction,
 			index: selectedIndex,
-			value: assistAction === 'input' ? inputContent.trim() || undefined : assistValue || undefined,
+			value:
+				assistAction === 'input'
+					? inputContent.trim() || undefined
+					: assistAction === 'select'
+						? assistValue || undefined
+						: undefined,
 			elementKey: key,
 			features,
 			userNote: userNote.trim(),
@@ -1294,6 +1322,7 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 												}
 											>
 												<option value="click">点击</option>
+												<option value="hover">悬停（不点击）</option>
 												<option value="input">输入文本</option>
 												<option value="select">下拉选择</option>
 												<option value="upload">上传（只写入步骤，不执行）</option>
@@ -1337,6 +1366,23 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 											>
 												<strong>提示</strong>：「下拉选择」仅支持原生{' '}
 												<strong>&lt;select&gt;</strong>。自定义 listbox 请用「点击」分步操作。
+											</div>
+										) : null}
+										{assistAction === 'hover' ? (
+											<div
+												style={{
+													fontSize: 10,
+													lineHeight: 1.45,
+													padding: '8px 10px',
+													background: '#1f2430',
+													border: '1px solid #3d4a66',
+													borderRadius: 6,
+													color: '#b8c0d4',
+												}}
+											>
+												<strong>提示</strong>：「悬停」调用{' '}
+												<code style={{ fontSize: 10 }}>hoverElement</code>
+												，用于展开菜单、tooltip 等；不触发点击或聚焦。
 											</div>
 										) : null}
 										{assistAction === 'input' ? (

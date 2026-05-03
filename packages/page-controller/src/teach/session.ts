@@ -5,7 +5,7 @@ export const STORAGE_KEY = '__pa_teach_session_v3'
 /** Same JSON as STORAGE_KEY; survives some edge cases where sessionTab loses sessionStorage timing. */
 export const STORAGE_MIRROR_KEY = '__pa_teach_session_v3_mirror'
 
-export type TeachAction = 'click' | 'input' | 'select' | 'upload' | 'state_refresh'
+export type TeachAction = 'click' | 'hover' | 'input' | 'select' | 'upload' | 'state_refresh'
 
 export interface StateSnapshot {
 	url: string

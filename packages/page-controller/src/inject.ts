@@ -23,7 +23,9 @@ declare global {
 	}
 }
 
-const CURRENT_VERSION = '3'
+// Bump when PageController's page-facing API changes so CDP re-inject replaces
+// a stale __pageAgentPC (same numeric idempotency would skip forever after CLI upgrade).
+const CURRENT_VERSION = '4'
 
 function initPageController() {
 	// Idempotent: skip if already initialized with the same version

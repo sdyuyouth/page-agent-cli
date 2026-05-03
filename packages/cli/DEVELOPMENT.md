@@ -33,6 +33,7 @@ packages/
 │   │   ├── commands/
 │   │   │   ├── state.ts        获取页面状态
 │   │   │   ├── click.ts        点击元素
+│   │   │   ├── hover.ts        悬停（不点击）
 │   │   │   ├── input.ts        输入文本
 │   │   │   ├── scroll.ts       滚动
 │   │   │   ├── select.ts       下拉选择
