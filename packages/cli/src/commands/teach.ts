@@ -326,7 +326,7 @@ export function registerTeach(program: Command): void {
 
 示例:
   $ page-agent-cli --json --target $TID teach --reason "找不到按钮"
-  $ page-agent-cli --json teach --site facebook --task post-image
+  $ page-agent-cli --json teach --site example.com --task post-image
   $ page-agent-cli --json teach --checkpoint-file ./my-teach-draft.json
   $ page-agent-cli --json teach --teach-all-page-tabs --teach-ui-targets TID_A,TID_B
 

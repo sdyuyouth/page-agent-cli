@@ -17,7 +17,7 @@
 
 1. Windows 侧浏览器已开启 CDP（默认 `http://localhost:9222`）
 2. WSL 内可直接执行 `page-agent-cli`
-3. 已知 Instagram tab 的 target id（先用 `tabs list` 查）
+3. 已知目标页的 CDP target id（先用 `tabs list` 查）
 
 ## 3. 路径规则（重点）
 
@@ -29,7 +29,7 @@
 
 ## 4. 标准测试流程
 
-将 `<TID>` 替换为 Instagram 的 target id：
+将 `<TID>` 替换为你要测的 Tab 的 target id：
 
 ```bash
 page-agent-cli --json tabs list
@@ -41,18 +41,18 @@ page-agent-cli --json --target <TID> eval "1+1"
 - `eval "1+1"` 返回 `Result: 2`
 - 命令快速退出，不挂起
 
-进入上传流程：
+进入上传流程（**索引与路径按你的环境替换**）：
 
 ```bash
-page-agent-cli --json --target <TID> click 37
+page-agent-cli --json --target <TID> click <index>
 page-agent-cli --json --target <TID> state
-page-agent-cli --json --target <TID> upload 0 "/mnt/c/Users/26291/Desktop/fmanmachinery/图片/产品分类图/最小空白区域/Backhoe Loader_mini.png"
+page-agent-cli --json --target <TID> upload <index> "/mnt/c/Users/<you>/Pictures/example.png"
 page-agent-cli --json --target <TID> state
 ```
 
 期望：
-- upload 返回 `✅ Set 1 file(s)...`
-- 后续 `state` 出现 `裁剪` / `继续` 等创建帖子下一步元素
+- upload 返回 `✅ Set 1 file(s)...`（或等价成功文案）
+- 后续 `state` 能反映上传后的 UI 变化（具体文案因站点而异）
 - 不出现 `CDP Target crashed` / `RESULT_CODE_KILLED_BAD_MESSAGE`
 
 ## 5. 失败判定与归类
@@ -76,7 +76,7 @@ page-agent-cli --json --target <TID> state
 ## 6. 失败上报模板（请原样填写）
 
 ```text
-[Case] upload-instagram
+[Case] upload-wsl-smoke
 [Time] <YYYY-MM-DD HH:mm:ss>
 [Command]
 page-agent-cli --json --target <TID> upload <index> "<path>"
@@ -92,7 +92,7 @@ page-agent-cli --json --target <TID> upload <index> "<path>"
 <关键 content 片段，至少含上传按钮所在区域>
 
 [AfterState]
-<关键 content 片段，至少含裁剪/继续或报错后状态>
+<关键 content 片段，至少含上传后下一屏或报错后状态>
 
 [Verdict]
 pass | fail
@@ -105,7 +105,7 @@ pass | fail
 
 1. `eval` 基础：`eval "1+1"` 应为 2
 2. `eval` 目标页：`eval "document.title"` 非空
-3. Instagram 上传：`upload` 成功并进入 `裁剪/继续`
+3. 目标站点上传：`upload` 成功且 `state` 反映预期 UI 变化
 4. 进程行为：每条命令在合理时间内退出（不挂起）
 
 ---

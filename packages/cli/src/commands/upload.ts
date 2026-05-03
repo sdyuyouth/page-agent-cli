@@ -45,20 +45,27 @@ function toLocalPathForExistenceCheck(inputPath: string): string {
 export function registerUpload(program: Command): void {
 	program
 		.command('upload <index> <files...>')
-		.description('Set local file(s) on a <input type="file"> element by index.')
+		.description(
+			'Set local file(s) on a <input type="file"> resolved from a state index (anchor may be the file input or nearby UI).'
+		)
 		.addHelpText(
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json state                          # observe → find file input index
-  $ page-agent-cli --json upload 5 /path/to/photo.jpg   # single file
+  $ page-agent-cli --json state                          # build index map
+  $ page-agent-cli --json upload 5 /path/to/photo.jpg   # index 5 = file input OR upload UI anchor
   $ page-agent-cli --json upload 5 img1.png img2.png     # multiple files (relative paths OK)
 
 Notes:
-  The element at <index> must be an <input type="file">. The index must match
-  the Page Agent flat tree (same numbering as \`state\`). Many sites omit file
-  inputs from \`state\` until you locate/prepare them in the DOM (often via
-  \`eval\` and/or UI clicks), then refresh \`state\` to read the correct index.
+  <index> comes from the Page Agent flat tree (same numbering as the latest
+  \`state\` on this tab). The indexed node does NOT have to be the <input
+  type="file"> line in the printed state: the CLI resolves the real file input
+  from that anchor (descendants, dialog/modal subtree, ancestors), and if there
+  is exactly one file input in the document it may use that as a last resort.
+  Run \`state\` at least once before upload so selectorMap exists; after large
+  DOM changes, run \`state\` again. Use \`eval\` / clicks / hovers to open upload
+  UI; you do not need to wait until \`state\` text shows type=file if the anchor
+  still resolves uniquely.
   Relative paths are resolved against the current working directory.
 
   The browser fires the normal change/input events after injection, so upload

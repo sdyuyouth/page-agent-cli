@@ -32,7 +32,7 @@
 > CLI 命令一般 **0.3–2 秒**就返回。如果你发现需要 kill，是你的 wrapper 把同步命令错当成了长任务。**只要等它返回即可。**
 
 ❌ **连续 `state` × 5 看页面是否变了**
-> `state` 在复杂页面（Facebook / 多帧站点）会消耗 1–3 秒做 DOM 序列化。**每次操作之间最多一次 `state`**。如果一定要等异步内容，配合 `eval` 轮询关键节点，比反复 `state` 便宜 10×。
+> `state` 在复杂页面（大型 SPA / 多帧站点）会消耗 1–3 秒做 DOM 序列化。**每次操作之间最多一次 `state`**。如果一定要等异步内容，配合 `eval` 轮询关键节点，比反复 `state` 便宜 10×。
 
 ❌ **管道里塞 `| head -30 | grep ...` 然后说 "no new output"**
 > CLI 在 `--json` 模式下一次性写完整 JSON 到 stdout。`head` 截断后 wrapper 可能误判输出未完。**用 `--json` 拿原始数据，自己解析**，不要靠 `head/grep` 截。
@@ -84,7 +84,7 @@
 ```bash
 page-agent-cli --json \
   --target $TID \
-  run "在 Facebook 主页发帖：内容是 'Hello from Tars'"
+  run "On the current page, fill the main text field with 'Hello from agent' and stop before any irreversible submit."
 ```
 
 **为什么这比你自己 orchestrate 原子操作快得多**：
@@ -127,7 +127,7 @@ page-agent-cli --json --target $TID state
 ### 4.2 始终带 `--target`
 
 ```bash
-TID=$(page-agent-cli --json tabs list | jq -r '.data[] | select(.url | contains("facebook")) | .id')
+TID=$(page-agent-cli --json tabs list | jq -r '.data[] | select(.url | contains("example.com")) | .id')
 page-agent-cli --json --target $TID state
 page-agent-cli --json --target $TID click 125
 ```
@@ -186,20 +186,13 @@ page-agent-cli --json --target $TID upload <index> "C:\a.png" "C:\b.jpg"
 - `<index>` 不必一定是 file input 本身，也可以是“从电脑中选择”按钮或其容器。CLI 会按“就近策略”解析真实 file input（当前元素 → 子元素 → 对话框容器 → 祖先链）。
 - 上传后浏览器会自动触发 `input/change` 事件，行为等价于手动选中文件。
 
-Instagram 实战流程：
+带 `<input type="file">` 的弹层（通用骨架；**索引须按当页 `state` 重取**）：
 
 ```bash
-# 1) 锁定 Instagram tab
 page-agent-cli --json tabs list
-
-# 2) 点击左侧“创建”
 page-agent-cli --json --target $TID state
-page-agent-cli --json --target $TID click 37
-
-# 3) 在“创建新帖子”弹层执行上传（通常 index=1 是“从电脑中选择”）
-page-agent-cli --json --target $TID upload 1 "C:\path\to\image.png"
-
-# 4) 再次 state，确认进入“裁剪/继续”步骤
+page-agent-cli --json --target $TID click <index-that-opens-upload-ui>
+page-agent-cli --json --target $TID upload <file-input-or-proxy-index> "C:\\path\\to\\image.png"
 page-agent-cli --json --target $TID state
 ```
 
@@ -213,7 +206,7 @@ page-agent-cli --json --target $TID state
 | `Target xxxx not found` | tab 已经被关掉 | 重新 `tabs list` 拿新 ID |
 | `click` 返回 success 但页面没变 | 你点错了 index（DOM 已变），或目标元素是装饰性容器 | 重新 `state`，找正确 index |
 | `eval` 返回 `undefined` | 1) 表达式本身是 undefined；2) 使用了旧版 CLI（旧版 statement 模式会让 `1+1` 也变 undefined）| 升级到最新包后重试；并先测 `eval "1+1"` |
-| `state` 返回的 content 极短 / 缺很多元素 | 页面还在加载或被反调试（如 Facebook）| `eval` 等待关键节点出现，再 `state` |
+| `state` 返回的 content 极短 / 缺很多元素 | 页面还在加载或被反调试 / 懒加载未完成 | `eval` 等待关键节点出现，再 `state` |
 | `upload` 报 `Could not find node with given id` | SPA 弹层重渲染，旧实现里的 `nodeId` 失效 | 升级到最新包（已改为 `objectId` 注入） |
 | `upload` 报不是 `<input type="file">` | 传入 index 指向的是按钮/容器，且附近未找到 file input | 先 `click` 打开上传弹层，再用该弹层里的按钮 index 执行 `upload` |
 | stdout 看起来"被截断" | 你在 wrapper 里管道做了 `head`/`grep` | 拿原始 stdout，自己 JSON 解析 |
@@ -222,34 +215,18 @@ page-agent-cli --json --target $TID state
 
 ---
 
-## 6. 完整示例：用原子操作发一条 Facebook 帖子
+## 6. 完整示例（原子操作骨架）
+
+以下仅用 **`example.com`** 演示「`tabs list` → 固定 `--target` → `state` → `click` → `state`」；**具体站点的索引与 grep 模式须自行从当页 `state` 推导**，勿照抄本段数字。
 
 ```bash
-TID=$(page-agent-cli --json tabs list | jq -r '.data[] | select(.url|contains("facebook.com")) | .id' | head -1)
-
-# 1. 打开发帖框
-STATE=$(page-agent-cli --json --target $TID state)
-POST_BTN=$(echo "$STATE" | jq -r '.data.content' | grep -oE '\[([0-9]+)\]<div role=button[^>]*分享' | head -1 | grep -oE '[0-9]+')
-page-agent-cli --json --target $TID click "$POST_BTN"
-
-# 2. 在弹出的对话框里输入文字
-STATE=$(page-agent-cli --json --target $TID state)
-TEXTBOX=$(echo "$STATE" | jq -r '.data.content' | grep -oE '\[([0-9]+)\]<div[^>]*role=textbox' | head -1 | grep -oE '[0-9]+')
-page-agent-cli --json --target $TID input "$TEXTBOX" "Hello from Tars!"
-
-# 3. 找"继续"或"发帖"按钮
-STATE=$(page-agent-cli --json --target $TID state)
-SUBMIT=$(echo "$STATE" | jq -r '.data.content' | grep -oE '\[([0-9]+)\]<div[^>]*aria-label=继续' | head -1 | grep -oE '[0-9]+')
-page-agent-cli --json --target $TID click "$SUBMIT"
-
-# 4. 如果还在弹窗里，再点"发帖"
-sleep 1
-STATE=$(page-agent-cli --json --target $TID state)
-SUBMIT=$(echo "$STATE" | jq -r '.data.content' | grep -oE '\[([0-9]+)\]<div[^>]*aria-label=发帖' | head -1 | grep -oE '[0-9]+')
-[ -n "$SUBMIT" ] && page-agent-cli --json --target $TID click "$SUBMIT"
+TID=$(page-agent-cli --json tabs list | jq -r '.data[] | select(.url | contains("example.com")) | .id' | head -1)
+page-agent-cli --json --target "$TID" state
+page-agent-cli --json --target "$TID" click 3
+page-agent-cli --json --target "$TID" state
 ```
 
-**整套流程的实测耗时**：CLI 工具本身贡献 ~5 秒（4 次 state + 3 次 click，每次 0.5–1.5 s）。如果你看到这个例子跑了 1 分钟以上，**99% 是 wrapper 在串/并发逻辑上出了问题，不是 CLI 卡住**。
+**耗时预期**：单次 CLI 调用通常 **0.3–2 s**；若整条链路被拖到数分钟，**优先排查 wrapper 并发/未等待进程结束**，而非假定 CLI 卡死。
 
 ---
 
@@ -261,7 +238,7 @@ SUBMIT=$(echo "$STATE" | jq -r '.data.content' | grep -oE '\[([0-9]+)\]<div[^>]*
 2. **是不是没用 `--target`，每条命令都重新选 tab？** 加上 `--target`。
 3. **是不是连续 `state` 多次？** 减到 1 次/操作。
 4. **任务是不是很长很复杂？** 改用 `run "..."`，让 CLI 内部 agent 一次性处理。
-5. **页面本身就慢（Facebook / Gmail / 重 SPA）？** `state` 在大 DOM 上 1–3 s 是正常的。无解，但和 CLI 设计无关；浏览器扩展处理同样的页面也一样慢，因为是同一份 DOM 提取代码。
+5. **页面本身就慢（大型收件箱 / 重 SPA）？** `state` 在大 DOM 上 1–3 s 是正常的。无解，但和 CLI 设计无关；浏览器扩展处理同样的页面也一样慢，因为是同一份 DOM 提取代码。
 
 ---
 

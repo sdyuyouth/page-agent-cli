@@ -126,8 +126,9 @@ page-agent-cli --json --target $TID upload 1 "C:\a.png" "C:\b.jpg"
 
 Behavior:
 - Paths are validated locally before injection.
+- Run `state` at least once on the tab so indices exist; after large DOM changes, run `state` again.
 - `<index>` can be a file input OR a nearby trigger/container (e.g. "Select from computer" button).
-- CLI resolves the actual `<input type="file">` near that index and injects files via CDP.
+- CLI resolves the actual `<input type="file">` from that anchor (descendants, modal/dialog, ancestors; or the only file input on the page) and injects files via CDP. You do **not** need the file input line to appear in the printed `state` text if the anchor still resolves uniquely—use `eval` / clicks / hovers to open the upload UI first.
 - Browser `input/change` events are fired automatically.
 
 ### `goto <url>`

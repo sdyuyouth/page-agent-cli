@@ -314,7 +314,10 @@ export class CdpPageController implements IPageController {
 	 * its page-agent index.  Uses CDP's DOM.setFileInputFiles so the browser
 	 * fires the normal change/input events — identical to a real user selection.
 	 *
-	 * @param index     - Element index from the most recent `state` snapshot.
+	 * @param index     - Element index from the most recent `state` snapshot (selectorMap).
+	 *   May be the file input itself or a nearby trigger/container; the implementation
+	 *   resolves `<input type="file">` under that anchor (descendants, dialog, ancestors),
+	 *   or the sole file input on the page when globally unique.
 	 * @param filePaths - Absolute local paths to the files to inject.
 	 */
 	async uploadFiles(
@@ -340,7 +343,7 @@ export class CdpPageController implements IPageController {
 					var nested = el.querySelector ? el.querySelector('input[type="file"]') : null;
 					if (nested) return nested;
 
-					// Common SPA modal container lookup (e.g. Instagram composer dialog)
+					// Common SPA modal container lookup (composer / overlay dialogs)
 					var dialog = el.closest ? el.closest('[role="dialog"], [aria-modal="true"]') : null;
 					if (dialog && dialog.querySelector) {
 						var inDialog = dialog.querySelector('input[type="file"]');
