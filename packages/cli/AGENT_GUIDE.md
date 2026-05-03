@@ -183,7 +183,7 @@ page-agent-cli --json --target $TID upload <index> "C:\a.png" "C:\b.jpg"
 
 关键规则：
 - 文件路径建议使用绝对路径；CLI 会先校验文件是否存在。
-- `<index>` 不必一定是 file input 本身，也可以是“从电脑中选择”按钮或其容器。CLI 会按“就近策略”解析真实 file input（当前元素 → 子元素 → 对话框容器 → 祖先链）。
+- `<index>` 是 **`state` 锚点**：不必是 file input 本身，也可以是「从电脑选择」按钮、composer 容器等。CLI 在 **`document.querySelectorAll('input[type="file"]')` 能枚举到的候选**中，选取与锚点 **DOM 树无向距离最短** 的 `<input type="file">`（沿 `parentElement` 到最近公共祖先；距离相同则文档顺序更靠前者优先）。**不穿透 Shadow DOM、不跨 iframe**（与常见 `state` 可见范围一致）。
 - 上传后浏览器会自动触发 `input/change` 事件，行为等价于手动选中文件。
 
 带 `<input type="file">` 的弹层（通用骨架；**索引须按当页 `state` 重取**）：
@@ -192,7 +192,7 @@ page-agent-cli --json --target $TID upload <index> "C:\a.png" "C:\b.jpg"
 page-agent-cli --json tabs list
 page-agent-cli --json --target $TID state
 page-agent-cli --json --target $TID click <index-that-opens-upload-ui>
-page-agent-cli --json --target $TID upload <file-input-or-proxy-index> "C:\\path\\to\\image.png"
+page-agent-cli --json --target $TID upload <anchor-index-near-target-file> "C:\\path\\to\\image.png"
 page-agent-cli --json --target $TID state
 ```
 
@@ -208,7 +208,8 @@ page-agent-cli --json --target $TID state
 | `eval` 返回 `undefined` | 1) 表达式本身是 undefined；2) 使用了旧版 CLI（旧版 statement 模式会让 `1+1` 也变 undefined）| 升级到最新包后重试；并先测 `eval "1+1"` |
 | `state` 返回的 content 极短 / 缺很多元素 | 页面还在加载或被反调试 / 懒加载未完成 | `eval` 等待关键节点出现，再 `state` |
 | `upload` 报 `Could not find node with given id` | SPA 弹层重渲染，旧实现里的 `nodeId` 失效 | 升级到最新包（已改为 `objectId` 注入） |
-| `upload` 报不是 `<input type="file">` | 传入 index 指向的是按钮/容器，且附近未找到 file input | 先 `click` 打开上传弹层，再用该弹层里的按钮 index 执行 `upload` |
+| `upload` 报 `Element … not found` / 绑到错误的 file | 页上无（可枚举的）file input、索引过期，或**多个 file** 时锚点树距离更近于「非目标」控件 | 先 `state`；`click`/`eval` 打开上传区后让锚点落在目标子树内再 `upload`；多 file 仍不稳用 `teach` |
+| `upload` 报不是 `<input type="file">` | 极少见（解析结果校验失败） | 升级到最新 CLI；仍失败则 `state` 后重试或 `teach` |
 | stdout 看起来"被截断" | 你在 wrapper 里管道做了 `head`/`grep` | 拿原始 stdout，自己 JSON 解析 |
 | wrapper 报"session still running"但任务已完成 | wrapper 抽象问题，不是 CLI 问题 | 修 wrapper，或忽略该状态，按 stdout JSON 内容判断 |
 | 长任务里跨多个 tab、上下文复杂 | 原子操作 orchestrate 太重 | 改用 `run "..."` |

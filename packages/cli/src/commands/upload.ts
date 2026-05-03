@@ -58,14 +58,12 @@ Examples:
 
 Notes:
   <index> comes from the Page Agent flat tree (same numbering as the latest
-  \`state\` on this tab). The indexed node does NOT have to be the <input
-  type="file"> line in the printed state: the CLI resolves the real file input
-  from that anchor (descendants, dialog/modal subtree, ancestors), and if there
-  is exactly one file input in the document it may use that as a last resort.
-  Run \`state\` at least once before upload so selectorMap exists; after large
-  DOM changes, run \`state\` again. Use \`eval\` / clicks / hovers to open upload
-  UI; you do not need to wait until \`state\` text shows type=file if the anchor
-  still resolves uniquely.
+  \`state\` on this tab). The indexed node is an **anchor**: the CLI picks the
+  **DOM-tree-nearest** \`<input type="file">\` (shortest path via \`parentElement\`
+  links; ties: earlier in document order). The anchor need not be the file
+  input row in the printed \`state\` text. Run \`state\` at least once before
+  upload so selectorMap exists; after large DOM changes, run \`state\` again.
+  Use \`eval\` / clicks / hovers so the anchor sits near the intended upload UI.
   Relative paths are resolved against the current working directory.
 
   The browser fires the normal change/input events after injection, so upload

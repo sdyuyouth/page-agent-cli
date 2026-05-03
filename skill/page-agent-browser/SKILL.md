@@ -45,7 +45,7 @@ page-agent --version
 | `run` | 内置 LLM 多步（需 `LLM_*`）；与外层 Agent 二选一 |
 | `repl` / `teach` | REPL；阻塞式教学浮窗（**`teach` 全文见 `CLI_REFERENCE.md`**） |
 
-**`upload`**：索引 `n` 来自**最近一次 `state`**，但 **不必** 等到 `state` 文本里出现 `type=file`**；常用做法是 **`eval`/`click` 打开上传区** 后直接 **`upload n`**（`n` 为入口按钮/容器等锚点，CLI 会解析到实际 file input）。大改 DOM 后再 `state` 校准。详见 **`CLI_REFERENCE.md`「upload」**。
+**`upload`**：索引 `n` 为**锚点**（**最近一次 `state`**，不必是 `type=file` 行）。CLI 在**主文档可枚举**的 **`<input type=file>`** 中选与锚点 **DOM 树距离最近** 的一个（多 file 时同理；不穿透 Shadow、不跨 iframe）。常用：**`eval`/`click` 打开上传区** 后 **`upload n`**，使 `n` 尽量靠近目标 file。大改 DOM 后再 `state`。详见 **`CLI_REFERENCE.md`「upload」**。
 
 **`teach`**：须 `--task` 或 `PAGE_AGENT_TEACH_TASK`；就绪后超时退出码 **124**；成功 JSON **无** `data` 包装；多 Tab、checkpoint、`steps` 里含 `hover`/`state_refresh` 等——**只读 `CLI_REFERENCE.md`「teach」**。
 

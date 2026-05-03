@@ -40,11 +40,13 @@
 
 **前提**：本 Tab 上至少跑过一次 **`state`**，页内才有当前 **`selectorMap`**；大导航 / 整页 DOM 重写后应再 **`state`** 再 `upload`，避免索引漂移。
 
-**`[n]` 不必是 `state` 文本里的 `type=file` 行**：`n` 来自**最近一次 `state` 的编号**，但 CLI 会把该节点当**锚点**，在其子树、所在 **`[role=dialog]` / `[aria-modal=true]`** 弹层、祖先链内查找 **`<input type="file">`**；若整页**恰好只有一个** file input，也会作为兜底。与「DOM 里第几个 file」不是同一计数。
+**`[n]` 不必是 `state` 文本里的 `type=file` 行**：`n` 来自**最近一次 `state` 的编号**，作为**锚点**。CLI 在整页所有 **`<input type="file">`** 中选取与锚点 **DOM 树无向距离最短** 的一个（沿 **`parentElement`** 走到最近公共祖先再折返；等价于「树上半径最小」）。**距离相同**时取 **文档顺序更靠前** 的那个。与「DOM 里第几个 file」不是同一计数。
 
-**推荐流程**：`state` → 用 **`eval` / `click` / `hover`** 打开上传区（shadow、滚动、`querySelector` 等用 **`eval`**）→ **`upload n`**（`n` 可为上传按钮、容器或已是 file 行——只要解析链能落到**唯一** file input）。**不要求**为了 `upload` 再等到 `state` 输出里出现 `type=file` 字样；若存在多个 file input 且锚点无法唯一定位，再 **`state`** 换更贴近的锚点、继续用 **`eval`** 收窄，或 **`teach`**。
+**推荐流程**：`state` → 用 **`eval` / `click` / `hover`** 让锚点落在目标上传控件附近（同一 composer / 弹层 subtree 更佳）→ **`upload n`**。页面上**多个** file 时，应保证所选 **`n`** 在树上离目标 file **比离其它 file 更近**；否则换锚点、`state` 或 **`teach`**。
 
 路径建议绝对路径；多文件空格分隔。失败时核对文件存在、`n` 是否仍对应最新 `state`。
+
+**限制**：候选 file 为当前主文档 **`document.querySelectorAll('input[type="file"]')`** 能枚举到的节点（与常见 `state` 一致）；**不穿透 open shadow、不跨 iframe**。
 
 ---
 

@@ -41,12 +41,12 @@ page-agent-cli --json --target <TID> eval "1+1"
 - `eval "1+1"` 返回 `Result: 2`
 - 命令快速退出，不挂起
 
-进入上传流程（**索引与路径按你的环境替换**）：
+进入上传流程（**索引与路径按你的环境替换**）。`upload` 的 `<index>` 为 **`state` 锚点**：CLI 在页内可枚举的 **`<input type="file">`** 中选与锚点 **DOM 树距离最近** 的一个（详见 `skill/page-agent-browser/CLI_REFERENCE.md` 与 `packages/cli/AGENT_GUIDE.md` §4.6）。
 
 ```bash
 page-agent-cli --json --target <TID> click <index>
 page-agent-cli --json --target <TID> state
-page-agent-cli --json --target <TID> upload <index> "/mnt/c/Users/<you>/Pictures/example.png"
+page-agent-cli --json --target <TID> upload <anchor-index> "/mnt/c/Users/<you>/Pictures/example.png"
 page-agent-cli --json --target <TID> state
 ```
 
@@ -62,8 +62,8 @@ page-agent-cli --json --target <TID> state
 - 结论：测试输入路径错误，不是 CLI 上传内核错误
 
 ### B. 索引问题
-- 现象：`No interactive element found at index ...`
-- 结论：页面状态变化导致 index 失效，需要先重新 `state`
+- 现象：`No interactive element found at index ...` / `Element at index ... not found`（upload）
+- 结论：页面状态变化导致 index 失效，或 upload 锚点无法对应到任何可枚举的 file input；先重新 `state`，必要时把锚点换到目标上传 UI 子树内（多 file 时避免离「非目标」file 更近）
 
 ### C. 连接问题
 - 现象：`Cannot connect to Chrome at ...`

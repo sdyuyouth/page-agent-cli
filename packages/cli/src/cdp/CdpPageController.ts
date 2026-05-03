@@ -27,6 +27,75 @@ import pageControllerInjectSource from 'virtual:page-agent-inject'
 
 import { type CdpClient, type CdpTarget, connectToFirstPage } from './CdpClient.js'
 
+/**
+ * Injected into the page for `upload`: pick the `<input type="file">` with
+ * minimum undirected DOM-tree distance from the `state` anchor (parent-chain
+ * hops). Tie-break: earlier in document order.
+ */
+const UPLOAD_NEAREST_FILE_HELPERS = `
+function treeDistanceFromAnchorTo(anchor, target) {
+	var upward = new Map();
+	var n = anchor;
+	var d = 0;
+	while (n) {
+		upward.set(n, d);
+		d++;
+		n = n.parentElement;
+	}
+	n = target;
+	d = 0;
+	while (n) {
+		if (upward.has(n)) return upward.get(n) + d;
+		d++;
+		n = n.parentElement;
+	}
+	return 1e9;
+}
+function resolveNearestFileInput(anchor) {
+	if (!anchor) return null;
+	if (anchor.tagName === 'INPUT' && (anchor.type || '').toLowerCase() === 'file') return anchor;
+	var list = document.querySelectorAll('input[type="file"]');
+	var best = null;
+	var bestDist = 1e9;
+	for (var i = 0; i < list.length; i++) {
+		var f = list[i];
+		var dist = treeDistanceFromAnchorTo(anchor, f);
+		if (dist < bestDist) {
+			bestDist = dist;
+			best = f;
+		} else if (dist === bestDist) {
+			if (!best) best = f;
+			else if (best.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_PRECEDING) best = f;
+		}
+	}
+	return bestDist < 1e9 ? best : null;
+}
+`
+
+function buildUploadResolveToElementExpression(index: number): string {
+	return `(function(){
+${UPLOAD_NEAREST_FILE_HELPERS}
+	var pc = window.__pageAgentPC;
+	if (!pc) return null;
+	var node = pc.selectorMap.get(${index});
+	var el = node ? node.ref : null;
+	return resolveNearestFileInput(el);
+})()`
+}
+
+function buildUploadResolveToTagInfoExpression(index: number): string {
+	return `(function(){
+${UPLOAD_NEAREST_FILE_HELPERS}
+	var pc = window.__pageAgentPC;
+	if (!pc) return null;
+	var node = pc.selectorMap.get(${index});
+	var el = node ? node.ref : null;
+	var resolved = resolveNearestFileInput(el);
+	if (!resolved) return null;
+	return { tag: resolved.tagName, inputType: (resolved.type || '').toLowerCase() };
+})()`
+}
+
 // ---------------------------------------------------------------------------
 // CdpPageController
 // ---------------------------------------------------------------------------
@@ -315,9 +384,9 @@ export class CdpPageController implements IPageController {
 	 * fires the normal change/input events — identical to a real user selection.
 	 *
 	 * @param index     - Element index from the most recent `state` snapshot (selectorMap).
-	 *   May be the file input itself or a nearby trigger/container; the implementation
-	 *   resolves `<input type="file">` under that anchor (descendants, dialog, ancestors),
-	 *   or the sole file input on the page when globally unique.
+	 *   May be the file input itself or any `state`-visible anchor; the implementation
+	 *   picks the **DOM-tree-nearest** `<input type=file>` (undirected distance via
+	 *   `parentElement` links). Ties: earlier in document order.
 	 * @param filePaths - Absolute local paths to the files to inject.
 	 */
 	async uploadFiles(
@@ -326,52 +395,8 @@ export class CdpPageController implements IPageController {
 	): Promise<import('@page-agent/page-controller').ActionResult> {
 		await this._ensureReady()
 
-		// selectorMap is private in TypeScript but accessible at runtime.
-		// Resolve strategy for file input:
-		// 1) indexed element itself
-		// 2) indexed element descendants
-		// 3) nearest dialog container descendants
-		// 4) ancestor chain descendants (closest first)
-		// 5) whole document only when exactly ONE file input exists
 		const elementHandle = await this.client.evaluateHandle(
-			`(function(){
-				function resolveFileInputFromElement(el) {
-					if (!el) return null;
-					if (el.tagName === 'INPUT' && (el.type || '').toLowerCase() === 'file') return el;
-
-					// Downward lookup from selected element
-					var nested = el.querySelector ? el.querySelector('input[type="file"]') : null;
-					if (nested) return nested;
-
-					// Common SPA modal container lookup (composer / overlay dialogs)
-					var dialog = el.closest ? el.closest('[role="dialog"], [aria-modal="true"]') : null;
-					if (dialog && dialog.querySelector) {
-						var inDialog = dialog.querySelector('input[type="file"]');
-						if (inDialog) return inDialog;
-					}
-
-					// Upward lookup: closest ancestor first
-					var cur = el.parentElement;
-					while (cur) {
-						if (cur.querySelector) {
-							var inAncestor = cur.querySelector('input[type="file"]');
-							if (inAncestor) return inAncestor;
-						}
-						cur = cur.parentElement;
-					}
-
-					// Last-resort fallback: only if globally unique
-					var all = document.querySelectorAll('input[type="file"]');
-					if (all.length === 1) return all[0];
-					return null;
-				}
-
-				var pc = window.__pageAgentPC;
-				if (!pc) return null;
-				var node = pc.selectorMap.get(${index});
-				var el = node ? node.ref : null;
-				return resolveFileInputFromElement(el);
-			})()`
+			buildUploadResolveToElementExpression(index)
 		)
 
 		if (!elementHandle.objectId) {
@@ -381,40 +406,8 @@ export class CdpPageController implements IPageController {
 			}
 		}
 
-		// Validate that the element is <input type="file"> before proceeding.
 		const tagInfo = await this.client.evaluate<{ tag: string; inputType: string } | null>(
-			`(function(){
-				function resolveFileInputFromElement(el) {
-					if (!el) return null;
-					if (el.tagName === 'INPUT' && (el.type || '').toLowerCase() === 'file') return el;
-					var nested = el.querySelector ? el.querySelector('input[type="file"]') : null;
-					if (nested) return nested;
-					var dialog = el.closest ? el.closest('[role="dialog"], [aria-modal="true"]') : null;
-					if (dialog && dialog.querySelector) {
-						var inDialog = dialog.querySelector('input[type="file"]');
-						if (inDialog) return inDialog;
-					}
-					var cur = el.parentElement;
-					while (cur) {
-						if (cur.querySelector) {
-							var inAncestor = cur.querySelector('input[type="file"]');
-							if (inAncestor) return inAncestor;
-						}
-						cur = cur.parentElement;
-					}
-					var all = document.querySelectorAll('input[type="file"]');
-					if (all.length === 1) return all[0];
-					return null;
-				}
-
-				var pc = window.__pageAgentPC;
-				if (!pc) return null;
-				var node = pc.selectorMap.get(${index});
-				var el = node ? node.ref : null;
-				el = resolveFileInputFromElement(el);
-				if (!el) return null;
-				return { tag: el.tagName, inputType: (el.type || '').toLowerCase() };
-			})()`
+			buildUploadResolveToTagInfoExpression(index)
 		)
 
 		if (!tagInfo) {
@@ -463,35 +456,7 @@ export class CdpPageController implements IPageController {
 			} catch (err) {
 				// One retry after fresh resolve to handle SPA re-mount races.
 				const retryHandle = await this.client.evaluateHandle(
-					`(function(){
-						function resolveFileInputFromElement(el) {
-							if (!el) return null;
-							if (el.tagName === 'INPUT' && (el.type || '').toLowerCase() === 'file') return el;
-							var nested = el.querySelector ? el.querySelector('input[type="file"]') : null;
-							if (nested) return nested;
-							var dialog = el.closest ? el.closest('[role="dialog"], [aria-modal="true"]') : null;
-							if (dialog && dialog.querySelector) {
-								var inDialog = dialog.querySelector('input[type="file"]');
-								if (inDialog) return inDialog;
-							}
-							var cur = el.parentElement;
-							while (cur) {
-								if (cur.querySelector) {
-									var inAncestor = cur.querySelector('input[type="file"]');
-									if (inAncestor) return inAncestor;
-								}
-								cur = cur.parentElement;
-							}
-							var all = document.querySelectorAll('input[type="file"]');
-							if (all.length === 1) return all[0];
-							return null;
-						}
-						var pc = window.__pageAgentPC;
-						if (!pc) return null;
-						var n = pc.selectorMap.get(${index});
-						var e = n ? n.ref : null;
-						return resolveFileInputFromElement(e);
-					})()`
+					buildUploadResolveToElementExpression(index)
 				)
 				if (!retryHandle.objectId) throw err
 				try {
