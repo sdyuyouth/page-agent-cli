@@ -40,3 +40,12 @@ package.json.bak
 .claude
 .cursor
 .gemini
+
+*Zone.Identifier*
+
+# page-agent-browser skill: local / runtime (see skill/ARCHITECTURE.md)
+skill/page-agent-browser/platforms/
+skill/page-agent-browser/**/*.tgz
+skill/page-agent-browser/**/lessons/*.json
+skill/page-agent-browser/**/exploration-log.md
+skill/page-agent-browser/**/health.md
