@@ -42,9 +42,43 @@ export interface BrowserState {
 	footer: string
 }
 
-interface ActionResult {
+export interface ActionResult {
 	success: boolean
 	message: string
+}
+
+/**
+ * PageController contract used by PageAgentCore and CdpPageController.
+ * All DOM operations are async to support remote / CDP-based implementations.
+ */
+export interface IPageController {
+	getBrowserState(): Promise<BrowserState>
+	getLastUpdateTime(): Promise<number>
+	updateTree(): Promise<string>
+	cleanUpHighlights(): Promise<void>
+	showMask(): Promise<void>
+	hideMask(): Promise<void>
+	clickElement(index: number): Promise<ActionResult>
+	inputText(index: number, text: string): Promise<ActionResult>
+	selectOption(index: number, optionText: string): Promise<ActionResult>
+	scroll(options: {
+		down: boolean
+		numPages: number
+		pixels?: number
+		index?: number
+	}): Promise<ActionResult>
+	scrollHorizontally(options: {
+		right: boolean
+		pixels: number
+		index?: number
+	}): Promise<ActionResult>
+	executeJavascript(script: string): Promise<ActionResult>
+	/**
+	 * Inject local file(s) into an `<input type="file">` element.
+	 * Only meaningful in CDP-based environments; in-page implementations throw.
+	 */
+	uploadFiles(index: number, filePaths: string[]): Promise<ActionResult>
+	dispose(): void
 }
 
 /**
@@ -55,7 +89,7 @@ interface ActionResult {
  * - beforeUpdate: Emitted before the DOM tree is updated.
  * - afterUpdate: Emitted after the DOM tree is updated.
  */
-export class PageController extends EventTarget {
+export class PageController extends EventTarget implements IPageController {
 	private config: PageControllerConfig
 
 	/** Corresponds to eval_page in browser-use */
@@ -376,13 +410,66 @@ export class PageController extends EventTarget {
 	}
 
 	/**
+	 * Not supported in the in-page PageController — local file system access
+	 * is unavailable inside the browser sandbox.  CDP-based callers
+	 * (CdpPageController) override this with a real implementation.
+	 */
+	async uploadFiles(_index: number, _filePaths: string[]): Promise<ActionResult> {
+		return {
+			success: false,
+			message: '❌ uploadFiles is not supported in the in-page PageController.',
+		}
+	}
+
+	/**
 	 * Execute arbitrary JavaScript on the page
 	 */
+	/**
+	 * Teach overlay: resolve a `state` index to the live HTMLElement (after `updateTree` / `getBrowserState`).
+	 */
+	getIndexedElementRef(index: number): HTMLElement | null {
+		if (!this.isIndexed) return null
+		try {
+			return getElementByIndex(this.selectorMap, index)
+		} catch {
+			return null
+		}
+	}
+
+	/**
+	 * Teach overlay: map a DOM node (e.g. click target) to the current interactive index, if any.
+	 */
+	findIndexForInteractiveTarget(target: EventTarget): number | null {
+		if (!this.isIndexed || !(target instanceof Element)) return null
+		let el: Element | null = target
+		while (el) {
+			for (const [idx, node] of this.selectorMap) {
+				if (node.ref === el) return idx
+			}
+			el = el.parentElement
+		}
+		if (target instanceof Node) {
+			for (const [idx, node] of this.selectorMap) {
+				if (node.ref.contains(target)) return idx
+			}
+		}
+		return null
+	}
+
 	async executeJavascript(script: string): Promise<ActionResult> {
 		try {
-			// Wrap script in async function to support await
-			const asyncFunction = eval(`(async () => { ${script} })`)
-			const result = await asyncFunction()
+			// Eval command is documented as expression-first. We first evaluate as an
+			// expression to make `eval "1+1"` return `2` (instead of undefined).
+			// If parsing as expression fails, fall back to statement-mode for cases
+			// like `const x = 1; return x + 1`.
+			let result: unknown
+			try {
+				const expressionFn = eval(`(async () => (${script}))`)
+				result = await expressionFn()
+			} catch {
+				const statementFn = eval(`(async () => { ${script} })`)
+				result = await statementFn()
+			}
 			return {
 				success: true,
 				message: `✅ Executed JavaScript. Result: ${result}`,

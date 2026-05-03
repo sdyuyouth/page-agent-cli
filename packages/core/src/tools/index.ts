@@ -184,7 +184,26 @@ tools.set(
 	})
 )
 
+tools.set(
+	'upload_file',
+	tool({
+		description:
+			'Upload one or more local files to an <input type="file"> element by index. ' +
+			'Provide absolute paths. The browser fires change/input events automatically.',
+		inputSchema: z.object({
+			index: z.int().min(0).describe('Element index from the current state snapshot'),
+			file_paths: z
+				.array(z.string())
+				.min(1)
+				.describe('Absolute local path(s) to the file(s) to upload'),
+		}),
+		execute: async function (this: PageAgentCore, input) {
+			const result = await this.pageController.uploadFiles(input.index, input.file_paths)
+			return result.message
+		},
+	})
+)
+
 // @todo send_keys
-// @todo upload_file
 // @todo go_back
 // @todo extract_structured_data

@@ -7,6 +7,23 @@ import { InvokeError, InvokeErrorTypes } from './errors'
 import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
 
+/** Best-effort message from non-standard error JSON bodies (e.g. `{ "error": "Origin not allowed" }`). */
+function messageFromHttpErrorBody(data: unknown): string {
+	if (!data || typeof data !== 'object') return ''
+	const d = data as Record<string, unknown>
+	if (typeof d.error === 'string') return d.error
+	const nested = d.error
+	if (
+		nested &&
+		typeof nested === 'object' &&
+		typeof (nested as { message?: string }).message === 'string'
+	) {
+		return (nested as { message: string }).message
+	}
+	if (typeof d.message === 'string') return d.message
+	return ''
+}
+
 /**
  * Client for OpenAI compatible APIs
  */
@@ -65,6 +82,7 @@ export class OpenAIClient implements LLMClient {
 				headers: {
 					'Content-Type': 'application/json',
 					...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
+					...this.config.requestHeaders,
 				},
 				body: JSON.stringify(finalRequestBody),
 				signal: abortSignal,
@@ -78,14 +96,22 @@ export class OpenAIClient implements LLMClient {
 
 		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch()
+			const errorData = await response.json().catch(() => undefined)
+			const fromBody = messageFromHttpErrorBody(errorData)
 			const errorMessage =
-				(errorData as { error?: { message?: string } }).error?.message || response.statusText
+				fromBody ||
+				(errorData as { error?: { message?: string } })?.error?.message ||
+				response.statusText
 
 			if (response.status === 401 || response.status === 403) {
+				const hint =
+					fromBody.toLowerCase().includes('origin') &&
+					fromBody.toLowerCase().includes('not allowed')
+						? ' If you call a gateway that allowlists Origin, set LLM_ORIGIN (or CLI --origin) to an allowed URL, or try LLM_STRIP_BROWSER_HEADERS=1.'
+						: ''
 				throw new InvokeError(
 					InvokeErrorTypes.AUTH_ERROR,
-					`Authentication failed: ${errorMessage}`,
+					`Authentication failed: ${errorMessage}${hint}`,
 					errorData
 				)
 			}

@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 import { InvokeError, LLM, type Tool } from '@page-agent/llms'
-import type { BrowserState, PageController } from '@page-agent/page-controller'
+import type { BrowserState, IPageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import * as z from 'zod/v4'
 
@@ -26,7 +26,7 @@ import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
 
-export type PageAgentCoreConfig = AgentConfig & { pageController: PageController }
+export type PageAgentCoreConfig = AgentConfig & { pageController: IPageController }
 
 /**
  * AI agent for browser automation.
@@ -63,7 +63,7 @@ export class PageAgentCore extends EventTarget {
 	readonly config: PageAgentCoreConfig & { maxSteps: number }
 	readonly tools: typeof tools
 	/** PageController for DOM operations */
-	readonly pageController: PageController
+	readonly pageController: IPageController
 
 	task = ''
 	taskId = ''
@@ -301,7 +301,7 @@ export class PageAgentCore extends EventTarget {
 					const success = action.input?.success ?? false
 					const text = action.input?.text || 'no text provided'
 					console.log(chalk.green.bold('Task completed'), success, text)
-					this.#onDone(success)
+					await this.#onDone(success)
 					const result: ExecutionResult = {
 						success,
 						data: text,
@@ -319,7 +319,7 @@ export class PageAgentCore extends EventTarget {
 				this.#emitActivity({ type: 'error', message: errorMessage })
 				this.history.push({ type: 'error', message: errorMessage, rawResponse: error })
 				this.#emitHistoryChange()
-				this.#onDone(false)
+				await this.#onDone(false)
 				const result: ExecutionResult = {
 					success: false,
 					data: errorMessage,
@@ -334,7 +334,7 @@ export class PageAgentCore extends EventTarget {
 				const errorMessage = 'Step count exceeded maximum limit'
 				this.history.push({ type: 'error', message: errorMessage })
 				this.#emitHistoryChange()
-				this.#onDone(false)
+				await this.#onDone(false)
 				const result: ExecutionResult = {
 					success: false,
 					data: errorMessage,
@@ -619,9 +619,13 @@ export class PageAgentCore extends EventTarget {
 		return prompt
 	}
 
-	#onDone(success = true) {
-		this.pageController.cleanUpHighlights()
-		this.pageController.hideMask() // No await - fire and forget
+	async #onDone(success = true): Promise<void> {
+		try {
+			await this.pageController.cleanUpHighlights()
+			await this.pageController.hideMask()
+		} catch {
+			// Tab may have navigated or CDP session may already be closing — non-fatal
+		}
 		this.#setStatus(success ? 'completed' : 'error')
 		this.#abortController.abort()
 	}

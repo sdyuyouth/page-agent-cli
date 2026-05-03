@@ -117,4 +117,18 @@ export interface LLMConfig {
 	 * The response should follow OpenAI API format.
 	 */
 	customFetch?: typeof globalThis.fetch
+
+	/**
+	 * Extra HTTP headers merged into every `POST .../chat/completions` request
+	 * (after `Content-Type` / `Authorization`). Use `Origin` / `Referer` when your
+	 * gateway (e.g. serverless FC) allowlists browser origins.
+	 */
+	requestHeaders?: Record<string, string>
+
+	/**
+	 * Strip Origin, Referer, and `Sec-Fetch-*` from the outgoing request before
+	 * calling fetch. Helps when the provider rejects Node's default cross-site
+	 * headers with errors like "Origin not allowed".
+	 */
+	stripBrowserSecurityHeaders?: boolean
 }

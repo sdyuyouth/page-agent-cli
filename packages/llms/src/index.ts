@@ -6,6 +6,28 @@ import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 export { InvokeError, InvokeErrorTypes }
 export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 
+function buildFetch(config: LLMConfig): typeof fetch {
+	let f: typeof fetch = (config.customFetch ?? fetch).bind(globalThis)
+	if (config.stripBrowserSecurityHeaders) {
+		const inner = f
+		f = (async (input: RequestInfo | URL, init?: RequestInit) => {
+			const headers = new Headers(init?.headers)
+			for (const name of [
+				'Origin',
+				'Referer',
+				'Sec-Fetch-Site',
+				'Sec-Fetch-Mode',
+				'Sec-Fetch-Dest',
+				'Sec-Fetch-User',
+			]) {
+				headers.delete(name)
+			}
+			return inner(input, { ...init, headers })
+		}) as typeof fetch
+	}
+	return f
+}
+
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 	// Runtime validation as defensive programming (types already guarantee these)
 	if (!config.baseURL || !config.model) {
@@ -23,7 +45,9 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
 		transformRequestBody: config.transformRequestBody ?? ((requestBody) => requestBody),
 		disableNamedToolChoice: config.disableNamedToolChoice ?? false,
-		customFetch: (config.customFetch ?? fetch).bind(globalThis), // fetch will be illegal unless bound
+		requestHeaders: { ...(config.requestHeaders ?? {}) },
+		stripBrowserSecurityHeaders: config.stripBrowserSecurityHeaders ?? false,
+		customFetch: buildFetch(config),
 	}
 }
 

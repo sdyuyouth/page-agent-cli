@@ -20,6 +20,7 @@
         "packages/ui/src/**/*",
         "packages/core/src/**/*",
         "packages/page-agent/src/**/*",
+        "packages/cli/src/**/*",
         "packages/website/src/**/*"
     ]
 }

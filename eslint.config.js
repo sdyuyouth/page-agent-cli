@@ -11,6 +11,8 @@ export default defineConfig([
 		'packages/*/src/components/ui',
 		'**/.wxt',
 		'**/.output',
+		// Not in package tsconfig "include"; eslint projectService cannot type-check it.
+		'packages/cli/vite.config.ts',
 	]),
 	{
 		files: ['**/*.{ts,tsx}'],

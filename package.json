@@ -10,6 +10,7 @@
         "packages/core",
         "packages/page-agent",
         "packages/mcp",
+        "packages/cli",
         "packages/extension",
         "packages/website"
     ],
@@ -29,6 +30,7 @@
         "start": "npm run dev --workspace=@page-agent/website",
         "dev:ext": "npm run dev -w @page-agent/ext",
         "dev:demo": "npm run dev:demo --workspace=page-agent",
+        "dev:cli": "concurrently -n iife,teach,cli -c cyan,magenta,yellow \"npm run dev:iife -w @page-agent/page-controller\" \"npm run dev:iife:teach -w @page-agent/page-controller\" \"npm run dev -w @page-agent/cli\"",
         "build": "node scripts/build.js",
         "build:libs": "node scripts/build-libs.js",
         "build:website": "npm run build:website --workspace=@page-agent/website",
@@ -67,6 +69,23 @@
     },
     "overrides": {
         "typescript": "^6.0.2"
+    },
+    "optionalDependencies": {
+        "@rolldown/binding-android-arm64": "1.0.0-rc.17",
+        "@rolldown/binding-darwin-arm64": "1.0.0-rc.17",
+        "@rolldown/binding-darwin-x64": "1.0.0-rc.17",
+        "@rolldown/binding-freebsd-x64": "1.0.0-rc.17",
+        "@rolldown/binding-linux-arm-gnueabihf": "1.0.0-rc.17",
+        "@rolldown/binding-linux-arm64-gnu": "1.0.0-rc.17",
+        "@rolldown/binding-linux-arm64-musl": "1.0.0-rc.17",
+        "@rolldown/binding-linux-ppc64-gnu": "1.0.0-rc.17",
+        "@rolldown/binding-linux-s390x-gnu": "1.0.0-rc.17",
+        "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.17",
+        "@rolldown/binding-linux-x64-musl": "1.0.0-rc.17",
+        "@rolldown/binding-openharmony-arm64": "1.0.0-rc.17",
+        "@rolldown/binding-wasm32-wasi": "1.0.0-rc.17",
+        "@rolldown/binding-win32-arm64-msvc": "1.0.0-rc.17",
+        "@rolldown/binding-win32-x64-msvc": "1.0.0-rc.17"
     },
     "lint-staged": {
         "*.{js,ts,cjs,cts,mjs,mts}": [

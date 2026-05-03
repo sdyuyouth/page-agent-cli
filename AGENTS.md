@@ -7,6 +7,7 @@ This is a **monorepo** with npm workspaces:
 - **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
 - **Extension** (`packages/extension/`) - Browser extension (WXT + React)
 - **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
+- **CLI** (`packages/cli/`) - CDP-based tab control and `teach` (npm: `@page-agent/cli`). **Treat `packages/cli/src` like core: reviewed, typed changes** (see `CONTRIBUTING.md`).
 
 Internal packages:
 
@@ -15,6 +16,10 @@ Internal packages:
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
 - **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageAgent
 
+Agent skill bundle (markdown + packaged CLI tgz for external agents; not a build workspace library):
+
+- **`skill/page-agent-browser/`** — keep CLI docs and skill in sync when commands or `--json` output changes.
+
 ## Development Commands
 
 ```bash
@@ -22,6 +27,7 @@ npm start                      # Start website dev server
 npm run build                  # Build all packages
 npm run build:libs             # Build all libraries
 npm run build:ext              # Build and zip the extension package
+npm run dev:cli                # Watch CLI + page-controller IIFE deps (see root package.json)
 npm run typecheck              # Typecheck all packages
 npm run lint                   # ESLint
 ```
@@ -38,9 +44,13 @@ packages/
 ├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
+├── mcp/                     # @page-agent/mcp
+├── cli/                     # @page-agent/cli — CDP CLI + teach
 ├── extension/               # Browser extension
 ├── page-controller/         # @page-agent/page-controller
 └── ui/                      # @page-agent/ui
+skill/
+└── page-agent-browser/      # Agent-facing skill markdown (+ optional packed CLI); see docs/developer-guide.md
 ```
 
 `workspaces` in `package.json` must be in topological order.
@@ -111,6 +121,16 @@ const pageInfo = await this.pageController.getPageInfo()
 | `src/actions.ts`            | Element interactions (click, input, scroll)                |
 | `src/dom/dom_tree/index.js` | Core DOM extraction engine                                 |
 
+### CLI (`packages/cli/`)
+
+| File                         | Description                                      |
+| ---------------------------- | ------------------------------------------------ |
+| `src/cli.ts`                 | ⭐ Commander entry and command registration      |
+| `src/commands/teach.ts`      | `teach` session, checkpoint, JSON stdout         |
+| `src/cdp/CdpPageController.ts` | CDP-backed PageController for tab automation |
+| `src/cdp/teachBridge.ts`     | Runtime binding bridge for teach UI              |
+| `DEVELOPMENT.md`             | Local CLI / CDP workflow                         |
+
 ## Adding New Features
 
 ### New Agent Tool
@@ -124,6 +144,12 @@ const pageInfo = await this.pageController.getPageInfo()
 1. Add implementation in `packages/page-controller/src/actions.ts`
 2. Expose via async method in `PageController.ts`
 3. Export from `packages/page-controller/src/index.ts`
+
+### New CLI Subcommand
+
+1. Add `src/commands/<name>.ts` and register in `src/cli.ts`
+2. Wire CDP or `getPageController()` as existing commands do; keep **`--json`** stdout clean (results JSON, logs on stderr) per `src/output.ts`
+3. Update **`skill/page-agent-browser/CLI_REFERENCE.md`**, **`packages/cli/SKILL.md`**, and **`packages/cli/DEVELOPMENT.md`** when CLI / `teach` behavior or flags change (keep the three in sync where they overlap).
 
 ## Code Standards
 

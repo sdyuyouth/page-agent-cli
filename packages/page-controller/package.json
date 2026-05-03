@@ -42,10 +42,16 @@
     "homepage": "https://alibaba.github.io/page-agent/",
     "scripts": {
         "build": "vite build",
+        "build:iife": "vite build --config vite.iife.config.js",
+        "build:iife:teach": "vite build --config vite.iife.teach.config.js",
+        "build:iife:all": "npm run build:iife && npm run build:iife:teach",
+        "dev:iife": "vite build --config vite.iife.config.js --watch",
+        "dev:iife:teach": "vite build --config vite.iife.teach.config.js --watch",
         "prepublishOnly": "node ../../scripts/pre-publish.js",
         "postpublish": "node ../../scripts/post-publish.js"
     },
     "dependencies": {
-        "ai-motion": "^0.4.8"
+        "ai-motion": "^0.4.8",
+        "preact": "^10.28.0"
     }
 }

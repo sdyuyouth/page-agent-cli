@@ -9,8 +9,8 @@ For contribution rules and expectations, see [../CONTRIBUTING.md](../CONTRIBUTIN
 ### Development Setup
 
 1. **Prerequisites**
-    - `macOS` / `Linux` / `WSL`
-    - `node.js ^22.13 || >=24` with `npm >= 11`
+    - `macOS` / `Linux` / `WSL` (primary); **Windows** hosts are fine for repo work — **CLI + CDP** against Edge/Chrome is often validated via **WSL**; see `packages/cli/WSL_CLI_TEST_GUIDE.md` when applicable
+    - `node.js ^22.13 || >=24` with `npm >= 11` (match root `package.json` **engines**)
     - An editor that supports `ts/eslint/prettier`
     - Make sure `eslint`, `prettier` and `commitlint` work well. Un-linted code won't pass the CI.
 
@@ -30,10 +30,15 @@ Published packages:
 
 - **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel (npm: `page-agent`)
 - **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@page-agent/mcp`)
+- **CLI** (`packages/cli/`) - CDP harness for headless browser control and `teach` (npm: `@page-agent/cli`, binary `page-agent-cli` — see package `bin` and `prepublishOnly` for publish layout)
 - **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-agent/core`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM
 - **UI** (`packages/ui/`) - Panel and i18n, decoupled from PageAgent
+
+Agent skill bundle (not an npm workspace library; shipped / copied alongside the CLI for external agents):
+
+- **`skill/page-agent-browser/`** - Markdown skill (`SKILL.md`, `CLI_REFERENCE.md`, platform recipes). Keep in sync with CLI behaviour when you change commands or flags.
 
 Applications:
 
@@ -80,6 +85,17 @@ npm run build:ext
 
 - Update `packages/extension/docs/extension_api.md` for API integration details
 
+### CLI and CDP (`packages/cli`)
+
+```bash
+npm run dev:cli   # IIFE page-controller + teach bundle + CLI watcher (see root package.json)
+npm run build     # Includes CLI via workspace build graph
+```
+
+- Deep dive: **`packages/cli/DEVELOPMENT.md`**, agent-oriented **`packages/cli/AGENT_GUIDE.md`**
+- **Contribution bar**: same as core for **TypeScript under `packages/cli/src/`** (no “vibe-only” merges); see [../CONTRIBUTING.md](../CONTRIBUTING.md) *Vibe Coding*
+- **Skill docs**: after changing CLI flags or JSON output, update **`skill/page-agent-browser/`** (and `packages/cli/SKILL.md` if you keep a package-local copy aligned)
+
 ### Testing on Other Websites
 
 - Start and serve a local `iife` script
@@ -100,6 +116,8 @@ npm run build:ext
 
 ### Adding Documentation
 
-Ask an AI to help you add documentation to the `website/` package. Follow the existing style.
+- **Product / user docs**: add or edit pages under **`packages/website/`** and follow **`packages/website/AGENTS.md`**. Follow the existing tone and structure.
+- **Contributor / architecture docs**: root **`AGENTS.md`**, this **`docs/developer-guide.md`**, **`CONTRIBUTING.md`**.
+- **CLI + external agents**: **`skill/page-agent-browser/`** and CLI-local `*.md` in **`packages/cli/`**.
 
-> Our AGENTS.md file and guardrails are designed for this purpose. But please be careful and review anything AI generated.
+> Our `AGENTS.md` and guardrails are designed for this purpose. Review anything AI-generated before merge.

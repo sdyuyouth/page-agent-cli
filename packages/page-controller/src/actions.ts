@@ -142,76 +142,73 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// - Monaco/CodeMirror: Require direct JS instance access. No universal way to obtain.
 		// - Draft.js: Not responsive to synthetic/execCommand/Range/DataTransfer. Unmaintained.
 		//
-		// Strategy: Try Plan A (synthetic events) first, then verify and fall back
-		// to Plan B (execCommand) if the text wasn't actually inserted.
+		// Strategy:
+		// Plan A — execCommand('insertText') with "select all" first.
+		//   Integrates natively with the browser editing pipeline that React,
+		//   Quill, Slate.js all hook into. Single atomic replace; no race condition
+		//   between our DOM writes and async React state reconciliation.
 		//
-		// Plan A: Dispatch synthetic events
-		// Works: React contenteditable, Quill.
-		// Fails: Slate.js, some contenteditable editors that ignore synthetic events.
-		// Sequence: beforeinput -> mutation -> input -> change -> blur
+		// Plan B — Synthetic beforeinput/input events.
+		//   Fallback for editors that block execCommand (e.g. some Monaco setups).
+		//   Risk of double-write is low here because we only use it when Plan A fails.
 
-		// Dispatch beforeinput + mutation + input for clearing
-		if (
-			element.dispatchEvent(
-				new InputEvent('beforeinput', {
-					bubbles: true,
-					cancelable: true,
-					inputType: 'deleteContent',
-				})
-			)
-		) {
-			element.innerText = ''
-			element.dispatchEvent(
-				new InputEvent('input', {
-					bubbles: true,
-					inputType: 'deleteContent',
-				})
-			)
-		}
+		element.focus({ preventScroll: true })
 
-		// Dispatch beforeinput + mutation + input for insertion (important for React apps)
-		if (
-			element.dispatchEvent(
-				new InputEvent('beforeinput', {
-					bubbles: true,
-					cancelable: true,
-					inputType: 'insertText',
-					data: text,
-				})
-			)
-		) {
-			element.innerText = text
-			element.dispatchEvent(
-				new InputEvent('input', {
-					bubbles: true,
-					inputType: 'insertText',
-					data: text,
-				})
-			)
-		}
+		// Plan A: select-all then execCommand replace
+		const doc = element.ownerDocument
+		const win = doc.defaultView || window
+		const selection = win.getSelection()
+		const range = doc.createRange()
+		range.selectNodeContents(element)
+		selection?.removeAllRanges()
+		selection?.addRange(range)
 
-		// Verify Plan A worked by checking if the text was actually inserted
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		doc.execCommand('insertText', false, text)
+
+		// Allow React / framework to flush state updates before checking
+		await waitFor(0.05)
+
 		const planASucceeded = element.innerText.trim() === text.trim()
 
 		if (!planASucceeded) {
-			// Plan B: execCommand fallback (deprecated but widely supported)
-			// Works: Quill, Slate.js, react contenteditable components.
-			// This approach integrates with the browser's undo stack and is handled
-			// natively by most rich-text editors.
-			element.focus()
+			// Plan B: synthetic events — for editors that don't respond to execCommand.
+			// Fire beforeinput + mutation + input exactly once per phase (delete then insert)
+			// to avoid the duplicate-write race that occurs when both synthetic events and
+			// execCommand are used together.
 
-			// Select all existing content and delete it
-			const doc = element.ownerDocument
-			const selection = (doc.defaultView || window).getSelection()
-			const range = doc.createRange()
-			range.selectNodeContents(element)
-			selection?.removeAllRanges()
-			selection?.addRange(range)
+			const beforeDeleteText = element.innerText
+			const allowDelete = element.dispatchEvent(
+				new InputEvent('beforeinput', {
+					bubbles: true,
+					cancelable: true,
+					inputType: 'deleteContent',
+				})
+			)
+			if (allowDelete && element.innerText === beforeDeleteText) {
+				element.innerText = ''
+				element.dispatchEvent(
+					new InputEvent('input', { bubbles: true, inputType: 'deleteContent' })
+				)
+			}
 
-			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			doc.execCommand('delete', false)
-			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			doc.execCommand('insertText', false, text)
+			const beforeInsertText = element.innerText
+			const allowInsert = element.dispatchEvent(
+				new InputEvent('beforeinput', {
+					bubbles: true,
+					cancelable: true,
+					inputType: 'insertText',
+					data: text,
+				})
+			)
+			// Wait one tick so async React state updates can settle before we check
+			await waitFor(0.05)
+			if (allowInsert && element.innerText === beforeInsertText) {
+				element.innerText = text
+				element.dispatchEvent(
+					new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text })
+				)
+			}
 		}
 
 		// Dispatch change event (for good measure)
