@@ -1,6 +1,6 @@
 /**
  * Minimal Chrome DevTools Protocol client over WebSocket.
- * Implements only what page-agent-cli needs: Runtime, Page, Target domains.
+ * Implements only what the page-agent CLI needs: Runtime, Page, Target domains.
  */
 import WebSocket from 'ws'
 

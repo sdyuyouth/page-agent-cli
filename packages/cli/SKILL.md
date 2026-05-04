@@ -1,8 +1,8 @@
-# page-agent-cli SKILL
+# page-agent SKILL
 
 ## What this CLI does
 
-`page-agent-cli` lets any agent (OpenClaw, Claude, GPT, scripts…) control a real Chrome
+`page-agent` lets any agent (OpenClaw, Claude, GPT, scripts…) control a real Chrome
 browser via the Chrome DevTools Protocol (CDP).  No browser extension, no MCP server
 required — just a running Chrome instance with `--remote-debugging-port=9222`.
 
@@ -44,7 +44,7 @@ Return the current page's URL, title, viewport info, and a list of interactive
 elements (each with a numeric index for `click`/`input`/`select`).
 
 ```bash
-page-agent-cli --json state
+page-agent --json state
 ```
 ```json
 {
@@ -63,7 +63,7 @@ page-agent-cli --json state
 Click the element at `<index>` (from `state` output).
 
 ```bash
-page-agent-cli --json click 3
+page-agent --json click 3
 ```
 ```json
 { "success": true, "data": "Clicked element 3" }
@@ -74,14 +74,14 @@ Move the pointer over the element at `<index>` without clicking or focusing it.
 Useful for hover menus, tooltips, and lazy-revealed controls.
 
 ```bash
-page-agent-cli --json hover 4
+page-agent --json hover 4
 ```
 
 ### `input <index> <text>`
 Type `<text>` into the input element at `<index>`.
 
 ```bash
-page-agent-cli --json input 2 "hello world"
+page-agent --json input 2 "hello world"
 ```
 ```json
 { "success": true, "data": "Input text into element 2" }
@@ -91,22 +91,22 @@ page-agent-cli --json input 2 "hello world"
 Scroll the page (or a scrollable container at `--index`).
 
 ```bash
-page-agent-cli --json scroll --pages 2
-page-agent-cli --json scroll --up --pixels 500
+page-agent --json scroll --pages 2
+page-agent --json scroll --up --pixels 500
 ```
 
 ### `select <index> <option>`
 Select a `<select>` option by its visible text.
 
 ```bash
-page-agent-cli --json select 5 "United States"
+page-agent --json select 5 "United States"
 ```
 
 ### `eval <script>`
 Execute arbitrary JavaScript and return the result.
 
 ```bash
-page-agent-cli --json eval "document.title"
+page-agent --json eval "document.title"
 ```
 ```json
 { "success": true, "data": "Example Domain" }
@@ -120,8 +120,8 @@ Notes:
 Upload one or more local files to a page file input.
 
 ```bash
-page-agent-cli --json --target $TID upload 1 "C:\path\to\image.png"
-page-agent-cli --json --target $TID upload 1 "C:\a.png" "C:\b.jpg"
+page-agent --json --target $TID upload 1 "C:\path\to\image.png"
+page-agent --json --target $TID upload 1 "C:\a.png" "C:\b.jpg"
 ```
 
 Behavior:
@@ -135,14 +135,14 @@ Behavior:
 Navigate the current tab to a URL.
 
 ```bash
-page-agent-cli --json goto https://news.ycombinator.com
+page-agent --json goto https://news.ycombinator.com
 ```
 
 ### `tabs list`
 List all open Chrome tabs.
 
 ```bash
-page-agent-cli --json tabs list
+page-agent --json tabs list
 ```
 ```json
 {
@@ -167,7 +167,7 @@ export LLM_BASE_URL=https://api.openai.com/v1
 export LLM_API_KEY=sk-...
 export LLM_MODEL_NAME=gpt-4o
 
-page-agent-cli --json run "Search for page-agent on GitHub and open the first result"
+page-agent --json run "Search for page-agent on GitHub and open the first result"
 ```
 ```json
 {
@@ -190,7 +190,7 @@ Flags:
 Start an interactive session (useful for manual inspection).
 
 ```bash
-page-agent-cli repl
+page-agent repl
 # pa> state
 # pa> click 3
 # pa> run "close all cookie banners"
@@ -206,15 +206,15 @@ Heavy in-site SPAs (e.g. Facebook profile ↔ page switches) may only fire CDP *
 **Single tab (default, backward compatible)** — no extra teach flags; uses `--target` or the first page tab:
 
 ```bash
-page-agent-cli --json --target $TID teach --reason "Cannot find the submit button"
-page-agent-cli --json teach --site example --task checkout-flow
+page-agent --json --target $TID teach --reason "Cannot find the submit button"
+page-agent --json teach --site example --task checkout-flow
 ```
 
 **Multi-tab (one browser, one CLI session, Hub sync)** — list every tab that should show the **full** overlay in `--teach-ui-targets` (comma-separated CDP **page** target IDs from `tabs list`). Steps and operation log stay **in sync** across those tabs; **element indices and the state panel are always per-tab** (each tab’s DOM only). Steps may include optional `targetId` for the tab where they were recorded.
 
 ```bash
-page-agent-cli --json tabs list   # copy target "id" fields
-page-agent-cli --json teach --teach-ui-targets TID_A,TID_B --reason "Cross-tab demo"
+page-agent --json tabs list   # copy target "id" fields
+page-agent --json teach --teach-ui-targets TID_A,TID_B --reason "Cross-tab demo"
 ```
 
 Optional scope flags (see also `packages/cli/DEVELOPMENT.md` § multi-tab teach):
@@ -234,16 +234,16 @@ Other useful options: `--checkpoint-file`, `PAGE_AGENT_TEACH_CHECKPOINT_FILE`, `
 ## Agent usage pattern (OpenClaw / external agent)
 
 ```
-1. page-agent-cli --json state              # observe the page
+1. page-agent --json state              # observe the page
 2. Reason about which element to act on
-3. page-agent-cli --json click <index>      # act
-4. page-agent-cli --json state              # observe again
+3. page-agent --json click <index>      # act
+4. page-agent --json state              # observe again
 5. Repeat until task complete
 ```
 
 For fully autonomous execution (when an LLM is available):
 ```
-page-agent-cli --json run "<task description>"
+page-agent --json run "<task description>"
 ```
 
 ## Error output

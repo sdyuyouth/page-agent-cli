@@ -16,10 +16,10 @@ export function registerScroll(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json scroll                    # one viewport page down
-  $ page-agent-cli --json scroll --up --pages 2     # two pages up
-  $ page-agent-cli --json scroll --pixels 800       # exactly 800px down
-  $ page-agent-cli --json scroll --index 42         # scroll a nested container
+  $ page-agent --json scroll                    # one viewport page down
+  $ page-agent --json scroll --up --pages 2     # two pages up
+  $ page-agent --json scroll --pixels 800       # exactly 800px down
+  $ page-agent --json scroll --index 42         # scroll a nested container
 
 Notes:
   After scrolling, call \`state\` again — newly-visible elements get fresh

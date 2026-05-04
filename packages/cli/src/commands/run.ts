@@ -77,16 +77,16 @@ Examples:
   $ export LLM_BASE_URL=https://api.openai.com/v1
   $ export LLM_API_KEY=sk-...
   $ export LLM_MODEL_NAME=gpt-4o
-  $ page-agent-cli --json run "Find the README of the alibaba/page-agent repo on GitHub"
+  $ page-agent --json run "Find the README of the alibaba/page-agent repo on GitHub"
 
-  $ page-agent-cli --json --base-url ... --api-key ... --model gpt-4o \\
+  $ page-agent --json --base-url ... --api-key ... --model gpt-4o \\
         run "Close all cookie banners on this page"
 
 When to use \`run\` vs primitives:
   - Use \`run\` when an LLM is available and the task is multi-step / open-ended.
     One \`run\` invocation = one persistent CDP connection + the full agent loop,
     so it is dramatically faster and more reliable than launching a new
-    page-agent-cli process for every primitive action.
+    page-agent process for every primitive action.
   - Use the primitives (state/click/input/...) when YOUR agent already
     decides what to do and only needs page-agent for DOM extraction and
     element interaction.

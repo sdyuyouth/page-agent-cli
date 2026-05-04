@@ -14,8 +14,8 @@ export function registerInput(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json input 7 "hello world"
-  $ page-agent-cli --json input 7 "$(cat ./long-message.txt)"
+  $ page-agent --json input 7 "hello world"
+  $ page-agent --json input 7 "$(cat ./long-message.txt)"
 
 Notes:
   Sets the field's value rather than appending. To submit, follow with

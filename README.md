@@ -10,7 +10,7 @@
 
 | 层次 | 说明 |
 |------|------|
-| **进程模型** | 每次 `page-agent-cli …` 为**一次同步 Node 进程**：连 CDP → 执行 → 退出；无常驻 daemon。 |
+| **进程模型** | 每次 `page-agent …` 为**一次同步 Node 进程**：连 CDP → 执行 → 退出；无常驻 daemon。 |
 | **控制面** | `packages/cli`：Commander 子命令、`CdpClient`（WebSocket）、`CdpPageController` / `CdpTabsController` 实现与扩展侧一致的 **`IPageController`** 契约。 |
 | **页面侧** | `packages/page-controller` 产出 **IIFE 注入包**，由 CLI 通过 `Page.addScriptToEvaluateOnNewDocument` / `Runtime.evaluate` 挂到 `window.__pageAgentPC`，与 DOM 操作、可选遮罩、**teach** 浮窗共用同一套逻辑。 |
 | **高层任务** | `packages/core` 的 `PageAgentCore` + `packages/llms`：供 **`run`** 子命令在单进程内做 ReAct 式多步自动化。 |
@@ -82,12 +82,12 @@
 **teach 怎么用（从命令到落盘）**
 
 1. **何时用**：`state` 索引反复对不齐、缺可靠 recipe、需要用户**按当前页与 `state` 一致的编号**演示多步（含悬停、下拉、刷新索引树等）。  
-2. **前置**：CDP 已通；`page-agent-cli --json tabs list` 取目标 Tab 的 **`id`** 作为 **`--target`**；该页需能注入带 **`hoverElement`** 等方法的 **`window.__pageAgentPC`**（CLI 默认会注入/热升级）。  
+2. **前置**：CDP 已通；`page-agent --json tabs list` 取目标 Tab 的 **`id`** 作为 **`--target`**；该页需能注入带 **`hoverElement`** 等方法的 **`window.__pageAgentPC`**（CLI 默认会注入/热升级）。  
 3. **必带任务名**：传 **`--task <name>`**，或事先设置环境变量 **`PAGE_AGENT_TEACH_TASK`**；否则任务名为 **`untitled`**，不利于后续检索经验。建议同时传 **`--reason "…"`**（浮窗说明）、**`--site <slug>`**（写入 JSON 的站点标识，默认当前主机名）。  
 4. **启动（单 Tab，默认）**：
 
 ```bash
-page-agent-cli --json --target "$TID" teach \
+page-agent --json --target "$TID" teach \
   --task my-flow \
   --reason "演示不可自动点的路径" \
   --site example.com
@@ -98,11 +98,11 @@ page-agent-cli --json --target "$TID" teach \
    - **操作**：先 **刷新页面元素**（与 CLI `state` 同源索引列表）；选 **索引** → 选动作类型（**点击 / 悬停 / 输入 / 下拉 / 上传步骤记录** 等）→ 需要时填内容或备注 → **执行并记录此步**。用户点的「刷新」会记为 **`state_refresh`**。  
    - **步骤**：查看已录列表；满意后 **确认写入**（结束进程并输出 JSON）或 **取消**；**仍在录制时也可直接确认写入**（浮窗会先自动结束录制并写检查点，与先点「结束录制」再等写入等价）。  
 6. **取结果**：**`--json` 时成功 JSON 在 stdout**（`[teach]` 日志在 stderr），适合 **`> file.json`** 落盘。未确认前可用 **`--checkpoint-file <path>`**（或 **`PAGE_AGENT_TEACH_CHECKPOINT_FILE`**）在点「结束录制」时得到原子检查点（直接确认写入时也会自动发同结构检查点）。  
-7. **常用可选参数**：**`--timeout`**（浮窗就绪后最长等待，默认 600s，超时无恢复则 **124**）、**`--ready-timeout`**（等待注入就绪，默认 180s）、多 Tab 见上文 **`--teach-ui-targets`** / **`--teach-all-page-tabs`**。完整选项与 JSON 字段见 **`page-agent-cli teach --help`** 与 **`skill/page-agent-browser/CLI_REFERENCE.md`**「`teach`」。  
+7. **常用可选参数**：**`--timeout`**（浮窗就绪后最长等待，默认 600s，超时无恢复则 **124**）、**`--ready-timeout`**（等待注入就绪，默认 180s）、多 Tab 见上文 **`--teach-ui-targets`** / **`--teach-all-page-tabs`**。完整选项与 JSON 字段见 **`page-agent teach --help`** 与 **`skill/page-agent-browser/CLI_REFERENCE.md`**「`teach`」。  
 8. **多 Tab 一行示例**：
 
 ```bash
-page-agent-cli --json teach \
+page-agent --json teach \
   --teach-ui-targets TID_A,TID_B \
   --task cross-tab-demo \
   --reason "两页同时演示"
@@ -126,7 +126,7 @@ page-agent-cli --json teach \
 
 ```bash
 npm install -g ./page-agent-cli-1.8.2.tgz
-page-agent-cli --version
+page-agent --version
 ```
 
 **使用 GitHub CLI 下载并安装（需已 `gh auth login`）：**
@@ -151,9 +151,9 @@ npm install -g ./page-agent-cli-<version>.tgz
 
 ```bash
 curl -s http://localhost:9222/json/version   # 确认 CDP 可用
-page-agent-cli --json tabs list
-page-agent-cli --json --target <TAB_ID> state
-page-agent-cli --json --target <TAB_ID> click <index>
+page-agent --json tabs list
+page-agent --json --target <TAB_ID> state
+page-agent --json --target <TAB_ID> click <index>
 ```
 
 ### 4. 给 AI / 宿主的技能包（同步到 Agent 的 Skill 路径）
@@ -175,7 +175,7 @@ Copy-Item -Path "$src\*" -Destination $dest -Recurse -Force
 rsync -a --delete ./skill/page-agent-browser/ ~/.cursor/skills/page-agent-browser/
 ```
 
-安装 CLI + 同步 skill 后，Agent 按该目录内 **`SKILL.md`** 入口与 **`CLI_REFERENCE.md`** 调用 `page-agent-cli` 即可。
+安装 CLI + 同步 skill 后，Agent 按该目录内 **`SKILL.md`** 入口与 **`CLI_REFERENCE.md`** 调用 `page-agent` 即可。
 
 ---
 

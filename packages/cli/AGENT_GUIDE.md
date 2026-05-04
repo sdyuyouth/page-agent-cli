@@ -1,6 +1,6 @@
-# AGENT_GUIDE — `page-agent-cli` 调用方守则
+# AGENT_GUIDE — `page-agent` 调用方守则
 
-> 这份文档写给**调用 `page-agent-cli` 的 AI Agent**（OpenClaw / Claude / GPT / 任意脚本）。
+> 这份文档写给**调用 `page-agent` 的 AI Agent**（OpenClaw / Claude / GPT / 任意脚本）。
 > 如果你正在通过 shell 工具调用本 CLI，请把这份文档完整读一遍，再开始你的任务。
 >
 > CLI 工具本身的设计目标是「快、单次、确定」。如果你观察到「卡顿、间隔很长、积压一堆 session」，**问题几乎一定在你的调用层（wrapper），不在 CLI**。本文给出标准做法。
@@ -9,7 +9,7 @@
 
 ## 0. 一句话理解 CLI 的执行模型
 
-> **每一次 `page-agent-cli ...` 调用 = 一次同步进程：开启 → 执行 → 退出。**
+> **每一次 `page-agent ...` 调用 = 一次同步进程：开启 → 执行 → 退出。**
 >
 > 没有后台、没有 daemon、没有 session pool。当 `node` 进程退出（exit code 返回），这条命令就结束了。`stdout` 上看到的就是它的全部产出。
 
@@ -19,7 +19,7 @@
 | 命令几秒就返回 stdout 但 wrapper 显示 "still running" | wrapper 没有正确读到 EOF / exit code，需要 wrapper 侧排查 |
 | 同时积压了 10+ 个 session | 你在没等上一条结束就发了下一条；别这样做 |
 
-**正确心智**：把 `page-agent-cli` 当成 `ls` / `curl`：**调用 → 等返回 → 用返回值**。一条接一条，串行。
+**正确心智**：把 `page-agent` 当成 `ls` / `curl`：**调用 → 等返回 → 用返回值**。一条接一条，串行。
 
 ---
 
@@ -82,7 +82,7 @@
 如果你**自己有 LLM**，并且任务是**多步、目标明确的自然语言任务**，最高效的做法是把任务整体委托给 CLI 内置的 agent：
 
 ```bash
-page-agent-cli --json \
+page-agent --json \
   --target $TID \
   run "On the current page, fill the main text field with 'Hello from agent' and stop before any irreversible submit."
 ```
@@ -112,7 +112,7 @@ page-agent-cli --json \
 ### 4.1 始终带 `--json`
 
 ```bash
-page-agent-cli --json --target $TID state
+page-agent --json --target $TID state
 # stdout: {"success": true, "data": {...}}
 # stderr: 进度日志
 ```
@@ -127,9 +127,9 @@ page-agent-cli --json --target $TID state
 ### 4.2 始终带 `--target`
 
 ```bash
-TID=$(page-agent-cli --json tabs list | jq -r '.data[] | select(.url | contains("example.com")) | .id')
-page-agent-cli --json --target $TID state
-page-agent-cli --json --target $TID click 125
+TID=$(page-agent --json tabs list | jq -r '.data[] | select(.url | contains("example.com")) | .id')
+page-agent --json --target $TID state
+page-agent --json --target $TID click 125
 ```
 
 只在切换到不同 tab 时重新 `tabs list`。
@@ -142,7 +142,7 @@ page-agent-cli --json --target $TID click 125
 
 ```bash
 # 等 toast 出现，每 200ms 检查，最多 5 秒
-page-agent-cli --json --target $TID eval "
+page-agent --json --target $TID eval "
 (async () => {
   for (let i = 0; i < 25; i++) {
     if (document.querySelector('[role=\"alert\"]')) return true
@@ -162,9 +162,9 @@ CLI 默认会在 click / hover / input / select / scroll 操作前后 **显示�
 如果你跑 headless / 脚本测试不需要这些：
 
 ```bash
-page-agent-cli --no-mask --target $TID click 3
+page-agent --no-mask --target $TID click 3
 # 或者
-PAGE_AGENT_NO_MASK=1 page-agent-cli --target $TID click 3
+PAGE_AGENT_NO_MASK=1 page-agent --target $TID click 3
 ```
 
 ### 4.6 文件上传（`upload`）详细说明
@@ -172,13 +172,13 @@ PAGE_AGENT_NO_MASK=1 page-agent-cli --target $TID click 3
 `upload` 用于给页面中的 `<input type="file">` 注入本地文件路径，不走系统文件选择器。
 
 ```bash
-page-agent-cli --json --target $TID upload <index> "<absolute-file-path>"
+page-agent --json --target $TID upload <index> "<absolute-file-path>"
 ```
 
 多文件上传（目标 input 需支持 `multiple`）：
 
 ```bash
-page-agent-cli --json --target $TID upload <index> "C:\a.png" "C:\b.jpg"
+page-agent --json --target $TID upload <index> "C:\a.png" "C:\b.jpg"
 ```
 
 关键规则：
@@ -189,11 +189,11 @@ page-agent-cli --json --target $TID upload <index> "C:\a.png" "C:\b.jpg"
 带 `<input type="file">` 的弹层（通用骨架；**索引须按当页 `state` 重取**）：
 
 ```bash
-page-agent-cli --json tabs list
-page-agent-cli --json --target $TID state
-page-agent-cli --json --target $TID click <index-that-opens-upload-ui>
-page-agent-cli --json --target $TID upload <anchor-index-near-target-file> "C:\\path\\to\\image.png"
-page-agent-cli --json --target $TID state
+page-agent --json tabs list
+page-agent --json --target $TID state
+page-agent --json --target $TID click <index-that-opens-upload-ui>
+page-agent --json --target $TID upload <anchor-index-near-target-file> "C:\\path\\to\\image.png"
+page-agent --json --target $TID state
 ```
 
 ---
@@ -221,10 +221,10 @@ page-agent-cli --json --target $TID state
 以下仅用 **`example.com`** 演示「`tabs list` → 固定 `--target` → `state` → `click` → `state`」；**具体站点的索引与 grep 模式须自行从当页 `state` 推导**，勿照抄本段数字。
 
 ```bash
-TID=$(page-agent-cli --json tabs list | jq -r '.data[] | select(.url | contains("example.com")) | .id' | head -1)
-page-agent-cli --json --target "$TID" state
-page-agent-cli --json --target "$TID" click 3
-page-agent-cli --json --target "$TID" state
+TID=$(page-agent --json tabs list | jq -r '.data[] | select(.url | contains("example.com")) | .id' | head -1)
+page-agent --json --target "$TID" state
+page-agent --json --target "$TID" click 3
+page-agent --json --target "$TID" state
 ```
 
 **耗时预期**：单次 CLI 调用通常 **0.3–2 s**；若整条链路被拖到数分钟，**优先排查 wrapper 并发/未等待进程结束**，而非假定 CLI 卡死。
@@ -252,7 +252,7 @@ page-agent-cli --json --target "$TID" state
                        │  shell exec(同步)
                        ▼
         ┌──────────────────────────────┐
-        │   page-agent-cli <command>    │  ← 单次进程, 0.3–2s
+        │   page-agent <command>    │  ← 单次进程, 0.3–2s
         │   stdout: JSON / stderr: log  │
         └──────────────┬────────────────┘
                        │  CDP WebSocket

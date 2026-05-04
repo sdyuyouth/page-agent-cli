@@ -1,6 +1,6 @@
 # WSL CLI 测试指南（只测，不改代码）
 
-> 适用对象：在 WSL 内运行的测试 AI（与 agent 相同能力边界），只能调用 `page-agent-cli`，不能编辑 `packages/cli` 源码。
+> 适用对象：在 WSL 内运行的测试 AI（与 agent 相同能力边界），只能调用 `page-agent`，不能编辑 `packages/cli` 源码。
 
 ## 1. 测试边界
 
@@ -16,7 +16,7 @@
 ## 2. 环境前提
 
 1. Windows 侧浏览器已开启 CDP（默认 `http://localhost:9222`）
-2. WSL 内可直接执行 `page-agent-cli`
+2. WSL 内可直接执行 `page-agent`
 3. 已知目标页的 CDP target id（先用 `tabs list` 查）
 
 ## 3. 路径规则（重点）
@@ -32,9 +32,9 @@
 将 `<TID>` 替换为你要测的 Tab 的 target id：
 
 ```bash
-page-agent-cli --json tabs list
-page-agent-cli --json --target <TID> state
-page-agent-cli --json --target <TID> eval "1+1"
+page-agent --json tabs list
+page-agent --json --target <TID> state
+page-agent --json --target <TID> eval "1+1"
 ```
 
 期望：
@@ -44,10 +44,10 @@ page-agent-cli --json --target <TID> eval "1+1"
 进入上传流程（**索引与路径按你的环境替换**）。`upload` 的 `<index>` 为 **`state` 锚点**：CLI 在页内可枚举的 **`<input type="file">`** 中选与锚点 **DOM 树距离最近** 的一个（详见 `skill/page-agent-browser/CLI_REFERENCE.md` 与 `packages/cli/AGENT_GUIDE.md` §4.6）。
 
 ```bash
-page-agent-cli --json --target <TID> click <index>
-page-agent-cli --json --target <TID> state
-page-agent-cli --json --target <TID> upload <anchor-index> "/mnt/c/Users/<you>/Pictures/example.png"
-page-agent-cli --json --target <TID> state
+page-agent --json --target <TID> click <index>
+page-agent --json --target <TID> state
+page-agent --json --target <TID> upload <anchor-index> "/mnt/c/Users/<you>/Pictures/example.png"
+page-agent --json --target <TID> state
 ```
 
 期望：
@@ -79,7 +79,7 @@ page-agent-cli --json --target <TID> state
 [Case] upload-wsl-smoke
 [Time] <YYYY-MM-DD HH:mm:ss>
 [Command]
-page-agent-cli --json --target <TID> upload <index> "<path>"
+page-agent --json --target <TID> upload <index> "<path>"
 
 [ExitCode] <code>
 [Stdout]

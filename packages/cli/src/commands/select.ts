@@ -12,7 +12,7 @@ export function registerSelect(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json select 12 "United States"
+  $ page-agent --json select 12 "United States"
 
 Notes:
   Only works for native <select> elements. For ARIA listboxes / custom

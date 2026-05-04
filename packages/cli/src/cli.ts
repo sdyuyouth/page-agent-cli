@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * page-agent-cli  —  control any Chrome tab via CDP, no MCP needed.
+ * page-agent  —  control any Chrome tab via CDP, no MCP needed.
  *
  * Each invocation is SYNCHRONOUS: it opens one CDP WebSocket, runs one
  * command, prints the result, and exits. There is no daemon, no session
@@ -38,19 +38,19 @@ function buildProgram(): Command {
 	const program = new Command()
 
 	program
-		.name('page-agent-cli')
+		.name('page-agent')
 		.description(
 			[
 				'Control Chrome via CDP with page-agent intelligence.',
 				'',
 				'Quick start:',
 				'  1. google-chrome --remote-debugging-port=9222',
-				'  2. page-agent-cli --json state            # observe',
-				'  3. page-agent-cli --json click <index>    # act (or hover <index> without click)',
-				'  4. page-agent-cli --json state            # observe again',
+				'  2. page-agent --json state            # observe',
+				'  3. page-agent --json click <index>    # act (or hover <index> without click)',
+				'  4. page-agent --json state            # observe again',
 				'',
 				'For full task delegation use:',
-				'  page-agent-cli --json run "<natural-language task>"',
+				'  page-agent --json run "<natural-language task>"',
 				'',
 				'Each command is SYNCHRONOUS: process exit = work complete.',
 				'See AGENT_GUIDE.md for the full calling protocol.',
@@ -133,7 +133,7 @@ Exit codes:
 				const p = buildProgram()
 				p.exitOverride()
 				try {
-					await p.parseAsync(['node', 'page-agent-cli', ...argv])
+					await p.parseAsync(['node', 'page-agent', ...argv])
 				} catch (e: unknown) {
 					if ((e as { code?: string }).code === 'commander.helpDisplayed') {
 						// help was printed, that's fine

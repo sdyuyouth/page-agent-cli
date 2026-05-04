@@ -13,8 +13,8 @@ export function registerState(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json state            # JSON: parse \`data.content\`
-  $ page-agent-cli state | head -40        # human-readable preview
+  $ page-agent --json state            # JSON: parse \`data.content\`
+  $ page-agent state | head -40        # human-readable preview
 
 Notes:
   Indices in \`content\` are valid only for THIS snapshot. Always call

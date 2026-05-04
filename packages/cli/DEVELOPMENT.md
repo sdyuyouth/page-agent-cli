@@ -176,27 +176,27 @@ node packages/cli/dist/cli.js \
   <command>
 
 # 获取当前页面状态（含交互元素索引列表）
-page-agent-cli --json state
+page-agent --json state
 
 # 点击第 3 个元素
-page-agent-cli --json click 3
+page-agent --json click 3
 
 # 在第 2 个输入框输入文本
-page-agent-cli --json input 2 "hello world"
+page-agent --json input 2 "hello world"
 
 # 向下滚动 2 页
-page-agent-cli --json scroll --pages 2
+page-agent --json scroll --pages 2
 
 # 导航
-page-agent-cli --json goto https://example.com
+page-agent --json goto https://example.com
 
 # 执行 JS
-page-agent-cli --json eval "document.title"
+page-agent --json eval "document.title"
 
 # Tab 管理
-page-agent-cli --json tabs list
-page-agent-cli --json tabs open https://example.com
-page-agent-cli --json tabs close <targetId>
+page-agent --json tabs list
+page-agent --json tabs open https://example.com
+page-agent --json tabs close <targetId>
 ```
 
 ### 高层任务（内置 LLM）
@@ -206,7 +206,7 @@ export LLM_BASE_URL=https://api.openai.com/v1
 export LLM_API_KEY=sk-...
 export LLM_MODEL_NAME=gpt-4o
 
-page-agent-cli --json run "在 GitHub 上搜索 page-agent 并打开第一个结果"
+page-agent --json run "在 GitHub 上搜索 page-agent 并打开第一个结果"
 ```
 
 ### JSON 输出格式
@@ -224,7 +224,7 @@ page-agent-cli --json run "在 GitHub 上搜索 page-agent 并打开第一个结
 ### 交互式 REPL
 
 ```bash
-page-agent-cli repl
+page-agent repl
 # pa> state
 # pa> click 3
 # pa> run "关闭所有 Cookie 弹窗"
@@ -238,10 +238,10 @@ page-agent-cli repl
 ### 模式 A：外部 Agent 自行循环（低层原语）
 
 ```
-1. page-agent-cli --json state              ← 观察
+1. page-agent --json state              ← 观察
 2. Agent 推理应该操作哪个元素
-3. page-agent-cli --json click <index>      ← 行动
-4. page-agent-cli --json state              ← 再次观察
+3. page-agent --json click <index>      ← 行动
+4. page-agent --json state              ← 再次观察
 5. 重复直到任务完成
 ```
 
@@ -250,7 +250,7 @@ page-agent-cli repl
 ### 模式 B：委托给内置 Agent（run 命令）
 
 ```
-page-agent-cli --json run "<任务描述>"
+page-agent --json run "<任务描述>"
 ```
 
 适合：Agent 或用户直接描述目标，由 page-agent 的 Re-act 循环自主完成，对外只暴露最终结果。
@@ -322,7 +322,7 @@ page-agent-cli --json run "<任务描述>"
 
 **使用流程（跨 Tab 录制）**
 
-1. `page-agent-cli --json tabs list`（或等价方式）取得各 Tab 的 **`id`**（CDP target id，非 CLI 内部序号）。
+1. `page-agent --json tabs list`（或等价方式）取得各 Tab 的 **`id`**（CDP target id，非 CLI 内部序号）。
 2. 执行 `teach`，用 **`--teach-ui-targets id1,id2,...`** 列出所有需要同时出现浮窗的 Tab；一条 CLI 进程即一次会话。
 3. 在每个已注入的 Tab 内操作：**索引与「刷新页面元素」只作用于当前 Tab**；**步骤列表与操作日志**在 UI Tab 之间由 CLI Hub **同步**。
 4. 在**任一**已注入 Tab 内结束录制 / 确认提交即可；`--json` 成功时 stdout 为一条 JSON（含 `steps`、`operationLog` 等）。多 UI 时可能含 **`teachUiTargetIds`**。

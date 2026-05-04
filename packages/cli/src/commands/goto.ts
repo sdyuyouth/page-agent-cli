@@ -11,8 +11,8 @@ export function registerGoto(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json goto github.com
-  $ page-agent-cli --json goto https://example.com/path?q=1
+  $ page-agent --json goto github.com
+  $ page-agent --json goto https://example.com/path?q=1
 
 Notes:
   Returns when navigation is initiated. The next \`state\` / \`click\` call

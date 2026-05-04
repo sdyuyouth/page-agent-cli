@@ -109,9 +109,7 @@ async function resolveTeachTargetSelections(
 			)
 		}
 		if (!pages.some((p) => p.id === id)) {
-			throw new Error(
-				`Unknown page target id "${id}". Run "page-agent-cli tabs list" to list targets.`
-			)
+			throw new Error(`Unknown page target id "${id}". Run "page-agent tabs list" to list targets.`)
 		}
 	}
 
@@ -438,18 +436,18 @@ export function registerTeach(program: Command): void {
 			'after',
 			`
 多 Tab（一次会话、步骤/日志同步，索引仍按各 Tab 自己的页面）:
-  1) page-agent-cli --json tabs list   取得各 Tab 的 CDP target id（字段 id）
-  2) page-agent-cli --json teach --teach-ui-targets <id1>,<id2> [--reason ...]
+  1) page-agent --json tabs list   取得各 Tab 的 CDP target id（字段 id）
+  2) page-agent --json teach --teach-ui-targets <id1>,<id2> [--reason ...]
      仅列在 --teach-ui-targets 中的 Tab 会注入完整浮窗；未列入的不注入 teach。
   3) 可选: --teach-all-page-tabs 与 --teach-targets 组合，用于扩大「参与集合」再
      用 --teach-ui-targets 收窄实际挂浮窗的 Tab（ui 必须是 teach-targets 子集）。
   详见 packages/cli/SKILL.md 的 teach 节与 packages/cli/DEVELOPMENT.md「多 Tab 教学」。
 
 示例:
-  $ page-agent-cli --json --target $TID teach --reason "找不到按钮"
-  $ page-agent-cli --json teach --site example.com --task post-image
-  $ page-agent-cli --json teach --checkpoint-file ./my-teach-draft.json
-  $ page-agent-cli --json teach --teach-all-page-tabs --teach-ui-targets TID_A,TID_B
+  $ page-agent --json --target $TID teach --reason "找不到按钮"
+  $ page-agent --json teach --site example.com --task post-image
+  $ page-agent --json teach --checkpoint-file ./my-teach-draft.json
+  $ page-agent --json teach --teach-all-page-tabs --teach-ui-targets TID_A,TID_B
 
 退出码:
   0   成功（--json 时 stdout 为 JSON）；若浮窗因整页刷新/注入失败未恢复，但 sessionStorage 中仍有已录步骤，也会退出 0 并带上 recoveryReason / warning

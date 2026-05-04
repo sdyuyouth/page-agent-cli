@@ -14,8 +14,8 @@ export function registerHover(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json state
-  $ page-agent-cli --json hover 4
+  $ page-agent --json state
+  $ page-agent --json hover 4
 
 Notes:
   Use this to reveal menus, tooltips, or lazy UI that respond to pointer hover.

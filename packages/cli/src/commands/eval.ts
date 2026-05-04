@@ -11,9 +11,9 @@ export function registerEval(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json eval "document.title"
-  $ page-agent-cli --json eval "document.querySelectorAll('a').length"
-  $ page-agent-cli --json eval "(()=>{ window.scrollTo(0,0); return 'ok' })()"
+  $ page-agent --json eval "document.title"
+  $ page-agent --json eval "document.querySelectorAll('a').length"
+  $ page-agent --json eval "(()=>{ window.scrollTo(0,0); return 'ok' })()"
 
 Notes:
   The script is evaluated as an EXPRESSION. To run statements, wrap them

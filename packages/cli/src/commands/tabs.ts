@@ -13,14 +13,14 @@ export function registerTabs(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json tabs list
-  $ page-agent-cli --json tabs open https://example.com
-  $ page-agent-cli --json tabs close ABCDEF1234567890
+  $ page-agent --json tabs list
+  $ page-agent --json tabs open https://example.com
+  $ page-agent --json tabs close ABCDEF1234567890
 
 Workflow:
   1. \`tabs list\` to see all open page targets and their CDP IDs.
   2. Pin further commands to one tab with the global \`--target <id>\`:
-       page-agent-cli --target ABCDEF... --json state
+       page-agent --target ABCDEF... --json state
   3. When done with a tab, \`tabs close <id>\`.`
 		)
 

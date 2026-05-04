@@ -12,8 +12,8 @@ export function registerClick(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json state          # observe → pick an index
-  $ page-agent-cli --json click 3        # then click that element
+  $ page-agent --json state          # observe → pick an index
+  $ page-agent --json click 3        # then click that element
 
 Notes:
   Element indices are valid only for the most recent \`state\` snapshot from

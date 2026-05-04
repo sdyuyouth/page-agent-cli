@@ -1,5 +1,5 @@
 /**
- * Unified output helpers for page-agent-cli.
+ * Unified output helpers for the page-agent CLI.
  *
  * In --json mode all results go to stdout as structured JSON.
  * In human mode results are colorful text, also on stdout.

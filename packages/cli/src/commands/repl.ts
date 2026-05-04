@@ -1,5 +1,5 @@
 /**
- * REPL (interactive) mode for page-agent-cli.
+ * REPL (interactive) mode for the page-agent CLI.
  *
  * Prints a banner, then presents a readline prompt. Each line is parsed
  * as a space-separated argv array and dispatched back through Commander,

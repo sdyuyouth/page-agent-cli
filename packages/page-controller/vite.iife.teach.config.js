@@ -10,7 +10,7 @@ console.log(chalk.cyan(`📦 Building @page-agent/page-controller (IIFE teach ov
 
 /**
  * Produces dist/iife/page-controller.teach.js
- * Injected by page-agent-cli `teach` command via CDP Runtime.evaluate.
+ * Injected by the page-agent CLI `teach` command via CDP Runtime.evaluate.
  */
 export default defineConfig({
 	clearScreen: false,

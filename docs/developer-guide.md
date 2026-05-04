@@ -30,7 +30,7 @@ Published packages:
 
 - **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel (npm: `page-agent`)
 - **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@page-agent/mcp`)
-- **CLI** (`packages/cli/`) - CDP harness for headless browser control and `teach` (npm: `@page-agent/cli`, binary `page-agent-cli` — see package `bin` and `prepublishOnly` for publish layout)
+- **CLI** (`packages/cli/`) - CDP harness for headless browser control and `teach` (npm: `@page-agent/cli`, binaries `page-agent` and `page-agent-cli` — same entry; see package `bin` and `prepublishOnly` for publish layout)
 - **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-agent/core`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM

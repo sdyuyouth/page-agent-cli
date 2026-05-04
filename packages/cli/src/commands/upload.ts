@@ -52,9 +52,9 @@ export function registerUpload(program: Command): void {
 			'after',
 			`
 Examples:
-  $ page-agent-cli --json state                          # build index map
-  $ page-agent-cli --json upload 5 /path/to/photo.jpg   # index 5 = file input OR upload UI anchor
-  $ page-agent-cli --json upload 5 img1.png img2.png     # multiple files (relative paths OK)
+  $ page-agent --json state                          # build index map
+  $ page-agent --json upload 5 /path/to/photo.jpg   # index 5 = file input OR upload UI anchor
+  $ page-agent --json upload 5 img1.png img2.png     # multiple files (relative paths OK)
 
 Notes:
   <index> comes from the Page Agent flat tree (same numbering as the latest
