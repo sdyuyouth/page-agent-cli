@@ -15,6 +15,7 @@
  *    document.readyState is 'complete', so initPageController() runs immediately.
  */
 import { PageController } from './PageController'
+import { TEACH_CLI_ACTIVE_SESSION_KEY } from './teach/session'
 
 declare global {
 	interface Window {
@@ -53,6 +54,35 @@ function initPageController() {
 		enableMask: true,
 	})
 	window.__pageAgentPCVersion = CURRENT_VERSION
+
+	/** Deferred so teach addScript (registered after inject) can attach the host first (optional beacon). */
+	scheduleTeachCliReinjectBeaconIfNeeded()
+}
+
+const TEACH_HOST_ID_FOR_BEACON = '__pa_teach_host'
+
+/**
+ * If a CLI teach session is active but the overlay is still missing after this document's scripts
+ * run, enqueue a hint for the CLI poller. Macrotask so teach's new-document IIFE runs first.
+ */
+function scheduleTeachCliReinjectBeaconIfNeeded(): void {
+	setTimeout(() => {
+		try {
+			if (sessionStorage.getItem(TEACH_CLI_ACTIVE_SESSION_KEY) !== '1') return
+			const host = document.getElementById(TEACH_HOST_ID_FOR_BEACON)
+			if (host?.isConnected) return
+			const w = window as Window & { __paTeachOutbound?: string[] }
+			if (!Array.isArray(w.__paTeachOutbound)) w.__paTeachOutbound = []
+			w.__paTeachOutbound.push(
+				JSON.stringify({
+					type: 'teach_cli_reinject_hint',
+					reason: 'inject_persistent_deferred',
+				})
+			)
+		} catch {
+			/* storage or DOM blocked */
+		}
+	}, 0)
 }
 
 // Handle both injection timings:

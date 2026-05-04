@@ -47,7 +47,30 @@ page-agent --version
 
 **`upload`**：索引 `n` 为**锚点**（**最近一次 `state`**，不必是 `type=file` 行）。CLI 在**主文档可枚举**的 **`<input type=file>`** 中选与锚点 **DOM 树距离最近** 的一个（多 file 时同理；不穿透 Shadow、不跨 iframe）。常用：**`eval`/`click` 打开上传区** 后 **`upload n`**，使 `n` 尽量靠近目标 file。大改 DOM 后再 `state`。详见 **`CLI_REFERENCE.md`「upload」**。
 
-**`teach`**：须 `--task` 或 `PAGE_AGENT_TEACH_TASK`；就绪后超时退出码 **124**；成功 JSON **无** `data` 包装；多 Tab、checkpoint、`steps` 里含 `hover`/`state_refresh` 等——**只读 `CLI_REFERENCE.md`「teach」**。
+**`teach`**：须 `--task` 或 `PAGE_AGENT_TEACH_TASK`；就绪后超时退出码 **124**；成功 JSON **无** `data` 包装；多 Tab、checkpoint、`steps` 里含 `hover`/`state_refresh` 等——细则见 **`CLI_REFERENCE.md`「teach」**与下节「**经验沉淀**」。站内 **pushState** 类 SPA 可能只有 CDP **`navigatedWithinDocument`**；CLI 会据此（debounce + URL 变化）再 reinject，避免 Facebook 等场景下浮窗被 DOM 重写后无法恢复。
+
+---
+
+## `teach` → 经验沉淀（Agent 必读）
+
+CLI **不会**在「结束录制」时向 **stdout** 输出整段会话 JSON；该步只写**检查点文件**（`--checkpoint-file` / `PAGE_AGENT_TEACH_CHECKPOINT_FILE`，默认工作目录下 `.page-agent-teach-checkpoint.json`），stderr 可出现 **`[teach] checkpoint written`** 或 **`checkpoint write failed`**。
+
+| 用户操作 | CLI 行为 | Agent / 自动化应做什么 |
+|----------|----------|------------------------|
+| 浮窗 **「结束录制」** | 原子写入**检查点 JSON**（草稿）；**stdout 无**最终 `success` teach 体 | 仅当需要**断点续录 / 崩溃恢复**时读该路径；**不要**把检查点当已提交的正式经验 |
+| 浮窗 **「确认写入 Agent 经验」** | **exit 0**，**`--json` 时整段 teach 成功 JSON 在 stdout**（与 `state` 等命令不同，**无** `data` 包装） | **必须**在 teach 进程**正常退出后**读取 **stdout** 整文件作为正式结果，再更新自建 **`platforms/<site>/`** 下的 **`elements.md` / `recipes/*.md`** 等（字段见 **`EXPERIENCE_SCHEMA.md`**） |
+
+**推荐落盘（示例）**：
+
+```bash
+# 仅示例：site/task 请换成当次 teach 的 --site / --task；目录须已存在或由脚本 mkdir -p
+page-agent --json --target "$TID" teach --site example.com --task post-image --reason "demo" \
+  > "${PAGE_AGENT_LESSON_DIR:-./platforms/example.com/lessons}/post-image-$(date +%Y%m%d-%H%M%S).json" 2>./teach.stderr.log
+```
+
+- **`2>`**：把 **`[teach]`** 与 checkpoint 相关日志打到单独文件，**避免**混进 JSON。  
+- **宿主 Exec 超时**：`teach` 在用户确认前会长时间阻塞；外层若 **SIGKILL** 超时，Agent **拿不到 stdout**——应放宽 teach 专用超时，或等用户确认后再杀。  
+- 仓库内 **无** `PAGE_AGENT_TEACH_OUTPUT` 环境变量；正式结果**只靠进程结束时的 stdout**（或你方包装器在 exit 0 后拷贝/上传该缓冲）。
 
 ---
 

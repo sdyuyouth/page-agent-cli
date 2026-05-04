@@ -11,6 +11,23 @@ import { type HostSessionSyncPayload, sendToHost } from './transport'
 
 const LAYOUT_KEY = '__pa_teach_layout_v1'
 
+/**
+ * Tear down the teach host after a short delay so `__paTeachReceive` stays alive long enough for
+ * in-flight `checkpoint_ack` / `session_sync` from the CLI (multi-tab `sendToPage` must complete
+ * before `clearTeachHostPipe` runs inside dispose).
+ */
+function scheduleDetachTeachOverlayFromPage(delayMs: number): void {
+	window.setTimeout(() => {
+		try {
+			;(
+				window as unknown as { __pageAgentTeach?: { dispose?: () => void } }
+			).__pageAgentTeach?.dispose?.()
+		} catch {
+			void 0
+		}
+	}, delayMs)
+}
+
 function parseIndexedLines(content: string): { index: number; preview: string }[] {
 	const out: { index: number; preview: string }[] = []
 	for (const line of content.split('\n')) {
@@ -406,7 +423,7 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 			const base = prev.slice(-250)
 			if (prev.length === 0) {
 				const intro =
-					'三 Tab：「会话」— 地址、说明、站点/任务、刷新页面状态与本日志；「操作」— 开始录制后选索引、选操作类型并执行（可刷新页面元素）；「步骤」— 查看已记录步骤、确认写入 Agent 经验或取消。'
+					'三 Tab：「会话」— 地址、说明、站点/任务、刷新页面状态与本日志；「操作」— 开始录制后选索引、选操作类型并执行（可刷新页面元素）；「步骤」— 查看已记录步骤、确认写入 Agent 经验（录制未结束时将自动结束录制并写检查点）或取消。'
 				return [...base, `[${ts}] ${intro}`, `[${ts}] ${line}`]
 			}
 			return [...base, `[${ts}] ${line}`]
@@ -660,6 +677,7 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 	const abort = useCallback((r?: string) => {
 		sendToHost({ type: 'abort', reason: r ?? 'user_cancelled' })
 		clearSession()
+		scheduleDetachTeachOverlayFromPage(500)
 	}, [])
 
 	const patchStepUserNote = useCallback((stepIndex: number, note: string) => {
@@ -691,10 +709,32 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 		checkpointAckTimerRef.current = window.setTimeout(() => {
 			setCheckpointBanner((prev) => (prev?.state === 'pending' ? { state: 'timeout' } : prev))
 			checkpointAckTimerRef.current = undefined
-		}, 8000) as unknown as number
+		}, 12_000) as unknown as number
 	}, [sessionStarted, steps, operationLog, taskName, state.url, reason, appendLog])
 
 	const submitSession = useCallback(() => {
+		if (checkpointAckTimerRef.current != null) {
+			clearTimeout(checkpointAckTimerRef.current)
+			checkpointAckTimerRef.current = undefined
+		}
+		/** Match explicit「结束录制」so checkpoint file + hub session_started stay consistent before `result`. */
+		if (sessionStarted) {
+			setSessionStarted(false)
+			appendLog('提交前已自动结束录制（写入与先点「结束录制」相同的检查点，再提交 Agent 经验）。')
+			sendToHost({
+				type: 'checkpoint',
+				payload: {
+					site: siteFromUrl(state.url),
+					task: taskName,
+					steps,
+					operationLog,
+					reason,
+					learnedFrom: 'user_teach',
+					experienceSource: 'interactive_teach',
+					phase: 'recording_ended',
+				},
+			})
+		}
 		const ts = new Date().toLocaleTimeString('zh-CN', { hour12: false })
 		const line = `[${ts}] 已确认提交（交互式教学 → Agent 经验，与模型自生成内容区分）。`
 		const fullLog = [...operationLog, line]
@@ -710,7 +750,8 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 			},
 		})
 		clearSession()
-	}, [steps, operationLog, state.url, taskName])
+		scheduleDetachTeachOverlayFromPage(500)
+	}, [sessionStarted, steps, operationLog, taskName, state.url, reason, appendLog])
 
 	const runExec = useCallback(async () => {
 		if (selectedIndex == null) {
@@ -1149,7 +1190,7 @@ export function TeachApp({ init, getPc }: { init: TeachInitPayload; getPc: () =>
 												onClick={() => {
 													setSessionStarted(true)
 													appendLog(
-														'已开始录制：可在本页刷新页面元素 → 悬停索引高亮 → 点击选中 → 选操作并执行；多步后在「步骤」页确认写入经验。'
+														'已开始录制：可在本页刷新页面元素 → 悬停索引高亮 → 点击选中 → 选操作并执行；多步后可在「步骤」页直接「确认写入 Agent 经验」（会自动结束录制），或先点「结束录制」再确认写入。'
 													)
 												}}
 											>

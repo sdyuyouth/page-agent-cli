@@ -1,5 +1,13 @@
 import type { Command } from 'commander'
-import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
+import {
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	renameSync,
+	unlinkSync,
+	writeFileSync,
+	writeSync,
+} from 'node:fs'
 import { dirname, join } from 'node:path'
 import pageControllerTeachSource from 'virtual:page-agent-teach'
 
@@ -174,15 +182,25 @@ async function runTeachReinjectOnPage(
 	client: CdpClient,
 	attemptIndex: number
 ): Promise<void> {
+	/** Tear down any stuck `#__pa_teach_host` (e.g. closed shadow) before mount / restore. */
+	await client.evaluate(DISPOSE_TEACH_PAGE_SCRIPT).catch(() => {})
 	const settleMs = attemptIndex === 0 ? 280 : 360 + Math.min(220, attemptIndex * 45)
 	await pc.waitUntilLoaded()
 	await new Promise((r) => setTimeout(r, settleMs))
 	await pc.getBrowserState()
 	await client.evaluate(OUTBOUND_QUEUE_INIT)
 	await client.evaluate(pageControllerTeachSource)
-	await client.evaluate(`(async () => { await window.__pageAgentTeach?.restore?.(); })()`, {
-		awaitPromise: true,
-	})
+	/**
+	 * Wait for in-page `restore()` so the host exists before this function returns.
+	 * Otherwise orphan/SPA pollers see no host and schedule reinject in a tight loop while `restore()` is still async.
+	 */
+	await client.evaluate(
+		`(async () => {
+			const t = window.__pageAgentTeach;
+			if (t && typeof t.restore === 'function') await t.restore();
+		})()`,
+		{ awaitPromise: true }
+	)
 }
 
 async function readTeachFallbackFromPage(client: CdpClient): Promise<SessionPayload | null> {
@@ -213,6 +231,39 @@ async function readTeachFallbackFromPage(client: CdpClient): Promise<SessionPayl
 		operationLog: parsed.operationLog ?? [],
 		learnedFrom: 'sessionStorage_fallback',
 		experienceSource: 'interactive_teach_recovered',
+	}
+}
+
+function teachSessionStepScore(p: SessionPayload): number {
+	return (p.steps?.length ?? 0) + (p.operationLog?.length ?? 0)
+}
+
+/** Best-effort checkpoint when navigation reinject fails (mirrors user「结束录制」file shape). */
+function writeTeachRecoveryCheckpoint(
+	filePath: string,
+	p: SessionPayload,
+	phase: string,
+	uiTargetIds: string[]
+): void {
+	if (teachSessionStepScore(p) <= 0) return
+	const body: Record<string, unknown> = {
+		site: p.site ?? 'unknown',
+		task: p.task ?? 'untitled',
+		steps: p.steps ?? [],
+		operationLog: p.operationLog ?? [],
+		learnedFrom: p.learnedFrom ?? 'sessionStorage_fallback',
+		experienceSource: p.experienceSource ?? 'interactive_teach_recovered',
+		phase,
+		savedAt: new Date().toISOString(),
+	}
+	if (p.recoveryReason) body.recoveryReason = p.recoveryReason
+	if (uiTargetIds.length > 1) body.teachUiTargetIds = uiTargetIds
+	try {
+		atomicWriteJsonFile(filePath, body)
+		process.stderr.write(`[teach] checkpoint written: ${filePath} (recovery phase=${phase})\n`)
+	} catch (err) {
+		const errMsg = err instanceof Error ? err.message : String(err)
+		process.stderr.write(`[teach] checkpoint write failed (${filePath}): ${errMsg}\n`)
 	}
 }
 
@@ -260,7 +311,12 @@ function writeTeachSuccessStdout(p: SessionPayload): void {
 				p.recoveryReason +
 				').'
 		}
-		process.stdout.write(JSON.stringify(body, null, 2) + '\n')
+		const out = JSON.stringify(body, null, 2) + '\n'
+		try {
+			writeSync(1, out, undefined, 'utf8')
+		} catch {
+			process.stdout.write(out)
+		}
 	} else {
 		if (p.recoveryReason) {
 			printInfo(
@@ -271,17 +327,82 @@ function writeTeachSuccessStdout(p: SessionPayload): void {
 	}
 }
 
+/** Must match `TEACH_CLI_ACTIVE_SESSION_KEY` in `packages/page-controller/src/teach/session.ts`. */
+const TEACH_CLI_ACTIVE_SESSION_KEY = '__pa_teach_cli_active'
+
+const CLEAR_TEACH_CLI_ACTIVE_SESSION = `(function(){ try { sessionStorage.removeItem(${JSON.stringify(
+	TEACH_CLI_ACTIVE_SESSION_KEY
+)}); } catch (e) {} })()`
+
 interface TeachTabSession {
 	targetId: string
 	pc: CdpPageController
 	bridge: TeachBridge
 	client: CdpClient
+	/** Registered for the duration of the teach command; removed in cleanup. */
+	teachNewDocumentScriptId?: string
+}
+
+const DISPOSE_TEACH_PAGE_SCRIPT =
+	'(function(){ try { window.__pageAgentTeach?.dispose?.(); } catch(e) {} })()'
+
+/** Avoid hanging the CLI if `Runtime.evaluate` never returns (host SIGKILL); overlay is also torn down from the page on result/abort. */
+async function evaluateDisposeTeachWithTimeout(client: CdpClient, ms: number): Promise<void> {
+	await Promise.race([
+		client.evaluate(DISPOSE_TEACH_PAGE_SCRIPT).catch(() => {}),
+		new Promise<void>((resolve) => setTimeout(resolve, ms)),
+	])
+}
+
+async function hideMaskWithTimeout(pc: CdpPageController, ms: number): Promise<void> {
+	await Promise.race([
+		pc.hideMask().catch(() => {}),
+		new Promise<void>((resolve) => setTimeout(resolve, ms)),
+	])
 }
 
 interface ReinjectTimers {
 	reinjectTimer?: ReturnType<typeof setTimeout>
 	delayedReinjectTimer?: ReturnType<typeof setTimeout>
+	/** Debounce for `Page.navigatedWithinDocument` (SPA / pushState) before reinject. */
+	spaNavDebounceTimer?: ReturnType<typeof setTimeout>
+	/** Debounce host-orphan checks from the outbound poller (SPA tore `#__pa_teach_host` without CDP nav). */
+	hostOrphanDebounceTimer?: ReturnType<typeof setTimeout>
 }
+
+/** Must match `HOST_ID` in `packages/page-controller/src/teach/inject.tsx`. */
+const TEACH_HOST_ID = '__pa_teach_host'
+
+/** Debounce SPA in-document navigation before reading page state (see DEVELOPMENT.md / Facebook). */
+const TEACH_SPA_NAV_DEBOUNCE_MS = 400
+
+/** Wait before evaluating teach host presence from the poller (coalesces with SPA debounce). */
+const TEACH_HOST_ORPHAN_DEBOUNCE_MS = 420
+
+const TEACH_SPA_PAGE_STATE_EXPR = `(() => {
+	var host = document.getElementById('${TEACH_HOST_ID}');
+	return {
+		href: location.href,
+		hostConnected: !!(host && host.isConnected),
+		bodyReady: !!document.body,
+	};
+})()`
+
+const TEACH_HOST_ORPHAN_EXPR = `(() => {
+	if (!document.body) return false;
+	var host = document.getElementById('${TEACH_HOST_ID}');
+	var hostOk = !!(host && host.isConnected);
+	if (hostOk) return false;
+	var api = window.__pageAgentTeach;
+	var hasApi = !!(api && typeof api.restore === 'function');
+	if (hasApi) return true;
+	try {
+		if (sessionStorage.getItem(${JSON.stringify(TEACH_CLI_ACTIVE_SESSION_KEY)}) !== '1') return false;
+		return true;
+	} catch (e) {
+		return false;
+	}
+})()`
 
 export function registerTeach(program: Command): void {
 	program
@@ -457,7 +578,30 @@ export function registerTeach(program: Command): void {
 					const msg = ok
 						? ({ type: 'checkpoint_ack' as const, ok: true as const, path } as const)
 						: ({ type: 'checkpoint_ack' as const, ok: false as const, error } as const)
-					await Promise.all(sessions.map((s) => s.bridge.sendToPage(msg).catch(() => {})))
+					const perTabMs = 4000
+					await Promise.all(
+						sessions.map((s) => s.bridge.sendToPage(msg, { timeoutMs: perTabMs }).catch(() => {}))
+					)
+				}
+
+				/** User「结束录制」或「确认写入」：同一文件形状 + stderr + 多 Tab ack。 */
+				const flushTeachCheckpointToDisk = async (
+					payload: TeachCheckpointPayload
+				): Promise<void> => {
+					const body = {
+						...payload,
+						savedAt: new Date().toISOString(),
+						...(sessions.length > 1 ? { teachUiTargetIds: sessions.map((s) => s.targetId) } : {}),
+					}
+					try {
+						atomicWriteJsonFile(checkpointPath, body)
+						process.stderr.write(`[teach] checkpoint written: ${checkpointPath}\n`)
+						await broadcastCheckpointAck(true, checkpointPath)
+					} catch (err) {
+						const errMsg = err instanceof Error ? err.message : String(err)
+						process.stderr.write(`[teach] checkpoint write failed (${checkpointPath}): ${errMsg}\n`)
+						await broadcastCheckpointAck(false, undefined, errMsg)
+					}
 				}
 
 				const readyTabs = new Set<string>()
@@ -485,6 +629,9 @@ export function registerTeach(program: Command): void {
 					if (readyTabs.size >= uiCount) markTeachReady()
 				}
 
+				/** Assigned after `scheduleReinjectAfterNavigation` is defined (used for inject beacon messages). */
+				let dispatchTeachReinjectHint: (sessionIdx: number, reason?: string) => void = () => {}
+
 				const handleBinding = (tabId: string, msg: TeachBindingMessage): void => {
 					const m = msg as {
 						type?: string
@@ -492,6 +639,15 @@ export function registerTeach(program: Command): void {
 						msg?: string
 						reason?: string
 						payload?: unknown
+					}
+					if (m.type === 'teach_cli_reinject_hint') {
+						const hintReason =
+							typeof m.reason === 'string' && m.reason.trim()
+								? m.reason.trim()
+								: 'teach_cli_reinject_hint'
+						const si = sessions.findIndex((x) => x.targetId === tabId)
+						if (si >= 0) dispatchTeachReinjectHint(si, hintReason)
+						return
 					}
 					if (m.type === 'ready') {
 						onTabReady(tabId)
@@ -508,7 +664,22 @@ export function registerTeach(program: Command): void {
 					if (m.type === 'result' && m.payload != null) {
 						const pl = m.payload as SessionPayload
 						if (sessions.length > 1) pl.teachUiTargetIds = sessions.map((s) => s.targetId)
-						resolveOnce({ kind: 'session', payload: pl })
+						void (async () => {
+							if (teachSessionStepScore(pl) > 0) {
+								const reasonTrim = (opts.reason ?? '').trim()
+								await flushTeachCheckpointToDisk({
+									site: pl.site ?? 'unknown',
+									task: pl.task ?? 'untitled',
+									steps: pl.steps ?? [],
+									operationLog: pl.operationLog ?? [],
+									...(reasonTrim ? { reason: reasonTrim } : {}),
+									learnedFrom: pl.learnedFrom ?? 'user_teach',
+									experienceSource: pl.experienceSource ?? 'interactive_teach',
+									phase: 'agent_submit',
+								})
+							}
+							resolveOnce({ kind: 'session', payload: pl })
+						})()
 						return
 					}
 					if (m.type === 'session_patch' && m.payload != null) {
@@ -516,30 +687,15 @@ export function registerTeach(program: Command): void {
 						scheduleHubDraftFromPatch(p)
 						for (const s of sessions) {
 							if (s.targetId === p.sourceTargetId) continue
-							void s.bridge.sendToPage({ type: 'session_sync', payload: p }).catch(() => {})
+							void s.bridge
+								.sendToPage({ type: 'session_sync', payload: p }, { timeoutMs: 3500 })
+								.catch(() => {})
 						}
 						return
 					}
 					if (m.type === 'checkpoint' && m.payload != null) {
 						const p = m.payload as TeachCheckpointPayload
-						const body = {
-							...p,
-							savedAt: new Date().toISOString(),
-							...(sessions.length > 1 ? { teachUiTargetIds: sessions.map((s) => s.targetId) } : {}),
-						}
-						void (async () => {
-							try {
-								atomicWriteJsonFile(checkpointPath, body)
-								process.stderr.write(`[teach] checkpoint written: ${checkpointPath}\n`)
-								await broadcastCheckpointAck(true, checkpointPath)
-							} catch (err) {
-								const errMsg = err instanceof Error ? err.message : String(err)
-								process.stderr.write(
-									`[teach] checkpoint write failed (${checkpointPath}): ${errMsg}\n`
-								)
-								await broadcastCheckpointAck(false, undefined, errMsg)
-							}
-						})()
+						void flushTeachCheckpointToDisk(p)
 						return
 					}
 				}
@@ -547,11 +703,19 @@ export function registerTeach(program: Command): void {
 				for (const s of sessions) {
 					await s.bridge.install((msg) => handleBinding(s.targetId, msg))
 					await s.client.evaluate(OUTBOUND_QUEUE_INIT)
+					const reg = await s.client.send<{ identifier: string }>(
+						'Page.addScriptToEvaluateOnNewDocument',
+						{
+							source: pageControllerTeachSource,
+						}
+					)
+					s.teachNewDocumentScriptId = reg.identifier
 				}
 
 				let poller: ReturnType<typeof setInterval> | undefined
 				const drainOutbound = async (): Promise<void> => {
-					for (const s of sessions) {
+					for (let si = 0; si < sessions.length; si++) {
+						const s = sessions[si]!
 						try {
 							const batch = await s.client.evaluate<string[]>(DRAIN_OUTBOUND)
 							if (!Array.isArray(batch)) continue
@@ -566,6 +730,9 @@ export function registerTeach(program: Command): void {
 									})
 								}
 							}
+							if (teachStarted && !settled) {
+								maybeScheduleReinjectIfTeachHostOrphaned(si)
+							}
 						} catch {
 							/* tab may be navigating */
 						}
@@ -575,16 +742,33 @@ export function registerTeach(program: Command): void {
 				poller = setInterval(() => void drainOutbound(), 80)
 
 				const reinjectTimers: ReinjectTimers[] = sessions.map(() => ({}))
+				/** Last seen `location.href` per teach UI tab; used to ignore redundant `navigatedWithinDocument` noise. */
+				const lastTeachPageHref: string[] = sessions.map(() => '')
+				/** Main frame id from CDP (for filtering `navigatedWithinDocument` iframe noise). */
+				const mainFrameIdBySession: string[] = sessions.map(() => '')
 				let teachStarted = false
 
-				const scheduleReinjectAfterNavigation = (sessionIdx: number): void => {
+				const scheduleReinjectAfterNavigation = (sessionIdx: number, reason?: string): void => {
 					if (!teachStarted || settled) return
 					const s = sessions[sessionIdx]
 					const rs = reinjectTimers[sessionIdx]!
+					if (reason) {
+						process.stderr.write(
+							`[teach] reinject scheduled target=${s.targetId.slice(0, 8)}… reason=${reason}\n`
+						)
+					}
 					if (rs.reinjectTimer !== undefined) clearTimeout(rs.reinjectTimer)
 					if (rs.delayedReinjectTimer !== undefined) {
 						clearTimeout(rs.delayedReinjectTimer)
 						rs.delayedReinjectTimer = undefined
+					}
+					if (rs.spaNavDebounceTimer !== undefined) {
+						clearTimeout(rs.spaNavDebounceTimer)
+						rs.spaNavDebounceTimer = undefined
+					}
+					if (rs.hostOrphanDebounceTimer !== undefined) {
+						clearTimeout(rs.hostOrphanDebounceTimer)
+						rs.hostOrphanDebounceTimer = undefined
 					}
 					rs.reinjectTimer = setTimeout(async () => {
 						rs.reinjectTimer = undefined
@@ -592,6 +776,11 @@ export function registerTeach(program: Command): void {
 						for (let attempt = 0; attempt < maxAttempts; attempt++) {
 							try {
 								await runTeachReinjectOnPage(s.pc, s.client, attempt)
+								try {
+									lastTeachPageHref[sessionIdx] = await s.client.evaluate<string>('location.href')
+								} catch {
+									/* ignore */
+								}
 								return
 							} catch (err) {
 								if (attempt === maxAttempts - 1) {
@@ -603,6 +792,12 @@ export function registerTeach(program: Command): void {
 									const fb = await readTeachFallbackFromPage(s.client)
 									if (fb) {
 										fb.recoveryReason = 'navigation_reinject_failed'
+										writeTeachRecoveryCheckpoint(
+											checkpointPath,
+											fb,
+											'cli_navigation_reinject_failed',
+											sessions.map((x) => x.targetId)
+										)
 										resolveOnce({ kind: 'session', payload: fb })
 									} else if (!settled) {
 										rs.delayedReinjectTimer = setTimeout(() => {
@@ -615,6 +810,12 @@ export function registerTeach(program: Command): void {
 													const fb2 = await readTeachFallbackFromPage(s.client)
 													if (fb2 && !settled) {
 														fb2.recoveryReason = 'navigation_reinject_delayed_failure'
+														writeTeachRecoveryCheckpoint(
+															checkpointPath,
+															fb2,
+															'cli_navigation_reinject_delayed_failure',
+															sessions.map((x) => x.targetId)
+														)
 														resolveOnce({ kind: 'session', payload: fb2 })
 													}
 												}
@@ -627,17 +828,102 @@ export function registerTeach(program: Command): void {
 					}, 150)
 				}
 
+				const scheduleReinjectAfterSpaNavIfNeeded = (sessionIdx: number): void => {
+					if (!teachStarted || settled) return
+					const rs = reinjectTimers[sessionIdx]!
+					if (rs.reinjectTimer !== undefined) {
+						clearTimeout(rs.reinjectTimer)
+						rs.reinjectTimer = undefined
+					}
+					if (rs.hostOrphanDebounceTimer !== undefined) {
+						clearTimeout(rs.hostOrphanDebounceTimer)
+						rs.hostOrphanDebounceTimer = undefined
+					}
+					if (rs.spaNavDebounceTimer !== undefined) {
+						clearTimeout(rs.spaNavDebounceTimer)
+						rs.spaNavDebounceTimer = undefined
+					}
+					rs.spaNavDebounceTimer = setTimeout(() => {
+						rs.spaNavDebounceTimer = undefined
+						void (async () => {
+							if (!teachStarted || settled) return
+							const s = sessions[sessionIdx]
+							let pageState: { href: string; hostConnected: boolean; bodyReady?: boolean }
+							try {
+								pageState = await s.client.evaluate<{
+									href: string
+									hostConnected: boolean
+									bodyReady?: boolean
+								}>(TEACH_SPA_PAGE_STATE_EXPR)
+							} catch {
+								return
+							}
+							if (!pageState.bodyReady) return
+							const hrefChanged = pageState.href !== lastTeachPageHref[sessionIdx]
+							const hostMissing = !pageState.hostConnected
+							if (!hrefChanged && !hostMissing) return
+							if (hrefChanged) lastTeachPageHref[sessionIdx] = pageState.href
+							scheduleReinjectAfterNavigation(sessionIdx, 'spa_href_or_host')
+						})()
+					}, TEACH_SPA_NAV_DEBOUNCE_MS)
+				}
+
+				const maybeScheduleReinjectIfTeachHostOrphaned = (sessionIdx: number): void => {
+					if (!teachStarted || settled) return
+					const rs = reinjectTimers[sessionIdx]!
+					if (rs.hostOrphanDebounceTimer !== undefined) return
+					if (rs.reinjectTimer !== undefined || rs.spaNavDebounceTimer !== undefined) return
+					rs.hostOrphanDebounceTimer = setTimeout(() => {
+						rs.hostOrphanDebounceTimer = undefined
+						void (async () => {
+							if (!teachStarted || settled) return
+							const s = sessions[sessionIdx]
+							const orphan = await s.client
+								.evaluate<boolean>(TEACH_HOST_ORPHAN_EXPR)
+								.catch(() => false)
+							if (!orphan) return
+							scheduleReinjectAfterNavigation(sessionIdx, 'host_orphan_poll')
+						})()
+					}, TEACH_HOST_ORPHAN_DEBOUNCE_MS)
+				}
+
 				const navigatedHandlers = sessions.map((s, sessionIdx) => {
 					const h = (params: unknown): void => {
+						const p = params as { frame?: { id?: string; parentId?: string } }
+						if (p.frame && !p.frame.parentId && p.frame.id) {
+							mainFrameIdBySession[sessionIdx] = p.frame.id
+						}
 						if (!isMainFrameNavigated(params)) return
-						scheduleReinjectAfterNavigation(sessionIdx)
+						scheduleReinjectAfterNavigation(sessionIdx, 'frame_navigated')
 					}
 					s.client.on('Page.frameNavigated', h)
 					return { client: s.client, h }
 				})
 
-				const teachFallbackScore = (p: SessionPayload): number =>
-					(p.steps?.length ?? 0) + (p.operationLog?.length ?? 0)
+				const navigatedWithinDocumentHandlers = sessions.map((s, sessionIdx) => {
+					const h = (params: unknown): void => {
+						const p = params as { frameId?: string }
+						const mainId = mainFrameIdBySession[sessionIdx]
+						if (mainId && p.frameId && p.frameId !== mainId) return
+						scheduleReinjectAfterSpaNavIfNeeded(sessionIdx)
+					}
+					s.client.on('Page.navigatedWithinDocument', h)
+					return { client: s.client, h }
+				})
+
+				const loadEventHandlers = sessions.map((s, sessionIdx) => {
+					const h = (): void => {
+						scheduleReinjectAfterNavigation(sessionIdx, 'load_event_fired')
+					}
+					s.client.on('Page.loadEventFired', h)
+					return { client: s.client, h }
+				})
+
+				dispatchTeachReinjectHint = (sessionIdx, reason) => {
+					scheduleReinjectAfterNavigation(sessionIdx, reason)
+				}
+
+				const teachFallbackScore = teachSessionStepScore
 
 				const readBestTeachFallback = async (): Promise<SessionPayload | null> => {
 					const candidates: SessionPayload[] = []
@@ -664,6 +950,14 @@ export function registerTeach(program: Command): void {
 							clearTimeout(rs.reinjectTimer)
 							rs.reinjectTimer = undefined
 						}
+						if (rs.spaNavDebounceTimer !== undefined) {
+							clearTimeout(rs.spaNavDebounceTimer)
+							rs.spaNavDebounceTimer = undefined
+						}
+						if (rs.hostOrphanDebounceTimer !== undefined) {
+							clearTimeout(rs.hostOrphanDebounceTimer)
+							rs.hostOrphanDebounceTimer = undefined
+						}
 					}
 					if (poller !== undefined) {
 						clearInterval(poller)
@@ -674,13 +968,26 @@ export function registerTeach(program: Command): void {
 					for (const { client, h } of navigatedHandlers) {
 						client.removeListener('Page.frameNavigated', h)
 					}
+					for (const { client, h } of navigatedWithinDocumentHandlers) {
+						client.removeListener('Page.navigatedWithinDocument', h)
+					}
+					for (const { client, h } of loadEventHandlers) {
+						client.removeListener('Page.loadEventFired', h)
+					}
 					for (const s of sessions) {
-						await s.client
-							.evaluate(
-								`(function(){ try { window.__pageAgentTeach?.dispose?.(); } catch(e) {} })()`
-							)
-							.catch(() => {})
-						await s.pc.hideMask().catch(() => {})
+						if (s.teachNewDocumentScriptId) {
+							await s.client
+								.send('Page.removeScriptToEvaluateOnNewDocument', {
+									identifier: s.teachNewDocumentScriptId,
+								})
+								.catch(() => {})
+							s.teachNewDocumentScriptId = undefined
+						}
+					}
+					await Promise.all(sessions.map((s) => s.client.evaluate(CLEAR_TEACH_CLI_ACTIVE_SESSION)))
+					await Promise.all(sessions.map((s) => evaluateDisposeTeachWithTimeout(s.client, 4500)))
+					await Promise.all(sessions.map((s) => hideMaskWithTimeout(s.pc, 3500)))
+					for (const s of sessions) {
 						await s.bridge.dispose().catch(() => {})
 					}
 					if (!useSingletonPc) {
@@ -696,6 +1003,7 @@ export function registerTeach(program: Command): void {
 					const peerCount = sessions.length
 
 					for (const s of sessions) {
+						await s.client.evaluate(DISPOSE_TEACH_PAGE_SCRIPT).catch(() => {})
 						await s.client.evaluate(pageControllerTeachSource)
 						const state = await s.pc.getBrowserState()
 						const init = {
@@ -713,6 +1021,14 @@ export function registerTeach(program: Command): void {
 						await s.client.evaluate(startExpr, { awaitPromise: true })
 					}
 					teachStarted = true
+
+					for (let i = 0; i < sessions.length; i++) {
+						try {
+							lastTeachPageHref[i] = await sessions[i]!.client.evaluate<string>('location.href')
+						} catch {
+							lastTeachPageHref[i] = ''
+						}
+					}
 
 					try {
 						await readyPromise

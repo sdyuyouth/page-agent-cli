@@ -2,7 +2,8 @@
 
 ## 1. 目录里有什么（自建 `platforms/<site>/`）
 
-`elements.md`、`recipes/*.md`、`critical.md`；运行期可维护 `exploration-log.md`、`health.md`。
+`elements.md`、`recipes/*.md`、`critical.md`；运行期可维护 `exploration-log.md`、`health.md`。  
+**`teach` 交互产物**：用户点 **「确认写入 Agent 经验」** 后 CLI **exit 0** 的 **`--json` stdout** 才是可入库的 teach 结果 JSON；可保存为 `lessons/*.json` 再据此更新 `elements`/`recipes`（**检查点文件**见 **`SKILL.md`**「经验沉淀」与 **`CLI_REFERENCE.md`「teach」**）。
 
 ## 2. `elements.md` 头与块
 

@@ -41,6 +41,8 @@ export type TeachBindingMessage =
 	| { type: 'checkpoint'; payload: TeachCheckpointPayload }
 	| { type: 'session_patch'; payload: TeachSessionPatchPayload }
 	| { type: 'ready' }
+	/** Page inject IIFE → CLI: teach overlay still missing after navigation (see inject.ts beacon). */
+	| { type: 'teach_cli_reinject_hint'; reason?: string }
 
 /**
  * CDP Runtime.addBinding bridge for the teach overlay (page → Node via __paTeachSend).
@@ -68,12 +70,19 @@ export class TeachBridge {
 		this.client.on('Runtime.bindingCalled', this.bindingHandler)
 	}
 
-	async sendToPage(msg: unknown): Promise<void> {
+	/**
+	 * Deliver a message to `window.__paTeachReceive` in the page.
+	 * Use `timeoutMs` so one hung tab cannot block multi-tab checkpoint ack / session_sync.
+	 */
+	async sendToPage(msg: unknown, options?: { timeoutMs?: number }): Promise<void> {
 		const json = JSON.stringify(msg)
 		const escaped = JSON.stringify(json)
-		await this.client.evaluate(
-			`(function(){ if (typeof window.__paTeachReceive==='function') window.__paTeachReceive(${escaped}); })()`
-		)
+		const expr = `(function(){ if (typeof window.__paTeachReceive==='function') window.__paTeachReceive(${escaped}); })()`
+		const ms = options?.timeoutMs ?? 12_000
+		await Promise.race([
+			this.client.evaluate(expr),
+			new Promise<void>((resolve) => setTimeout(resolve, ms)),
+		])
 	}
 
 	async dispose(): Promise<void> {

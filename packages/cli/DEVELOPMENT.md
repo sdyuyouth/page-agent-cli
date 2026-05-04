@@ -302,6 +302,13 @@ page-agent-cli --json run "<任务描述>"
 - **CLI 侧**：`--ready-timeout` 到期仍无 `ready` 时，若 `sessionStorage` 可读出已录步骤，**立即 stdout JSON 并 exit 0**（`recoveryReason: 'ready_timeout'`）；主会话 **`--timeout`** 到期同理（`session_storage` 有则 exit 0，否则仍 **124**）。导航后 **reinject** 连续失败亦会尝试同一条 **sessionStorage** 退回（`recoveryReason: 'navigation_reinject_failed'`）。`--json` 成功体可能含 **`warning`** 与 **`recoveryReason`**，Agent 应据此提示用户补录或复核。
 - **加固**：会话 **双写** `sessionStorage` + **`localStorage` 镜像**（`__pa_teach_session_v3_mirror`）；浮窗在 **`pagehide` / `beforeunload` / `visibilitychange(hidden)`** 再 `persist`；`restore()` 等 **`window.load`**（或超时）再轮询 `__pageAgentPC`；CLI 首轮 reinject 全失败后 **约 3s 再试一整轮**；退回 JSON 时也会读 **localStorage 镜像**。
 - **加固（实现）**：会话 JSON **双写** `sessionStorage` + **`localStorage` 镜像键** `__pa_teach_session_v3_mirror`；浮窗侧在 **`pagehide` / `beforeunload` / `visibilitychange(hidden)`** 再刷一次持久化，减轻「刚录一步就整页刷新丢数据」；`restore()` 先 **`waitForPageLoad`** 再拉长等待 **`__pageAgentPC`**；CLI 在首轮 reinject 全失败后 **约 3s 再试一整轮**，退回读取时也会读 **localStorage 镜像**。
+- **整页刷新（再加固）**：`teach` 会话期间为该 tab 额外注册 **`Page.addScriptToEvaluateOnNewDocument`（teach IIFE）**，与主 **`inject` IIFE** 并列；`start()` 写入 **`sessionStorage.__pa_teach_cli_active`**，新 document 内 teach 在 **有快照时自动 `queueMicrotask(restore)`**。CLI 侧除 **`Page.frameNavigated`** 外还监听 **`Page.loadEventFired`**，轮询 orphan 在 **「API 已丢但 flag 仍在」**（整页刷新间隙）也会调度 reinject；主 **`inject`** 在 **`setTimeout(0)`** 后若仍无 **`#__pa_teach_host`** 则向 **`__paTeachOutbound`** 推 **`teach_cli_reinject_hint`**。会话结束 **`Page.removeScriptToEvaluateOnNewDocument`** 并 **`sessionStorage.removeItem(__pa_teach_cli_active)`**。stderr 会打印 **`[teach] reinject scheduled … reason=…`** 便于对照 CDP 顺序。
+
+### 站内 SPA 导航（无整页刷新）
+
+重度 SPA（例如 Facebook 个人主页 ↔ 公共主页）常走 **History API**，Chrome CDP 更可能只发 **`Page.navigatedWithinDocument`**，而**不发**主框架 **`Page.frameNavigated`**。若 CLI 只依赖后者，不会再次 **reinject / `restore()`**；站点又可能在路由切换时重写 body，摘掉 **`#__pa_teach_host`**，表现为浮窗消失且无法自动回来。
+
+**实现**：`teach` 除 **`Page.frameNavigated`** 外，对每个 teach UI tab 监听 **`Page.navigatedWithinDocument`**（可按 CDP **`frameId`** 过滤到主框架），经 **debounce**（约 400ms）后在页面内读取 **`location.href`** 与 **`#__pa_teach_host` 是否仍 `isConnected`**：任一表明「应恢复」即调度与整页相同的 reinject（Facebook 等常在 **URL 不变** 时重写 body，仅靠 href 会漏）。另在 **`drainOutbound` 轮询** 上挂轻量 **orphan** 检测（`window.__pageAgentTeach.restore` 仍在但宿主不在文档中），debounce 后同样 reinject，覆盖 CDP 未上报或事件顺序靠后的情况。
 
 ### 多 Tab 教学（单 CLI 会话 · Hub 同步）
 

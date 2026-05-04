@@ -6,7 +6,7 @@ import { render } from 'preact'
 
 import type { BrowserState } from '../PageController'
 import { TeachApp, type TeachInitPayload, siteFromUrl } from './TeachUi'
-import { readSession } from './session'
+import { TEACH_CLI_ACTIVE_SESSION_KEY, readSession } from './session'
 import { clearTeachHostPipe, installTeachHostPipe, sendToHost } from './transport'
 
 installTeachHostPipe()
@@ -24,10 +24,19 @@ interface PageAgentPc {
 	hideMask(): Promise<void>
 }
 
+/**
+ * Remove any prior host. `attachShadow({ mode: 'closed' })` leaves `element.shadowRoot === null`
+ * for author scripts, so reusing a connected host makes `mountWithPayload` think there is no
+ * shadow and throws "Shadow root cannot be created on a host which already hosts a shadow tree."
+ */
+function removeTeachHostIfPresent(): void {
+	const el = document.getElementById(HOST_ID)
+	el?.remove()
+}
+
 function ensureHost(): HTMLDivElement {
-	let el = document.getElementById(HOST_ID) as HTMLDivElement | null
-	if (el?.isConnected) return el
-	el = document.createElement('div')
+	removeTeachHostIfPresent()
+	const el = document.createElement('div')
 	el.id = HOST_ID
 	el.setAttribute('data-page-agent-not-interactive', 'true')
 	document.body.appendChild(el)
@@ -53,35 +62,60 @@ function waitForPageLoad(): Promise<void> {
 	})
 }
 
+/**
+ * Heavy SPAs (e.g. Facebook) can keep `document.body` null for a long time after `addScriptToEvaluateOnNewDocument`;
+ * mounting before `body` exists throws and triggers reinject storms from the CLI.
+ */
+async function waitForDocumentBody(timeoutMs = 20_000): Promise<boolean> {
+	if (typeof document === 'undefined') return false
+	if (document.body) return true
+	const start = Date.now()
+	while (!document.body) {
+		if (Date.now() - start > timeoutMs) return false
+		await new Promise<void>((r) => setTimeout(r, 40))
+	}
+	return true
+}
+
 async function mountWithPayload(payload: TeachInitPayload) {
 	await window.__pageAgentPC?.hideMask?.().catch(() => {})
-	const host = ensureHost()
-	let root = host.shadowRoot
-	if (!root) {
-		root = host.attachShadow({ mode: 'closed' })
-	} else {
-		render(null, root)
-		root.innerHTML = ''
+	const bodyOk = await waitForDocumentBody()
+	if (!bodyOk) {
+		throw new Error(
+			'[page-agent-teach] document.body is not available yet; refuse mount to avoid appendChild(null). Retry when the page has a body.'
+		)
 	}
+	const host = ensureHost()
+	const root = host.attachShadow({ mode: 'closed' })
 	render(<TeachApp init={payload} getPc={() => getPcForApp()} />, root)
 }
 
 const api = {
 	async start(jsonStr: string) {
+		try {
+			sessionStorage.setItem(TEACH_CLI_ACTIVE_SESSION_KEY, '1')
+		} catch {
+			void 0
+		}
 		const payload = JSON.parse(jsonStr) as TeachInitPayload
 		await mountWithPayload(payload)
 	},
 	dispose() {
 		clearTeachHostPipe()
 		void window.__pageAgentPC?.hideMask?.().catch(() => {})
-		const host = document.getElementById(HOST_ID)
-		if (host?.shadowRoot) render(null, host.shadowRoot)
-		host?.remove()
+		removeTeachHostIfPresent()
 	},
 	async restore() {
 		const snap = readSession()
 		if (!snap) return
 		await waitForPageLoad()
+		if (!(await waitForDocumentBody())) {
+			const msg =
+				'[page-agent-teach] restore: document.body did not appear in time; overlay mount skipped (page still loading).'
+			console.warn(msg)
+			sendToHost({ type: 'log', level: 'warn', msg })
+			return
+		}
 		let state: BrowserState | undefined
 		const maxAttempts = 40
 		for (let i = 0; i < maxAttempts; i++) {
@@ -136,3 +170,16 @@ declare global {
 }
 
 window.__pageAgentTeach = api
+
+/** After full navigation, teach IIFE may run from addScriptToEvaluateOnNewDocument before Node reinject. */
+;(function scheduleTeachAutoRestoreFromNewDocument(): void {
+	try {
+		if (sessionStorage.getItem(TEACH_CLI_ACTIVE_SESSION_KEY) !== '1') return
+		if (!readSession()) return
+		queueMicrotask(() => {
+			void api.restore()
+		})
+	} catch {
+		void 0
+	}
+})()

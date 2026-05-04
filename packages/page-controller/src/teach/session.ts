@@ -5,6 +5,12 @@ export const STORAGE_KEY = '__pa_teach_session_v3'
 /** Same JSON as STORAGE_KEY; survives some edge cases where sessionTab loses sessionStorage timing. */
 export const STORAGE_MIRROR_KEY = '__pa_teach_session_v3_mirror'
 
+/**
+ * sessionStorage flag while a CLI `teach` session is active. Survives full reload so the teach
+ * bundle (addScriptToEvaluateOnNewDocument) can auto-restore; cleared by CLI on teardown.
+ */
+export const TEACH_CLI_ACTIVE_SESSION_KEY = '__pa_teach_cli_active'
+
 export type TeachAction = 'click' | 'hover' | 'input' | 'select' | 'upload' | 'state_refresh'
 
 export interface StateSnapshot {

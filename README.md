@@ -76,7 +76,8 @@
 - **`--teach-ui-targets`**：仅这些 Tab **挂载完整浮窗**；须为 `teach-targets` 子集；**未列入的 Tab 不注入 teach**。  
 - **`--teach-all-page-tabs`**：从 CDP 枚举 `page` 型 target，经 URL 黑名单过滤后加入 teach-targets（排除 `chrome://`、`edge://`、`devtools://`、`chrome-extension://` 等）。  
 - **Hub**：各 Tab 通过 **`session_patch`** 上报增量，CLI 合并为真相后向其它 UI Tab 下发 **`session_sync`**；**不依赖**同源的 `BroadcastChannel` / 共享 `sessionStorage`。  
-- **语义**：**步骤列表与操作日志跨 Tab 同步**；**元素索引与「刷新页面元素」始终只对应当前 Tab 的 DOM**。在**任一**已注入 Tab 内结束录制或确认提交即可结束进程。
+- **语义**：**步骤列表与操作日志跨 Tab 同步**；**元素索引与「刷新页面元素」始终只对应当前 Tab 的 DOM**。在**任一**已注入 Tab 内结束录制或确认提交即可结束进程。  
+- **已知限制**：在少数站点或网络时序下，**整页刷新后浮窗自动恢复** 与 **录制未结束时直接「确认写入」** 的增强路径可能**同时偶发失效**；可改为先点「结束录制」再确认写入，或重开 `teach`，并留意 stdout JSON 的 **`recoveryReason`** 与检查点文件。
 
 **teach 怎么用（从命令到落盘）**
 
@@ -95,8 +96,8 @@ page-agent-cli --json --target "$TID" teach \
 5. **浮窗内操作（三栏：会话 / 操作 / 步骤）**  
    - **会话**：看 URL、说明、站点与任务名；可 **刷新页面状态**；点 **开始录制** 进入「操作」。  
    - **操作**：先 **刷新页面元素**（与 CLI `state` 同源索引列表）；选 **索引** → 选动作类型（**点击 / 悬停 / 输入 / 下拉 / 上传步骤记录** 等）→ 需要时填内容或备注 → **执行并记录此步**。用户点的「刷新」会记为 **`state_refresh`**。  
-   - **步骤**：查看已录列表；满意后 **确认写入**（结束进程并输出 JSON）或 **取消**。  
-6. **取结果**：**`--json` 时成功 JSON 在 stdout**（`[teach]` 日志在 stderr），适合 **`> file.json`** 落盘。未确认前可用 **`--checkpoint-file <path>`**（或 **`PAGE_AGENT_TEACH_CHECKPOINT_FILE`**）在点「结束录制」时得到原子检查点。  
+   - **步骤**：查看已录列表；满意后 **确认写入**（结束进程并输出 JSON）或 **取消**；**仍在录制时也可直接确认写入**（浮窗会先自动结束录制并写检查点，与先点「结束录制」再等写入等价）。  
+6. **取结果**：**`--json` 时成功 JSON 在 stdout**（`[teach]` 日志在 stderr），适合 **`> file.json`** 落盘。未确认前可用 **`--checkpoint-file <path>`**（或 **`PAGE_AGENT_TEACH_CHECKPOINT_FILE`**）在点「结束录制」时得到原子检查点（直接确认写入时也会自动发同结构检查点）。  
 7. **常用可选参数**：**`--timeout`**（浮窗就绪后最长等待，默认 600s，超时无恢复则 **124**）、**`--ready-timeout`**（等待注入就绪，默认 180s）、多 Tab 见上文 **`--teach-ui-targets`** / **`--teach-all-page-tabs`**。完整选项与 JSON 字段见 **`page-agent-cli teach --help`** 与 **`skill/page-agent-browser/CLI_REFERENCE.md`**「`teach`」。  
 8. **多 Tab 一行示例**：
 
@@ -121,12 +122,21 @@ page-agent-cli --json teach \
 
 ### 2. 安装 CLI
 
-**发行包（推荐）：** 在 [Releases](https://github.com/sdyuyouth/page-agent-cli/releases) 下载对应版本的 **`page-agent-cli-*.tgz`**，然后：
+**发行包（推荐）：** 在 [Releases · sdyuyouth/page-agent-cli](https://github.com/sdyuyouth/page-agent-cli/releases) 下载当前线 **`page-agent-cli-1.8.2.tgz`**（或该页列出的最新附件），然后：
 
 ```bash
 npm install -g ./page-agent-cli-1.8.2.tgz
 page-agent-cli --version
 ```
+
+**使用 GitHub CLI 下载并安装（需已 `gh auth login`）：**
+
+```bash
+gh release download page-agent-cli-1.8.2 -R sdyuyouth/page-agent-cli -p "page-agent-cli-1.8.2.tgz"
+npm install -g ./page-agent-cli-1.8.2.tgz
+```
+
+> 若 Release 标签名变更，将上面命令中的 `page-agent-cli-1.8.2` 换成发布页上的 **Tag**；`-p` 与附件文件名一致即可。
 
 **从源码构建本 monorepo：**
 
@@ -146,9 +156,26 @@ page-agent-cli --json --target <TAB_ID> state
 page-agent-cli --json --target <TAB_ID> click <index>
 ```
 
-### 4. 给 AI / 宿主的技能包
+### 4. 给 AI / 宿主的技能包（同步到 Agent 的 Skill 路径）
 
-目录 **`skill/page-agent-browser/`** 为精简 Markdown（原语表、`teach`/`upload` 要点、探索协议等），便于拷贝到 OpenClaw 等 workspace。
+目录 **`skill/page-agent-browser/`** 为精简 Markdown（原语表、`teach`/`upload` 要点、探索协议等）。除随仓库阅读外，可将**该目录整体**复制到 Agent 所配置的 **Skills 根目录**下的同名文件夹（路径因 Cursor / OpenClaw 等产品而异，请在对应「Skills / Project skills」设置中查看）。
+
+**PowerShell 示例（把 `$src` 换成本仓库克隆路径，把 `$dest` 换成你的 Agent skill 目录）：**
+
+```powershell
+$src = "D:\code\page-agent\skill\page-agent-browser"
+$dest = "$env:USERPROFILE\.cursor\skills\page-agent-browser"
+New-Item -ItemType Directory -Force $dest | Out-Null
+Copy-Item -Path "$src\*" -Destination $dest -Recurse -Force
+```
+
+**bash 示例：**
+
+```bash
+rsync -a --delete ./skill/page-agent-browser/ ~/.cursor/skills/page-agent-browser/
+```
+
+安装 CLI + 同步 skill 后，Agent 按该目录内 **`SKILL.md`** 入口与 **`CLI_REFERENCE.md`** 调用 `page-agent-cli` 即可。
 
 ---
 

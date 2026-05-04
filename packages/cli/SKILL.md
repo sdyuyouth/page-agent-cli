@@ -201,6 +201,7 @@ page-agent-cli repl
 Inject the **interactive teach overlay** into one or more Chrome tabs so a human can
 record ordered steps (clicks, inputs, state refreshes, notes) for agent experience data.
 The CLI **blocks** until the user submits, aborts, times out, or a recovery path emits JSON.
+Heavy in-site SPAs (e.g. Facebook profile ↔ page switches) may only fire CDP **`Page.navigatedWithinDocument`**, not a main-frame **`Page.frameNavigated`**; the CLI debounces that path, compares **`location.href`**, and reinjects so **`restore()`** can re-mount the overlay if the site rewrote the DOM.
 
 **Single tab (default, backward compatible)** — no extra teach flags; uses `--target` or the first page tab:
 

@@ -84,9 +84,15 @@ page-agent --json teach --teach-ui-targets ID_A,ID_B --reason "multi-tab"
 | `--checkpoint-file` / `PAGE_AGENT_TEACH_CHECKPOINT_FILE` | 原子检查点（默认 `./.page-agent-teach-checkpoint.json`） |
 | `--teach-targets` / `--teach-ui-targets` / `--teach-all-page-tabs` | 多 Tab：参与集 / 注入浮窗子集 / 枚举 page 型 target |
 
-**成功 `--json`**：顶层 `success` + `steps` + `operationLog`（**无** `data`）；`steps[].action` ∈ `click`|`hover`|`input`|`select`|`upload`|`state_refresh`；多 Tab 步可有 `targetId`；多浮窗时可有 `teachUiTargetIds`。stderr 为 `[teach]` 日志，**重定向 stdout 得纯 JSON**。取消：`success:false`，退出 **1**。
+**成功 `--json`**：仅在用户于浮窗 **「步骤」** 中点击 **「确认写入 Agent 经验」** 且进程 **exit 0** 时，**stdout** 才输出**整段** teach 成功 JSON：顶层 `success` + `steps` + `operationLog`（**无** `data`）；`steps[].action` ∈ `click`|`hover`|`input`|`select`|`upload`|`state_refresh`；多 Tab 步可有 `targetId`；多浮窗时可有 `teachUiTargetIds`。
 
-多 Tab 细节与 Hub 行为以 **`page-agent teach --help`** 与仓库 `packages/cli/DEVELOPMENT.md` 为准。
+**「结束录制」≠  stdout 结果**：该操作触发 CLI 写 **`--checkpoint-file`**（原子检查点草稿），stderr 可出现 **`[teach] checkpoint written`**；**不要把检查点文件误当成已提交的 teach stdout JSON**。断点续录、崩溃恢复时再读检查点。
+
+**Agent 落盘**：对一次完整 `teach`，在命令末尾 **`> path/to/lesson.json`**，并 **`2> teach.log`**，保证 JSON 文件**只含 stdout**；进程退出后再解析 JSON 并合并进自建 **`platforms/<site>/`** 经验树（见 **`EXPERIENCE_SCHEMA.md`**）。宿主若对子进程 **SIGKILL** 超时，会导致**拿不到 stdout**——须为 `teach` 单独放宽或禁用该超时。
+
+取消：`success:false`，退出 **1**。stderr 为 `[teach]` 日志。
+
+多 Tab 细节与 Hub 行为以 **`page-agent teach --help`** 与仓库 `packages/cli/DEVELOPMENT.md` 为准。重度 SPA 站内路由可能只触发 CDP **`Page.navigatedWithinDocument`**（不发主框架 **`Page.frameNavigated`**）；CLI 对该事件做 debounce 与 **`location.href`** 变化检测后再 reinject，以便浮窗在 DOM 被站点重写后仍能 **`restore()`**。
 
 ---
 
